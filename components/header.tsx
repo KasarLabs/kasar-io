@@ -10,22 +10,27 @@ import { usePathname } from "next/navigation";
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
-  
+
   return (
-    <header className="w-full z-50 sticky top-0"> {/* Changed from fixed to sticky */}
+    <header className="w-full z-50 sticky top-0">
+      {" "}
+      {/* Changed from fixed to sticky */}
       <nav className="h-20 px-4 backdrop-blur-sm md:px-6">
         <div className="flex items-center justify-between h-full">
           {/* Logo */}
           <div className="flex items-center">
-          <Link href="/" className="relative w-15 h-15 rounded-full overflow-hidden">
-            <Image
-              src="/images/kasarLogo.webp"
-              alt="Logo"
-              width={60}
-              height={60}
-              className="object-cover"
-            />
-          </Link>
+            <Link
+              href="/"
+              className="relative w-15 h-15 rounded-full overflow-hidden"
+            >
+              <Image
+                src="/images/kasarLogo.webp"
+                alt="Logo"
+                width={60}
+                height={60}
+                className="object-cover"
+              />
+            </Link>
           </div>
 
           {/* Desktop Navigation */}

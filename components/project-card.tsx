@@ -1,12 +1,12 @@
-import AsciiArt from "./ascii-art"
+import AsciiArt from "./ascii-art";
 
 interface ProjectCardProps {
   project: {
-    id: number
-    title: string
-    description: string
-    asciiArt: string
-  }
+    id: number;
+    title: string;
+    description: string;
+    asciiArt: string;
+  };
 }
 
 export default function ProjectCard({ project }: ProjectCardProps) {
@@ -18,6 +18,5 @@ export default function ProjectCard({ project }: ProjectCardProps) {
       <h3 className="text-xl font-semibold mb-2">{project.title}</h3>
       <p className="text-neutral-300 text-sm">{project.description}</p>
     </div>
-  )
+  );
 }
-

@@ -1,24 +1,24 @@
-"use client"
+"use client";
 
-import { useRef, useEffect } from "react"
+import { useRef, useEffect } from "react";
 
 interface VideoAsciiArtProps {
-  videoSrc: string
+  videoSrc: string;
 }
 
 export default function VideoAsciiArt({ videoSrc }: VideoAsciiArtProps) {
-  const videoRef = useRef<HTMLVideoElement>(null)
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
     // Reset video when source changes
     if (videoRef.current) {
-      videoRef.current.load()
+      videoRef.current.load();
       videoRef.current.play().catch((e) => {
-        console.log("Auto-play prevented:", e)
+        console.log("Auto-play prevented:", e);
         // Add a play button or other UI if needed
-      })
+      });
     }
-  }, [videoSrc])
+  }, [videoSrc]);
 
   return (
     <div className="w-full h-full flex items-center justify-center">
@@ -27,7 +27,14 @@ export default function VideoAsciiArt({ videoSrc }: VideoAsciiArtProps) {
         The actual MP4 files will need to be added to the public folder.
       */}
       <div className="relative w-full h-full">
-        <video ref={videoRef} className="w-full h-full object-contain" autoPlay muted loop playsInline>
+        <video
+          ref={videoRef}
+          className="w-full h-full object-contain"
+          autoPlay
+          muted
+          loop
+          playsInline
+        >
           <source src={videoSrc} type="video/mp4" />
           Your browser does not support the video tag.
         </video>
@@ -40,6 +47,5 @@ export default function VideoAsciiArt({ videoSrc }: VideoAsciiArtProps) {
         </div>
       </div>
     </div>
-  )
+  );
 }
-

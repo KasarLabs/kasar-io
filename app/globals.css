@@ -74,7 +74,9 @@ footer {
 .slide-exit {
   opacity: 0;
   transform: translateX(-30px);
-  transition: opacity 600ms ease-out, transform 600ms ease-out;
+  transition:
+    opacity 600ms ease-out,
+    transform 600ms ease-out;
 }
 
 .slide-enter {
@@ -96,11 +98,15 @@ footer {
 
 /* Direction-based animations */
 .slide-direction-left .slide-element {
-  transition: opacity 600ms ease-out, transform 600ms ease-out;
+  transition:
+    opacity 600ms ease-out,
+    transform 600ms ease-out;
 }
 
 .slide-direction-right .slide-element {
-  transition: opacity 600ms ease-out, transform 600ms ease-out;
+  transition:
+    opacity 600ms ease-out,
+    transform 600ms ease-out;
 }
 
 /* Detached element animations */
@@ -153,7 +159,7 @@ footer {
 }
 
 /* Override any max-width constraints in ProjectSlider */
-.slide-direction-left, 
+.slide-direction-left,
 .slide-direction-right {
   width: 100%;
   max-width: 100%;
@@ -196,4 +202,3 @@ footer {
   right: auto !important;
   z-index: auto !important;
 }
-

@@ -15,7 +15,8 @@ const slides = [
   {
     id: 1,
     title: "Sn Stack exploration",
-    description: "L'exploration de solutions client and blockchain for the Starknet Stack.",
+    description:
+      "L'exploration de solutions client and blockchain for the Starknet Stack.",
     videoSrc: "/placeholder-stack.mp4",
   },
   {
@@ -43,7 +44,10 @@ export default function ProjectSlider() {
       if (isTransitioning) return;
       setIsTransitioning(true);
 
-      if (index > currentSlide || (currentSlide === slides.length - 1 && index === 0)) {
+      if (
+        index > currentSlide ||
+        (currentSlide === slides.length - 1 && index === 0)
+      ) {
         setDirection("left");
       } else {
         setDirection("right");
@@ -68,7 +72,7 @@ export default function ProjectSlider() {
         }
       }, 600);
     },
-    [currentSlide, isTransitioning]
+    [currentSlide, isTransitioning],
   );
 
   const nextSlide = useCallback(() => {
@@ -87,7 +91,7 @@ export default function ProjectSlider() {
     <div className="w-full min-h-[calc(100vh-5rem)] flex flex-col justify-center overflow-hidden relative">
       {/* Unified ASCII Animation - visible on slides 0, 1, and 3 */}
       {(currentSlide === 0 || currentSlide === 1 || currentSlide === 2) && (
-        <div 
+        <div
           className="absolute inset-0 w-screen h-screen"
           style={{ top: "-5rem" }}
         >
@@ -98,7 +102,9 @@ export default function ProjectSlider() {
       <div
         ref={slideContainerRef}
         className={`w-full flex items-center justify-center transition-all duration-800 relative z-10 ${
-          direction === "left" ? "slide-direction-left" : "slide-direction-right"
+          direction === "left"
+            ? "slide-direction-left"
+            : "slide-direction-right"
         }`}
       >
         <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-8 items-center px-6 md:px-20">
@@ -110,9 +116,9 @@ export default function ProjectSlider() {
               {slides[currentSlide].description}
             </p>
           </div>
-          
+
           {/* Empty right column for slide 0, 1, and 3 to maintain layout */}
-          {(currentSlide === 0 || currentSlide === 1 || currentSlide === 2) ? (
+          {currentSlide === 0 || currentSlide === 1 || currentSlide === 2 ? (
             <div className="md:block hidden">
               {/* Intentionally empty to maintain grid layout */}
             </div>

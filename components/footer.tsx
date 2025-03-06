@@ -6,7 +6,9 @@ import { BsTelegram, BsTwitter, BsGithub } from "react-icons/bs";
 
 const Footer = () => {
   return (
-    <footer className="w-full bg-neutral-900 border-t border-neutral-800 mt-auto"> {/* Changed from fixed to relative, added mt-auto */}
+    <footer className="w-full bg-neutral-900 border-t border-neutral-800 mt-auto">
+      {" "}
+      {/* Changed from fixed to relative, added mt-auto */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
           {/* Column 1 - KasarLabs Logo and Terms */}

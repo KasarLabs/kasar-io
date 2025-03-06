@@ -1,10 +1,11 @@
-import ProjectCard from "@/components/project-card"
+import ProjectCard from "@/components/project-card";
 
 const projects = [
   {
     id: 1,
     title: "Sn Stack exploration",
-    description: "L'exploration de solutions client et blockchain pour la Starknet Stack.",
+    description:
+      "L'exploration de solutions client et blockchain pour la Starknet Stack.",
     asciiArt: "stack",
   },
   {
@@ -19,7 +20,7 @@ const projects = [
     description: "Le Starknet agent kit framework pour build des agents.",
     asciiArt: "snak",
   },
-]
+];
 
 export default function Projects() {
   return (
@@ -33,5 +34,5 @@ export default function Projects() {
         </div>
       </div>
     </div>
-  )
+  );
 }
