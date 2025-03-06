@@ -13,8 +13,9 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
 
     let ww: number, wh: number, camera: Vector;
     const CHARS: Char[] = [];
-    const MAX_CHARS = 250;
-    const SEPARATION = 1.2;
+    // For slide 0, replicate the standalone effect (300 chars, wider spread)
+    const MAX_CHARS = currentSlide === 0 ? 300 : 250;
+    const SEPARATION = currentSlide === 0 ? 1.5 : 1.2;
     let time = 0;
     let transitionProgress = 0;
     let transition3Progress = 0;
@@ -273,7 +274,7 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
         this.rowIndex = 0;
         this.colIndex = 0;
 
-        // Enhanced rotation parameters for slide 0
+        // Enhanced rotation parameters for slide 0 (will be overridden if slide 0)
         this.rotationSpeed = Math.random() * 0.01 + 0.005;
         this.rotationSpeedX = Math.random() * 0.01 + 0.004;
         this.rotationSpeedY = Math.random() * 0.01 + 0.005;
@@ -350,23 +351,24 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
       }
 
       rotate(dir: "x" | "y" | "z", ang: number): void {
-        // Only rotate in 3D mode or during early transition phases
-        if (transitionProgress < 0.7 && transition3Progress < 0.7) {
-          this.pos.rotate(dir, ang);
-        }
+        this.pos.rotate(dir, ang);
       }
 
-      // New method for self-rotating in 3D for slide 0
+      // Updated selfRotate to replicate slide 0 effect exactly
       selfRotate(): void {
         if (
           currentSlide === 0 &&
           transitionProgress < 0.1 &&
           transition3Progress < 0.1
         ) {
-          // Apply individual rotation on each axis
+          // Use fixed rotation as in the standalone effect
+          const DX = 0.006 * Math.sin(time * 0.001);
+          const DY = 0.006 * Math.cos(time * 0.001);
+          this.rotate("x", DX);
+          this.rotate("y", DY);
+        } else if (currentSlide !== 0) {
+          // Original selfRotate for non-slide0 (or during transitions)
           const timeScale = time * 0.002;
-
-          // Apply per-character rotation on all three axes
           this.rotate(
             "x",
             this.rotationSpeedX *
@@ -395,7 +397,6 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
               this.pos.originalZ,
             );
 
-            // Create orbit motion based on the orbit axis
             if (this.orbitAxis === "x") {
               this.pos.y = originalPos.y + Math.sin(orbitT) * this.orbitRadius;
               this.pos.z = originalPos.z + Math.cos(orbitT) * this.orbitRadius;
@@ -411,8 +412,11 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
       }
 
       update(progress: number, progress3: number): void {
-        // Apply self-rotation for slide 0
-        this.selfRotate();
+        // For slide 0, rely on selfRotate (using fixed rotation)
+        if (currentSlide === 0) {
+          this.selfRotate();
+        }
+        // For other slides, the selfRotate (if any) is applied in the above branch
 
         // Update spiral position for slide 3
         this.assignSpiralPosition();
@@ -435,10 +439,7 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
               this.colorType = ColorType.TRANSITION;
             }
           }
-        }
-        // Slide 1-2 transition
-        else if (progress > 0 && progress < 1) {
-          // During transition, gradually change to numbers or crazy chars
+        } else if (progress > 0 && progress < 1) {
           if (Math.random() < 0.02) {
             const rnd = Math.random();
             if (rnd < 0.6) {
@@ -455,10 +456,7 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
               this.colorType = this.getColorType(this.letter);
             }
           }
-        }
-        // Complete transition to 2D mode
-        else if (progress >= 1) {
-          // In full 2D mode, use mostly numbers with occasional changes
+        } else if (progress >= 1) {
           if (Math.random() < 0.05) {
             if (Math.random() < 0.8) {
               this.letter =
@@ -470,10 +468,7 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
               this.colorType = ColorType.TRANSITION;
             }
           }
-        }
-        // Reset to original 3D mode
-        else {
-          // In 3D mode, occasionally change characters
+        } else {
           if (Math.random() < 0.002) {
             const rnd = Math.random();
             if (rnd < 0.3) {
@@ -486,7 +481,6 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
               this.colorType = this.getColorType(this.letter);
             }
           }
-          // But preserve center special characters
           if (this.isCenter) {
             this.letter = this.originalLetter;
             this.colorType = ColorType.CENTER;
@@ -499,18 +493,15 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
         const XP = PIXEL[0];
         const YP = PIXEL[1];
 
-        // Size calculation - different between 3D and 2D modes
         let MAX_SIZE = 60;
         let SIZE = ((1 / PIXEL[2]) * MAX_SIZE) | 0;
 
-        // In 2D mode, use a more uniform size
         if (transitionProgress > 0.8 && transition3Progress < 0.2) {
-          const blendFactor = (transitionProgress - 0.8) * 5; // 0 to 1 during last 20% of transition
+          const blendFactor = (transitionProgress - 0.8) * 5;
           const uniformSize = Math.min(ww / GRID_COLS, wh / GRID_ROWS) * 0.4;
           SIZE = SIZE * (1 - blendFactor) + uniformSize * blendFactor;
         }
 
-        // In spiral mode (slide 3), adjust size with distance
         if (transition3Progress > 0.5) {
           const distFactor = Math.sqrt(
             Math.pow(this.pos.x, 2) +
@@ -522,28 +513,22 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
 
         let BRIGHTNESS = SIZE / MAX_SIZE;
 
-        // Apply pulsing effect to bright characters
         if (this.colorType === ColorType.BRIGHT || this.isCenter) {
           BRIGHTNESS *= 0.8 + 0.2 * Math.sin(time * 0.05 + this.pulseOffset);
         }
 
-        // Enhanced brightness effect for slide 0 self-rotating characters
         if (
           currentSlide === 0 &&
           transitionProgress === 0 &&
           transition3Progress === 0
         ) {
-          // Add depth-based brightness enhancement
           const depthFactor = 1 + (this.pos.z / SEPARATION) * 0.3;
           BRIGHTNESS *= depthFactor;
-
-          // Add slight color variation based on rotation
           if (this.pos.z > 0) {
-            BRIGHTNESS *= 1.2; // Make characters coming toward viewer brighter
+            BRIGHTNESS *= 1.2;
           }
         }
 
-        // In 2D grid mode, add wave effect
         if (transitionProgress > 0.8 && transition3Progress < 0.2) {
           const distFromCenter = Math.sqrt(
             Math.pow(this.colIndex - GRID_COLS / 2, 2) +
@@ -553,34 +538,38 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
           BRIGHTNESS *= 0.7 + 0.3 * (0.5 + waveEffect * 0.5);
         }
 
-        // In spiral mode (slide 3), add pulse based on position
         if (transition3Progress > 0.2) {
           const spiralPulse = Math.sin(time * 0.03 + this.spiralAngle * 3);
           BRIGHTNESS *= 0.7 + 0.3 * (0.5 + spiralPulse * 0.5);
         }
 
-        // Prevent brightness from going below a minimum threshold
         BRIGHTNESS = Math.max(BRIGHTNESS, 0.1);
 
-        // Get the color based on character type
         let colorStr = COLOR_MAP[this.colorType];
-        // Replace '$opacity' with the actual brightness value
         colorStr = colorStr.replace("$opacity", BRIGHTNESS.toFixed(2));
 
-        if (ctx) {
-          ctx.beginPath();
-          ctx.fillStyle = colorStr;
-          ctx.font = SIZE + "px monospace";
-          ctx.fillText(this.letter, XP, YP);
-          ctx.fill();
-          ctx.closePath();
-        }
+        ctx.beginPath();
+        ctx.fillStyle = colorStr;
+        ctx.font = SIZE + "px monospace";
+        ctx.fillText(this.letter, XP, YP);
+        ctx.fill();
+        ctx.closePath();
       }
     }
 
+    // Updated getCenter so that slide 0 uses the canvas center (as in the standalone effect)
     function getCenter(): [number, number] {
-      // Center the animation on the screen
-      return [ww / 2, wh / 2];
+      if (currentSlide === 0) {
+        return [ww / 2, wh / 2];
+      } else if (transitionProgress >= 0.5 || currentSlide > 0) {
+        return [ww / 2, wh / 2];
+      } else {
+        const rightPos = ww * 0.7;
+        const centerPos = ww / 2;
+        const interpolatedX =
+          rightPos * (1 - transitionProgress) + centerPos * transitionProgress;
+        return [interpolatedX, wh / 2];
+      }
     }
 
     function signedRandom(): number {
@@ -602,10 +591,11 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
 
     function update(): void {
       ctx.clearRect(0, 0, ww, wh);
-      ctx.fillStyle = "rgba(0, 0, 0, 0.98)";
+      // For a solid black background
+      ctx.fillStyle = currentSlide === 0 ? "black" : "rgba(0, 0, 0, 0.98)";
       ctx.fillRect(0, 0, ww, wh);
 
-      // Add title text
+      // Title text remains unchanged
       ctx.font = "24px sans-serif";
       ctx.fillStyle = "rgba(255, 255, 255, 1)";
       ctx.textAlign = "center";
@@ -614,11 +604,9 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
       // Handle transition based on slide
       if (currentSlide === 1 && transitionProgress < 1) {
         transitionProgress = Math.min(transitionProgress + TRANSITION_SPEED, 1);
-        // Make sure spiral transition is reset
         transition3Progress = 0;
       } else if (currentSlide === 0 && transitionProgress > 0) {
         transitionProgress = Math.max(transitionProgress - TRANSITION_SPEED, 0);
-        // Make sure spiral transition is reset
         transition3Progress = 0;
       } else if (currentSlide === 2 && transition3Progress < 1) {
         transition3Progress = Math.min(
@@ -632,39 +620,35 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
         );
       }
 
-      // Check if slide changed
       if (lastSlide !== currentSlide) {
         if (currentSlide === 1) {
-          // Assign grid positions when transitioning to slide 1
           assignGridPositions();
         }
         lastSlide = currentSlide;
       }
 
-      // Global rotation factors for the entire scene
+      // For non-slide0, apply global rotation
       const globalRotationX = Math.sin(time * 0.0003) * 0.002;
       const globalRotationY = Math.cos(time * 0.0002) * 0.003;
       const globalRotationZ = Math.sin(time * 0.0001) * 0.001;
 
-      // Update character positions based on transition progress
       for (let i = 0; i < CHARS.length; i++) {
-        // Update character positions for transition
         CHARS[i].pos.updateForTransition(
           transitionProgress,
           transition3Progress,
         );
 
-        // Characters self-rotate in slide 0 (handled in the Char class)
-
-        // Apply group rotation for all slides
-        if (transitionProgress < 0.7 && transition3Progress < 0.7) {
-          // Apply global rotation to create overall movement
+        // For slide 0, we now rely on selfRotate (with fixed rotation) so we skip global rotation
+        if (
+          currentSlide !== 0 &&
+          transitionProgress < 0.7 &&
+          transition3Progress < 0.7
+        ) {
           CHARS[i].rotate("x", globalRotationX);
           CHARS[i].rotate("y", globalRotationY);
           CHARS[i].rotate("z", globalRotationZ);
         }
 
-        // Update character appearance
         CHARS[i].update(transitionProgress, transition3Progress);
       }
 
@@ -672,7 +656,6 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
     }
 
     function assignGridPositions(): void {
-      // Assign each character a position in the 2D grid
       for (let i = 0; i < CHARS.length; i++) {
         const rowIndex = i % GRID_ROWS;
         const colIndex = Math.floor(i / GRID_ROWS) % GRID_COLS;
@@ -701,7 +684,6 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
 
       // Create regular characters
       for (let i = 0; i < MAX_CHARS - 20; i++) {
-        // Choose character from main set
         const CHARACTER =
           MAIN_CHARS[Math.floor(Math.random() * MAIN_CHARS.length)];
         const X = signedRandom() * SEPARATION;
@@ -712,7 +694,6 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
         CHARS.push(CHAR);
       }
 
-      // Pre-assign grid positions for all characters
       assignGridPositions();
     }
 
