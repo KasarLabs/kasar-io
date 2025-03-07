@@ -11,530 +11,255 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    let ww: number, wh: number, camera: Vector;
-    const CHARS: Char[] = [];
-    // Parameters for slide 0
+    // Configuration
     const MAX_CHARS = 200;
     const SEPARATION = 1;
+    
+    // Canvas dimensions
+    let width: number;
+    let height: number;
+    
+    // Animation state
+    let animationFrame: number;
     let time = 0;
     let transitionProgress = 0;
     const TRANSITION_SPEED = 0.05;
     let lastSlide = currentSlide;
-
-    // 2D grid parameters
+    
+    // Grid parameters for slide 1
     const GRID_ROWS = 25;
     const GRID_COLS = 50;
 
-    // Character sets
-    const NODE_CHARS = ["ﾊ", "ﾐ", "ﾋ", "ｹ", "ﾒ", "ｳ", "ｼ", "ﾅ"];
-    const CONNECTION_CHARS = ["│", "─", "┌", "┐", "└", "┘", "┼", "╬"];
-    const BRIGHT_CHARS = ["ﾘ", "ｱ", "ｶ", "ｻ", "ﾀ"];
-    const NUMBER_CHARS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
-    const MAIN_CHARS = [...NODE_CHARS, ...CONNECTION_CHARS];
-    const CRAZY_CHARS = [
-      "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "_", "+",
-      "=", "{", "}", "[", "]", "|", "\\", ":", ";", "\"", "'", "<",
-      ">", "?", "/", "~", "`", "±", "§", "Δ", "Σ", "Ω", "£", "¢",
-      "¥", "Γ", "Λ", "Θ", "Ξ", "Π", "Φ", "Ψ"
-    ];
-
-    // Color types
-    enum ColorType {
-      CENTER = "center",
-      NODE = "node",
-      BRIGHT = "bright",
-      CONNECTION = "connection",
-      TRANSITION = "transition",
-      NUMBER = "number",
-    }
-
-    // Color mapping
-    const COLOR_MAP: Record<ColorType, string> = {
-      [ColorType.CENTER]: "rgba(136, 239, 255, $opacity)", // cyan-300
-      [ColorType.NODE]: "rgba(192, 132, 252, $opacity)", // purple-400
-      [ColorType.BRIGHT]: "rgba(216, 180, 254, $opacity)", // purple-300
-      [ColorType.CONNECTION]: "rgba(165, 180, 252, $opacity)", // indigo-300
-      [ColorType.TRANSITION]: "rgba(134, 239, 172, $opacity)", // green-300
-      [ColorType.NUMBER]: "rgba(253, 224, 71, $opacity)", // yellow-300
-    };
-
-    class Vector {
-      x: number;
-      y: number;
-      z: number;
+    // Store all characters
+    let characters: {
+      char: string;
       originalX: number;
       originalY: number;
       originalZ: number;
+      x: number;
+      y: number;
+      z: number;
       targetX: number;
       targetY: number;
       targetZ: number;
+      gridRow: number;
+      gridCol: number;
+    }[] = [];
 
-      constructor(x: number, y: number, z: number) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        this.originalX = x;
-        this.originalY = y;
-        this.originalZ = z;
-        this.targetX = 0;
-        this.targetY = 0;
-        this.targetZ = 0;
-      }
+    // Camera position
+    const camera = {
+      x: 0,
+      y: 0,
+      z: SEPARATION + 1
+    };
 
-      reset(): void {
-        this.x = this.originalX;
-        this.y = this.originalY;
-        this.z = this.originalZ;
+    // Create initial characters
+    function initCharacters() {
+      characters = [];
+      
+      for (let i = 0; i < MAX_CHARS; i++) {
+        const char = String.fromCharCode(Math.floor(Math.random() * 93) + 33);
+        
+        // Create position with signed random values for even distribution
+        const x = (Math.random() - 0.5) * 2 * SEPARATION;
+        const y = (Math.random() - 0.5) * 2 * SEPARATION;
+        const z = (Math.random() - 0.5) * 2 * SEPARATION;
+        
+        characters.push({
+          char,
+          originalX: x,
+          originalY: y,
+          originalZ: z,
+          x,
+          y,
+          z,
+          targetX: 0,
+          targetY: 0,
+          targetZ: 0,
+          gridRow: 0,
+          gridCol: 0
+        });
       }
-
-      setTarget(x: number, y: number, z: number): void {
-        this.targetX = x;
-        this.targetY = y;
-        this.targetZ = z;
-      }
-
-      updateForTransition(progress: number): void {
-        if (progress > 0) {
-          // Slide 0-1 transition
-          this.x = this.originalX * (1 - progress) + this.targetX * progress;
-          this.y = this.originalY * (1 - progress) + this.targetY * progress;
-          this.z = this.originalZ * (1 - progress) + this.targetZ * progress;
-        } else {
-          // Reset to original 3D position
-          this.reset();
-        }
-      }
-
-      rotate(dir: "x" | "y" | "z", ang: number): void {
-        const X = this.x;
-        const Y = this.y;
-        const Z = this.z;
-        const SIN = Math.sin(ang);
-        const COS = Math.cos(ang);
-        if (dir === "x") {
-          this.y = Y * COS - Z * SIN;
-          this.z = Y * SIN + Z * COS;
-        } else if (dir === "y") {
-          this.x = X * COS - Z * SIN;
-          this.z = X * SIN + Z * COS;
-        } else if (dir === "z") {
-          this.x = X * COS - Y * SIN;
-          this.y = X * SIN + Y * COS;
-        }
-      }
-
-      project(): [number, number, number] {
-        const ZP = this.z + camera.z;
-        const DIV = ZP / wh;
-        const XP = (this.x + camera.x) / DIV;
-        const YP = (this.y + camera.y) / DIV;
-        const CENTER = getCenter();
-        return [XP + CENTER[0], YP + CENTER[1], ZP];
-      }
+      
+      // Assign grid positions for slide 1
+      assignGridPositions();
     }
 
-    class Char {
-      letter: string;
-      pos: Vector;
-      colorType: ColorType;
-      isCenter: boolean;
-      pulseOffset: number;
-      rowIndex: number;
-      colIndex: number;
-      originalLetter: string;
-      useSlide0Style: boolean;
-
-      constructor(letter: string, pos: Vector, useSlide0Style = false) {
-        this.letter = letter;
-        this.originalLetter = letter;
-        this.pos = pos;
-        this.useSlide0Style = useSlide0Style;
-        this.colorType = this.getColorType(letter);
-        this.isCenter =
-          Math.abs(pos.x) < 0.2 &&
-          Math.abs(pos.y) < 0.2 &&
-          Math.abs(pos.z) < 0.2;
-        this.pulseOffset = Math.random() * 2 * Math.PI;
-
-        // Assign row and column indices for 2D grid transition
-        this.rowIndex = 0;
-        this.colIndex = 0;
-
-        // Special treatment for characters near center in non-slide-0 mode
-        if (this.isCenter && !useSlide0Style) {
-          this.colorType = ColorType.CENTER;
-          if (Math.random() < 0.5) {
-            this.letter = "◉";
-            this.originalLetter = "◉";
-          }
-        }
-      }
-
-      getColorType(char: string): ColorType {
-        if (char === "◉" || char === "○") return ColorType.CENTER;
-        if (BRIGHT_CHARS.includes(char)) return ColorType.BRIGHT;
-        if (NODE_CHARS.includes(char)) return ColorType.NODE;
-        if (CONNECTION_CHARS.includes(char)) return ColorType.CONNECTION;
-        if (NUMBER_CHARS.includes(char)) return ColorType.NUMBER;
-        if (CRAZY_CHARS.includes(char)) return ColorType.TRANSITION;
-        return ColorType.NODE; // default
-      }
-
-      assignGridPosition(rowIndex: number, colIndex: number): void {
-        this.rowIndex = rowIndex;
-        this.colIndex = colIndex;
-
+    // Assign grid positions for slide 1 transition
+    function assignGridPositions() {
+      for (let i = 0; i < characters.length; i++) {
+        const rowIndex = i % GRID_ROWS;
+        const colIndex = Math.floor(i / GRID_ROWS) % GRID_COLS;
+        
         // Calculate grid positions
         const xSpacing = (SEPARATION * 2) / GRID_COLS;
         const ySpacing = (SEPARATION * 2) / GRID_ROWS;
-
+        
         // Position starts from top-left corner of the grid
         const gridX = -SEPARATION + xSpacing * colIndex + xSpacing / 2;
         const gridY = -SEPARATION + ySpacing * rowIndex + ySpacing / 2;
-
-        // Set the target position for 2D grid
-        this.pos.setTarget(gridX, gridY, 0.5);
-      }
-
-      rotate(dir: "x" | "y" | "z", ang: number): void {
-        this.pos.rotate(dir, ang);
-      }
-
-      update(progress: number): void {
-        // Character appearance logic based on slide and transition
-        if (currentSlide === 0 && progress < 0.5) {
-          // Special case for slide 0 - periodically change characters randomly
-          if (Math.random() < 0.002) {
-            if (this.useSlide0Style) {
-              // Random ASCII character (33-126) for slide 0 style
-              this.letter = String.fromCharCode((Math.random() * 93 + 33) | 0);
-            } else {
-              this.letter = CRAZY_CHARS[Math.floor(Math.random() * CRAZY_CHARS.length)];
-            }
-          }
-          
-          // In slide 0 to slide 1 transition, start morphing characters
-          if (progress > 0.2 && progress < 0.5) {
-            const transitionFactor = (progress - 0.2) / 0.3;
-            if (Math.random() < 0.01 * transitionFactor) {
-              if (Math.random() < 0.7) {
-                this.letter = NUMBER_CHARS[Math.floor(Math.random() * NUMBER_CHARS.length)];
-                this.colorType = ColorType.NUMBER;
-              } else {
-                this.letter = MAIN_CHARS[Math.floor(Math.random() * MAIN_CHARS.length)];
-                this.colorType = this.getColorType(this.letter);
-              }
-            }
-          }
-        } 
-        // For transitions and other slides
-        else if (progress > 0.5) {
-          if (Math.random() < 0.02) {
-            const rnd = Math.random();
-            if (rnd < 0.6) {
-              this.letter = NUMBER_CHARS[Math.floor(Math.random() * NUMBER_CHARS.length)];
-              this.colorType = ColorType.NUMBER;
-            } else if (rnd < 0.8) {
-              this.letter = CRAZY_CHARS[Math.floor(Math.random() * CRAZY_CHARS.length)];
-              this.colorType = ColorType.TRANSITION;
-            } else {
-              this.letter = MAIN_CHARS[Math.floor(Math.random() * MAIN_CHARS.length)];
-              this.colorType = this.getColorType(this.letter);
-            }
-          }
-        } else {
-          if (Math.random() < 0.002) {
-            const rnd = Math.random();
-            if (rnd < 0.3) {
-              this.letter = BRIGHT_CHARS[Math.floor(Math.random() * BRIGHT_CHARS.length)];
-              this.colorType = ColorType.BRIGHT;
-            } else {
-              this.letter = MAIN_CHARS[Math.floor(Math.random() * MAIN_CHARS.length)];
-              this.colorType = this.getColorType(this.letter);
-            }
-          }
-          if (this.isCenter) {
-            this.letter = this.originalLetter;
-            this.colorType = ColorType.CENTER;
-          }
-        }
-      }
-
-      render(): void {
-        const PIXEL = this.pos.project();
-        const XP = PIXEL[0];
-        const YP = PIXEL[1];
-        const ZP = PIXEL[2];
-
-        // Determine if this character should use slide 0 style rendering
-        const useSlide0Rendering = this.useSlide0Style && currentSlide === 0 && transitionProgress < 0.5;
         
-        // Size calculation based on slide
-        const MAX_SIZE = useSlide0Rendering ? 50 : 70;
-        let SIZE = ((1 / ZP) * MAX_SIZE) | 0;
-
-        // Size adjustments for transitions
-        if (transitionProgress > 0.8) {
-          const blendFactor = (transitionProgress - 0.8) * 5;
-          const uniformSize = Math.min(ww / GRID_COLS, wh / GRID_ROWS) * 0.4;
-          SIZE = SIZE * (1 - blendFactor) + uniformSize * blendFactor;
-        }
-
-        // Brightness calculation
-        let BRIGHTNESS = SIZE / MAX_SIZE;
-
-        // Special brightness handling for slide 0
-        if (useSlide0Rendering) {
-          // Exaggerate depth perception with stronger brightness variations
-          // Closer characters are brighter, further characters are dimmer
-          const depthFactor = 1.5 - (ZP / (SEPARATION * 3));
-          BRIGHTNESS = Math.max(0.1, Math.min(1.0, BRIGHTNESS * depthFactor));
-          
-          // Enhanced slide0 color with depth-based blue variation
-          const blueValue = Math.min(255, Math.max(100, (200 * BRIGHTNESS) | 0));
-          const slide0Color = `rgba(255, 255, ${blueValue}, ${BRIGHTNESS})`;
-          
-          ctx.beginPath();
-          ctx.fillStyle = slide0Color;
-          ctx.font = SIZE + "px monospace";
-          ctx.fillText(this.letter, XP, YP);
-          ctx.fill();
-          ctx.closePath();
-          return;
-        }
-
-        // Standard brightness adjustments for other slides
-        if (currentSlide === 0 && transitionProgress < 0.3) {
-          const depthFactor = 1 + (this.pos.z / SEPARATION) * 0.3;
-          BRIGHTNESS *= depthFactor;
-          if (this.pos.z > 0) {
-            BRIGHTNESS *= 1.2;
-          }
-        }
-
-        // Pulse effect for bright and center characters
-        if (this.colorType === ColorType.BRIGHT || this.isCenter) {
-          BRIGHTNESS *= 0.8 + 0.2 * Math.sin(time * 0.05 + this.pulseOffset);
-        }
-
-        // Wave effect for grid transition
-        if (transitionProgress > 0.8) {
-          const distFromCenter = Math.sqrt(
-            Math.pow(this.colIndex - GRID_COLS / 2, 2) +
-            Math.pow(this.rowIndex - GRID_ROWS / 2, 2)
-          );
-          const waveEffect = Math.sin(time * 0.05 - distFromCenter * 0.3);
-          BRIGHTNESS *= 0.7 + 0.3 * (0.5 + waveEffect * 0.5);
-        }
-
-        BRIGHTNESS = Math.max(BRIGHTNESS, 0.1);
-
-        // Standard color rendering for non-slide-0 or during transition
-        const colorStr = COLOR_MAP[this.colorType].replace("$opacity", BRIGHTNESS.toFixed(2));
-
-        ctx.beginPath();
-        ctx.fillStyle = colorStr;
-        ctx.font = SIZE + "px monospace";
-        ctx.fillText(this.letter, XP, YP);
-        ctx.fill();
-        ctx.closePath();
+        characters[i].gridRow = rowIndex;
+        characters[i].gridCol = colIndex;
+        characters[i].targetX = gridX;
+        characters[i].targetY = gridY;
+        characters[i].targetZ = 0.5;
       }
     }
 
-    function getCenter(): [number, number] {
-      return [ww / 2, wh / 2];
+    // Project 3D point to 2D screen position
+    function project(x: number, y: number, z: number): [number, number, number] {
+      const zp = z + camera.z;
+      const div = zp / height;
+      const xp = (x + camera.x) / div;
+      const yp = (y + camera.y) / div;
+      return [xp + width / 2, yp + height / 2, zp];
     }
 
-    function signedRandom(): number {
-      return Math.random() - Math.random();
-    }
-
-    function renderAll(): void {
-      // For slide 0, emphasize depth by sorting and adding visual cues
-      const isSlide0 = currentSlide === 0 && transitionProgress < 0.5;
+    // Rotate a point around an axis
+    function rotate(point: { x: number, y: number, z: number }, axis: string, angle: number) {
+      const cos = Math.cos(angle);
+      const sin = Math.sin(angle);
       
-      // Sort characters by z-position for proper depth rendering
-      if (isSlide0) {
-        // For slide 0, sort from near-to-far (painter's algorithm)
-        CHARS.sort((a, b) => {
-          const aPos = a.pos.project();
-          const bPos = b.pos.project();
-          return aPos[2] - bPos[2]; // Painter's algorithm: render near-to-far
-        });
-      } else {
-        // For other slides, sort from far-to-near
-        CHARS.sort((a, b) => {
-          const aPos = a.pos.project();
-          const bPos = b.pos.project();
-          return bPos[2] - aPos[2]; // render far-to-near
-        });
-      }
-
-      for (let i = 0; i < CHARS.length; i++) {
-        CHARS[i].render();
+      const { x, y, z } = point;
+      
+      if (axis === 'x') {
+        point.y = y * cos - z * sin;
+        point.z = y * sin + z * cos;
+      } else if (axis === 'y') {
+        point.x = x * cos - z * sin;
+        point.z = x * sin + z * cos;
+      } else if (axis === 'z') {
+        point.x = x * cos - y * sin;
+        point.y = x * sin + y * cos;
       }
     }
 
-    function update(): void {
-      ctx.clearRect(0, 0, ww, wh);
-      // For a solid black background
+    // Render frame
+    function render() {
+      // Clear canvas
+      ctx.clearRect(0, 0, width, height);
       ctx.fillStyle = "black";
-      ctx.fillRect(0, 0, ww, wh);
-
+      ctx.fillRect(0, 0, width, height);
+      
       // Title text
       ctx.font = "24px sans-serif";
       ctx.fillStyle = "rgba(255, 255, 255, 1)";
       ctx.textAlign = "center";
-      ctx.fillText("STARKNET", ww / 2, 40);
-
-      // Handle transition based on slide
+      ctx.fillText("STARKNET", width / 2, 40);
+      
+      // Handle transition between slides
       if (currentSlide === 1 && transitionProgress < 1) {
         transitionProgress = Math.min(transitionProgress + TRANSITION_SPEED, 1);
       } else if (currentSlide === 0 && transitionProgress > 0) {
         transitionProgress = Math.max(transitionProgress - TRANSITION_SPEED, 0);
       }
-
+      
+      // Check for slide change
       if (lastSlide !== currentSlide) {
-        if (currentSlide === 1) {
-          assignGridPositions();
-        }
         lastSlide = currentSlide;
       }
-
-      // For slide 0, apply dramatically enhanced rotation to showcase 3D disposition
-      if (currentSlide === 0 && transitionProgress < 0.5) {
-        // Use much larger rotation angles for dramatic effect
-        const angleX = Math.sin(time * 0.0005) * 0.03;
-        const angleY = Math.cos(time * 0.0007) * 0.03;
+      
+      // Update character positions based on current rotation and transition state
+      for (let i = 0; i < characters.length; i++) {
+        const char = characters[i];
         
-        // Apply rotation to each character
-        for (let i = 0; i < CHARS.length; i++) {
-          CHARS[i].rotate("x", angleX);
-          CHARS[i].rotate("y", angleY);
+        // For slide 0, apply continuous rotation
+        if (currentSlide === 0 || transitionProgress < 1) {
+          // First reset to original position if we're in slide 0 with no transition
+          if (currentSlide === 0 && transitionProgress === 0) {
+            char.x = char.originalX;
+            char.y = char.originalY;
+            char.z = char.originalZ;
+          }
           
-          // Add more z-axis rotation
-          if (i % 2 === 0) {
-            CHARS[i].rotate("z", 0.005 * Math.sin(time * 0.0003));
-          }
+          // Apply rotation - this is the key for the animation
+          const rotationFactor = currentSlide === 0 ? 1 : 1 - transitionProgress;
+          
+          // Apply different rotation speeds - REDUCED SPEED HERE
+          rotate(char, 'x', 0.003 * rotationFactor); // Reduced from 0.01
+          rotate(char, 'y', 0.002 * rotationFactor); // Reduced from 0.0075
         }
-      } else {
-        // For other slides, apply global rotation
-        const globalRotationX = Math.sin(time * 0.0003) * 0.002;
-        const globalRotationY = Math.cos(time * 0.0002) * 0.003;
-        const globalRotationZ = Math.sin(time * 0.0001) * 0.001;
-
-        for (let i = 0; i < CHARS.length; i++) {
-          if (transitionProgress < 0.7) {
-            CHARS[i].rotate("x", globalRotationX);
-            CHARS[i].rotate("y", globalRotationY);
-            CHARS[i].rotate("z", globalRotationZ);
+        
+        // Apply transition to grid position for slide 1
+        if (transitionProgress > 0) {
+          char.x = char.x * (1 - transitionProgress) + char.targetX * transitionProgress;
+          char.y = char.y * (1 - transitionProgress) + char.targetY * transitionProgress;
+          char.z = char.z * (1 - transitionProgress) + char.targetZ * transitionProgress;
+          
+          // Update character to binary for slide 1
+          if (Math.random() < 0.02 * transitionProgress) {
+            char.char = Math.random() > 0.5 ? "0" : "1";
           }
+        } else if (currentSlide === 0 && Math.random() < 0.002) {
+          // Randomly change characters for slide 0
+          char.char = String.fromCharCode(Math.floor(Math.random() * 93) + 33);
         }
       }
-
-      // Update positions and characters
-      for (let i = 0; i < CHARS.length; i++) {
-        CHARS[i].pos.updateForTransition(transitionProgress);
-        CHARS[i].update(transitionProgress);
+      
+      // Sort characters by Z depth for correct rendering
+      characters.sort((a, b) => (b.z + camera.z) - (a.z + camera.z));
+      
+      // Render each character
+      for (let i = 0; i < characters.length; i++) {
+        const char = characters[i];
+        const [screenX, screenY, screenZ] = project(char.x, char.y, char.z);
+        
+        // Skip if character is behind camera
+        if (screenZ <= 0) continue;
+        
+        // Calculate size based on distance
+        const maxSize = 50;
+        const size = Math.floor(maxSize / screenZ);
+        if (size <= 0) continue;
+        
+        // Calculate brightness based on size/distance
+        let brightness = size / maxSize;
+        brightness = Math.max(0.1, Math.min(brightness, 1));
+        
+        // Always use blue-tinted ASCII colors from slide 0
+        const blueValue = Math.min(255, Math.max(100, Math.floor(150 + 100 * brightness)));
+        const color = `rgba(255, 255, ${blueValue}, ${brightness})`;
+        
+        // Draw character
+        ctx.font = `${size}px monospace`;
+        ctx.fillStyle = color;
+        ctx.fillText(char.char, screenX, screenY);
       }
-
+      
+      // Update time and request next frame
       time++;
+      animationFrame = requestAnimationFrame(render);
     }
 
-    function assignGridPositions(): void {
-      for (let i = 0; i < CHARS.length; i++) {
-        const rowIndex = i % GRID_ROWS;
-        const colIndex = Math.floor(i / GRID_ROWS) % GRID_COLS;
-        CHARS[i].assignGridPosition(rowIndex, colIndex);
-      }
-    }
-
-    function loop(): void {
-      window.requestAnimationFrame(loop);
-      update();
-      renderAll();
-    }
-
-    function createChars(): void {
-      // Create a dramatically structured 3D arrangement for better visualization
-      // We'll create characters in a sphere AND a cube lattice to emphasize depth
-      
-      // First, create some characters in cube lattice points
-      const latticeSize = 3; // 3x3x3 cube
-      const latticeSpacing = SEPARATION / (latticeSize - 1);
-      
-      let charCount = 0;
-      
-      // Create cube lattice structure (corners and edges)
-      for (let x = 0; x < latticeSize; x++) {
-        for (let y = 0; y < latticeSize; y++) {
-          for (let z = 0; z < latticeSize; z++) {
-            // Only use points on the edges of the cube for clearer structure
-            if (x === 0 || x === latticeSize-1 || 
-                y === 0 || y === latticeSize-1 || 
-                z === 0 || z === latticeSize-1) {
-              
-              const X = (x * latticeSpacing) - SEPARATION/2;
-              const Y = (y * latticeSpacing) - SEPARATION/2;
-              const Z = (z * latticeSpacing) - SEPARATION/2;
-              
-              // Create character
-              const CHARACTER = String.fromCharCode((Math.random() * 93 + 33) | 0);
-              const POS = new Vector(X, Y, Z);
-              const CHAR = new Char(CHARACTER, POS, true);
-              CHARS.push(CHAR);
-              charCount++;
-            }
-          }
-        }
-      }
-      
-      // Fill the rest with spherical distribution
-      for (let i = charCount; i < MAX_CHARS; i++) {
-        const CHARACTER = String.fromCharCode((Math.random() * 93 + 33) | 0);
-        
-        // Spherical distribution with higher concentration toward the center
-        let theta = Math.random() * Math.PI * 2;
-        let phi = Math.acos(2 * Math.random() - 1);
-        let radius = Math.pow(Math.random(), 1/2) * SEPARATION * 0.8; // Square root for more central concentration
-        
-        const X = radius * Math.sin(phi) * Math.cos(theta);
-        const Y = radius * Math.sin(phi) * Math.sin(theta);
-        const Z = radius * Math.cos(phi);
-        
-        const POS = new Vector(X, Y, Z);
-        const CHAR = new Char(CHARACTER, POS, true);
-        CHARS.push(CHAR);
-      }
-
-      assignGridPositions();
-    }
-
-    function setDim(): void {
-      ww = canvas.clientWidth;
-      wh = canvas.clientHeight;
-      canvas.width = ww * window.devicePixelRatio;
-      canvas.height = wh * window.devicePixelRatio;
+    // Set canvas dimensions
+    function setDimensions() {
+      width = canvas.clientWidth;
+      height = canvas.clientHeight;
+      canvas.width = width * window.devicePixelRatio;
+      canvas.height = height * window.devicePixelRatio;
       ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
     }
 
-    function initCamera(): void {
-      // Using a closer camera position for slide 0 to accentuate perspective
-      camera = new Vector(0, 0, SEPARATION * 1.2);
+    // Initialize and start animation
+    function init() {
+      setDimensions();
+      initCharacters();
+      animationFrame = requestAnimationFrame(render);
     }
 
-    setDim();
-    initCamera();
-    createChars();
-    loop();
-
+    // Handle window resize
     const handleResize = () => {
-      setDim();
+      setDimensions();
     };
-
+    
     window.addEventListener("resize", handleResize);
+    init();
+    
+    // Cleanup on component unmount
     return () => {
       window.removeEventListener("resize", handleResize);
+      cancelAnimationFrame(animationFrame);
     };
   }, [currentSlide]);
 
