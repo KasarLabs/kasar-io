@@ -23,12 +23,23 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
     let animationFrame: number;
     let time = 0;
     let transitionProgress = 0;
-    const TRANSITION_SPEED = 0.05;
+    const TRANSITION_SPEED = 0.03;
     let lastSlide = currentSlide;
     
-    // Grid parameters for slide 1
+    // Grid parameters for slide 2 (grid view)
     const GRID_ROWS = 25;
     const GRID_COLS = 50;
+
+    // Rain parameters for slide 0
+    const raindrops: {
+      char: string;
+      x: number;
+      y: number;
+      speed: number;
+      opacity: number;
+    }[] = [];
+    
+    const MAX_RAINDROPS = 100;
 
     // Store all characters
     let characters: {
@@ -44,6 +55,7 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
       targetZ: number;
       gridRow: number;
       gridCol: number;
+      velocity: { x: number; y: number; z: number };
     }[] = [];
 
     // Camera position
@@ -53,7 +65,46 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
       z: SEPARATION + 1
     };
 
-    // Create initial characters
+    // Initialize rain effect
+    function initRain() {
+      for (let i = 0; i < MAX_RAINDROPS; i++) {
+        createRaindrop();
+      }
+    }
+    
+    function createRaindrop() {
+      const char = String.fromCharCode(Math.floor(Math.random() * 93) + 33);
+      const x = Math.random() * width;
+      const y = Math.random() * -height; // Start above the screen
+      const speed = Math.random() * 2 + 1;
+      const opacity = Math.random() * 0.5 + 0.5;
+      
+      raindrops.push({ char, x, y, speed, opacity });
+    }
+    
+    function updateRain() {
+      for (let i = raindrops.length - 1; i >= 0; i--) {
+        const drop = raindrops[i];
+        drop.y += drop.speed;
+        
+        // Remove drops that have fallen off-screen
+        if (drop.y > height) {
+          raindrops.splice(i, 1);
+          createRaindrop();
+        }
+      }
+    }
+    
+    function renderRain() {
+      for (const drop of raindrops) {
+        const size = 14;
+        ctx.font = `${size}px monospace`;
+        ctx.fillStyle = `rgba(0, 255, 255, ${drop.opacity})`;
+        ctx.fillText(drop.char, drop.x, drop.y);
+      }
+    }
+
+    // Create initial 3D characters
     function initCharacters() {
       characters = [];
       
@@ -61,9 +112,14 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
         const char = String.fromCharCode(Math.floor(Math.random() * 93) + 33);
         
         // Create position with signed random values for even distribution
-        const x = (Math.random() - 0.5) * 2 * SEPARATION;
-        const y = (Math.random() - 0.5) * 2 * SEPARATION;
-        const z = (Math.random() - 0.5) * 2 * SEPARATION;
+        // Using a sphere distribution for better 3D cloud effect
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.acos(2 * Math.random() - 1);
+        const radius = Math.random() * SEPARATION;
+        
+        const x = radius * Math.sin(phi) * Math.cos(theta);
+        const y = radius * Math.sin(phi) * Math.sin(theta);
+        const z = radius * Math.cos(phi);
         
         characters.push({
           char,
@@ -77,15 +133,16 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
           targetY: 0,
           targetZ: 0,
           gridRow: 0,
-          gridCol: 0
+          gridCol: 0,
+          velocity: { x: 0, y: 0, z: 0 }
         });
       }
       
-      // Assign grid positions for slide 1
+      // Assign grid positions for slide 2
       assignGridPositions();
     }
 
-    // Assign grid positions for slide 1 transition
+    // Assign grid positions for slide 2 transition
     function assignGridPositions() {
       for (let i = 0; i < characters.length; i++) {
         const rowIndex = i % GRID_ROWS;
@@ -134,6 +191,26 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
         point.y = x * sin + y * cos;
       }
     }
+    
+    // Function to smoothly transition characters between states
+    function transitionCharacters() {
+      for (const char of characters) {
+        // Calculate distance to target
+        const dx = char.targetX - char.x;
+        const dy = char.targetY - char.y;
+        const dz = char.targetZ - char.z;
+        
+        // Apply velocity for smooth movement
+        char.velocity.x = char.velocity.x * 0.9 + dx * 0.1;
+        char.velocity.y = char.velocity.y * 0.9 + dy * 0.1;
+        char.velocity.z = char.velocity.z * 0.9 + dz * 0.1;
+        
+        // Update position
+        char.x += char.velocity.x * 0.1;
+        char.y += char.velocity.y * 0.1;
+        char.z += char.velocity.z * 0.1;
+      }
+    }
 
     // Render frame
     function render() {
@@ -148,83 +225,153 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
       ctx.textAlign = "center";
       ctx.fillText("STARKNET", width / 2, 40);
       
-      // Handle transition between slides
-      if (currentSlide === 1 && transitionProgress < 1) {
-        transitionProgress = Math.min(transitionProgress + TRANSITION_SPEED, 1);
-      } else if (currentSlide === 0 && transitionProgress > 0) {
-        transitionProgress = Math.max(transitionProgress - TRANSITION_SPEED, 0);
-      }
-      
-      // Check for slide change
-      if (lastSlide !== currentSlide) {
-        lastSlide = currentSlide;
-      }
-      
-      // Update character positions based on current rotation and transition state
-      for (let i = 0; i < characters.length; i++) {
-        const char = characters[i];
-        
-        // For slide 0, apply continuous rotation
-        if (currentSlide === 0 || transitionProgress < 1) {
-          // First reset to original position if we're in slide 0 with no transition
-          if (currentSlide === 0 && transitionProgress === 0) {
+      // Handle slide transitions
+      if (currentSlide !== lastSlide) {
+        // Initialize transition
+        if (currentSlide === 1 && lastSlide === 0) {
+          // Transition from rain to 3D rotation
+          transitionProgress = 0;
+          
+          // Initialize 3D characters if coming from rain
+          if (characters.length === 0) {
+            initCharacters();
+          }
+          
+          // Reset rotation for a clean start
+          for (const char of characters) {
             char.x = char.originalX;
             char.y = char.originalY;
             char.z = char.originalZ;
+            char.velocity = { x: 0, y: 0, z: 0 };
           }
-          
-          // Apply rotation - this is the key for the animation
-          const rotationFactor = currentSlide === 0 ? 1 : 1 - transitionProgress;
-          
-          // Apply different rotation speeds - REDUCED SPEED HERE
-          rotate(char, 'x', 0.003 * rotationFactor); // Reduced from 0.01
-          rotate(char, 'y', 0.002 * rotationFactor); // Reduced from 0.0075
+        } else if (currentSlide === 2 && lastSlide === 1) {
+          // Transition from 3D rotation to grid
+          transitionProgress = 0;
+          assignGridPositions();
+        } else if (currentSlide === 0) {
+          // Transition to rain
+          transitionProgress = 0;
+          initRain();
         }
         
-        // Apply transition to grid position for slide 1
-        if (transitionProgress > 0) {
-          char.x = char.x * (1 - transitionProgress) + char.targetX * transitionProgress;
-          char.y = char.y * (1 - transitionProgress) + char.targetY * transitionProgress;
-          char.z = char.z * (1 - transitionProgress) + char.targetZ * transitionProgress;
-          
-          // Update character to binary for slide 1
-          if (Math.random() < 0.02 * transitionProgress) {
-            char.char = Math.random() > 0.5 ? "0" : "1";
-          }
-        } else if (currentSlide === 0 && Math.random() < 0.002) {
-          // Randomly change characters for slide 0
-          char.char = String.fromCharCode(Math.floor(Math.random() * 93) + 33);
-        }
+        lastSlide = currentSlide;
       }
       
-      // Sort characters by Z depth for correct rendering
-      characters.sort((a, b) => (b.z + camera.z) - (a.z + camera.z));
+      // Update transition progress
+      if (transitionProgress < 1) {
+        transitionProgress = Math.min(transitionProgress + TRANSITION_SPEED, 1);
+      }
       
-      // Render each character
-      for (let i = 0; i < characters.length; i++) {
-        const char = characters[i];
-        const [screenX, screenY, screenZ] = project(char.x, char.y, char.z);
+      // Render based on current slide
+      if (currentSlide === 0) {
+        // Slide 0: Rain effect
+        updateRain();
+        renderRain();
+      } else if (currentSlide === 1) {
+        // Slide 1: 3D rotating cloud
+        for (let i = 0; i < characters.length; i++) {
+          const char = characters[i];
+          
+          // If we just transitioned to 3D, ensure positions are reset
+          if (lastSlide === 0 && transitionProgress < 1) {
+            // During transition from rain, move to 3D positions
+            char.targetX = char.originalX;
+            char.targetY = char.originalY;
+            char.targetZ = char.originalZ;
+            transitionCharacters();
+          } else {
+            // When fully in 3D mode or continuing rotation
+            // We need to save original positions before rotation
+            const originalX = char.x;
+            const originalY = char.y;
+            const originalZ = char.z;
+            
+            // Apply rotation for 3D effect
+            rotate(char, 'x', 0.003);
+            rotate(char, 'y', 0.002);
+            
+            // If coming from rain, keep the rotation minimal to build up
+            if (transitionProgress < 1) {
+              // Blend between original and rotated position
+              char.x = originalX * (1 - transitionProgress) + char.x * transitionProgress;
+              char.y = originalY * (1 - transitionProgress) + char.y * transitionProgress;
+              char.z = originalZ * (1 - transitionProgress) + char.z * transitionProgress;
+            }
+          }
+          
+          // Randomly change characters
+          if (Math.random() < 0.01) {
+            char.char = String.fromCharCode(Math.floor(Math.random() * 93) + 33);
+          }
+        }
         
-        // Skip if character is behind camera
-        if (screenZ <= 0) continue;
+        // Sort characters by Z depth for correct rendering
+        characters.sort((a, b) => (b.z + camera.z) - (a.z + camera.z));
         
-        // Calculate size based on distance
-        const maxSize = 50;
-        const size = Math.floor(maxSize / screenZ);
-        if (size <= 0) continue;
+        // Render each character in 3D space
+        for (let i = 0; i < characters.length; i++) {
+          const char = characters[i];
+          const [screenX, screenY, screenZ] = project(char.x, char.y, char.z);
+          
+          // Skip if character is behind camera
+          if (screenZ <= 0) continue;
+          
+          // Calculate size based on distance
+          const maxSize = 50;
+          const size = Math.floor(maxSize / screenZ);
+          if (size <= 0) continue;
+          
+          // Calculate brightness based on distance
+          let brightness = size / maxSize;
+          brightness = Math.max(0.1, Math.min(brightness, 1));
+          
+          // Blue-tinted ASCII colors
+          const blueValue = Math.min(255, Math.max(100, Math.floor(150 + 100 * brightness)));
+          const color = `rgba(200, 200, ${blueValue}, ${brightness})`;
+          
+          // Draw character
+          ctx.font = `${size}px monospace`;
+          ctx.fillStyle = color;
+          ctx.fillText(char.char, screenX, screenY);
+        }
+      } else if (currentSlide === 2) {
+        // Slide 2: 2D Grid layout
+        for (let i = 0; i < characters.length; i++) {
+          const char = characters[i];
+          
+          // Set target positions for grid layout
+          char.targetX = char.targetX;
+          char.targetY = char.targetY;
+          char.targetZ = char.targetZ;
+          
+          // Apply smooth transition to target positions
+          transitionCharacters();
+          
+          // Update character to binary for grid view
+          if (Math.random() < 0.02) {
+            char.char = Math.random() > 0.5 ? "0" : "1";
+          }
+        }
         
-        // Calculate brightness based on size/distance
-        let brightness = size / maxSize;
-        brightness = Math.max(0.1, Math.min(brightness, 1));
-        
-        // Always use blue-tinted ASCII colors from slide 0
-        const blueValue = Math.min(255, Math.max(100, Math.floor(150 + 100 * brightness)));
-        const color = `rgba(255, 255, ${blueValue}, ${brightness})`;
-        
-        // Draw character
-        ctx.font = `${size}px monospace`;
-        ctx.fillStyle = color;
-        ctx.fillText(char.char, screenX, screenY);
+        // Render each character in grid
+        for (let i = 0; i < characters.length; i++) {
+          const char = characters[i];
+          const [screenX, screenY, screenZ] = project(char.x, char.y, char.z);
+          
+          // Skip if character is behind camera
+          if (screenZ <= 0) continue;
+          
+          // Fixed size for grid view
+          const size = 16;
+          
+          // Blue-green color for grid characters
+          const color = "rgba(0, 255, 200, 0.8)";
+          
+          // Draw character
+          ctx.font = `${size}px monospace`;
+          ctx.fillStyle = color;
+          ctx.fillText(char.char, screenX, screenY);
+        }
       }
       
       // Update time and request next frame
@@ -244,7 +391,15 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
     // Initialize and start animation
     function init() {
       setDimensions();
+      
+      // Always initialize characters so they're ready for transition
       initCharacters();
+      
+      // Initialize based on starting slide
+      if (currentSlide === 0) {
+        initRain();
+      }
+      
       animationFrame = requestAnimationFrame(render);
     }
 
