@@ -13,9 +13,9 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
 
     let ww: number, wh: number, camera: Vector;
     const CHARS: Char[] = [];
-    // For slide 0, replicate the standalone effect (300 chars, wider spread)
-    const MAX_CHARS = currentSlide === 0 ? 300 : 250;
-    const SEPARATION = currentSlide === 0 ? 1.5 : 1.2;
+    // Keep parameters consistent with old-ascii-animation for slide 0
+    const MAX_CHARS = 300;
+    const SEPARATION = 1.5;
     let time = 0;
     let transitionProgress = 0;
     let transition3Progress = 0;
@@ -27,88 +27,27 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
     const GRID_ROWS = 25;
     const GRID_COLS = 50;
 
-    // Imported from NetworkAsciiArt
+    // Character sets from original implementation
     const NODE_CHARS = ["ﾊ", "ﾐ", "ﾋ", "ｹ", "ﾒ", "ｳ", "ｼ", "ﾅ"];
     const CONNECTION_CHARS = ["│", "─", "┌", "┐", "└", "┘", "┼", "╬"];
     const BRIGHT_CHARS = ["ﾘ", "ｱ", "ｶ", "ｻ", "ﾀ"];
     const NUMBER_CHARS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
 
-    // Combined character set for 3D animation
+    // Combined character sets
     const MAIN_CHARS = [...NODE_CHARS, ...CONNECTION_CHARS];
 
-    // Crazy ASCII characters for transition effects
+    // Use the exact same character set as old-ascii-animation for slide 0
     const CRAZY_CHARS = [
-      "!",
-      "@",
-      "#",
-      "$",
-      "%",
-      "^",
-      "&",
-      "*",
-      "(",
-      ")",
-      "_",
-      "+",
-      "=",
-      "{",
-      "}",
-      "[",
-      "]",
-      "|",
-      "\\",
-      ":",
-      ";",
-      '"',
-      "'",
-      "<",
-      ">",
-      "?",
-      "/",
-      "~",
-      "`",
-      "±",
-      "§",
-      "Δ",
-      "Σ",
-      "Ω",
-      "£",
-      "¢",
-      "¥",
-      "Γ",
-      "Λ",
-      "Θ",
-      "Ξ",
-      "Π",
-      "Φ",
-      "Ψ",
+      "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "_", "+",
+      "=", "{", "}", "[", "]", "|", "\\", ":", ";", "\"", "'", "<",
+      ">", "?", "/", "~", "`", "±", "§", "Δ", "Σ", "Ω", "£", "¢",
+      "¥", "Γ", "Λ", "Θ", "Ξ", "Π", "Φ", "Ψ"
     ];
 
     // Spiral characters for slide 3
     const SPIRAL_CHARS = [
-      "◎",
-      "◉",
-      "●",
-      "◐",
-      "◑",
-      "◒",
-      "◓",
-      "◔",
-      "◕",
-      "◖",
-      "◗",
-      "◌",
-      "◍",
-      "◎",
-      "◉",
-      "○",
-      "◌",
-      "◍",
-      "◎",
-      "◉",
-      "○",
-      "◌",
-      "◍",
+      "◎", "◉", "●", "◐", "◑", "◒", "◓", "◔", "◕", "◖", "◗", "◌", "◍", 
+      "◎", "◉", "○", "◌", "◍", "◎", "◉", "○", "◌", "◍",
     ];
 
     // Color types based on NetworkAsciiArt
@@ -133,7 +72,6 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
       [ColorType.SPIRAL]: "rgba(249, 115, 22, $opacity)", // orange-500
     };
 
-    // Enhanced Vector class with rotational capabilities
     class Vector {
       x: number;
       y: number;
@@ -185,12 +123,12 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
 
       updateForTransition(progress: number, progress3: number): void {
         if (progress > 0 && progress3 === 0) {
-          // Slide 1-2 transition: Interpolate between 3D position and 2D grid position
+          // Slide 0-1 transition: Interpolate between 3D position and 2D grid position
           this.x = this.originalX * (1 - progress) + this.targetX * progress;
           this.y = this.originalY * (1 - progress) + this.targetY * progress;
           this.z = this.originalZ * (1 - progress) + this.targetZ * progress;
         } else if (progress3 > 0) {
-          // Slide 3 transition: Interpolate between current position and spiral 3D position
+          // Slide 2-3 transition: Interpolate between current position and spiral 3D position
           const baseX = progress > 0 ? this.targetX : this.originalX;
           const baseY = progress > 0 ? this.targetY : this.originalY;
           const baseZ = progress > 0 ? this.targetZ : this.originalZ;
@@ -241,28 +179,13 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
       rowIndex: number;
       colIndex: number;
       originalLetter: string;
-      rotationSpeed: number;
-      spiralRadius: number;
-      spiralAngle: number;
-      spiralHeight: number;
-      // Add individual rotation axes speeds
-      rotationSpeedX: number;
-      rotationSpeedY: number;
-      rotationSpeedZ: number;
-      // Add rotation direction
-      rotationDirectionX: number;
-      rotationDirectionY: number;
-      rotationDirectionZ: number;
-      // Add orbit parameters
-      orbitRadius: number;
-      orbitSpeed: number;
-      orbitPhase: number;
-      orbitAxis: "x" | "y" | "z";
+      useWhiteColor: boolean;
 
-      constructor(letter: string, pos: Vector) {
+      constructor(letter: string, pos: Vector, useWhiteColor = false) {
         this.letter = letter;
         this.originalLetter = letter;
         this.pos = pos;
+        this.useWhiteColor = useWhiteColor;
         this.colorType = this.getColorType(letter);
         this.isCenter =
           Math.abs(pos.x) < 0.2 &&
@@ -274,33 +197,8 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
         this.rowIndex = 0;
         this.colIndex = 0;
 
-        // Enhanced rotation parameters for slide 0 (will be overridden if slide 0)
-        this.rotationSpeed = Math.random() * 0.01 + 0.005;
-        this.rotationSpeedX = Math.random() * 0.01 + 0.004;
-        this.rotationSpeedY = Math.random() * 0.01 + 0.005;
-        this.rotationSpeedZ = Math.random() * 0.01 + 0.006;
-
-        // Random rotation directions (1 or -1)
-        this.rotationDirectionX = Math.random() > 0.5 ? 1 : -1;
-        this.rotationDirectionY = Math.random() > 0.5 ? 1 : -1;
-        this.rotationDirectionZ = Math.random() > 0.5 ? 1 : -1;
-
-        // Orbit parameters
-        this.orbitRadius = Math.random() * 0.2;
-        this.orbitSpeed = Math.random() * 0.002 + 0.001;
-        this.orbitPhase = Math.random() * Math.PI * 2;
-        this.orbitAxis = ["x", "y", "z"][Math.floor(Math.random() * 3)] as
-          | "x"
-          | "y"
-          | "z";
-
-        // Spiral parameters for slide 3
-        this.spiralRadius = Math.random() * 0.5 + 0.5;
-        this.spiralAngle = Math.random() * Math.PI * 2;
-        this.spiralHeight = (Math.random() * 2 - 1) * SEPARATION;
-
-        // Special treatment for characters near center
-        if (this.isCenter) {
+        // Special treatment for characters near center in non-slide-0 mode
+        if (this.isCenter && !useWhiteColor) {
           this.colorType = ColorType.CENTER;
           if (Math.random() < 0.5) {
             this.letter = "◉";
@@ -338,9 +236,9 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
 
       assignSpiralPosition(): void {
         // Calculate spiral positions for slide 3
-        const t = this.spiralAngle + time * 0.001;
-        const radius = this.spiralRadius;
-        const height = this.spiralHeight;
+        const t = this.pulseOffset + time * 0.001;
+        const radius = Math.random() * 0.5 + 0.5;
+        const height = (Math.random() * 2 - 1) * SEPARATION;
 
         // Spiral coordinates
         const spiralX = Math.cos(t) * radius;
@@ -354,130 +252,71 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
         this.pos.rotate(dir, ang);
       }
 
-      // Updated selfRotate to replicate slide 0 effect exactly
-      selfRotate(): void {
-        if (
-          currentSlide === 0 &&
-          transitionProgress < 0.1 &&
-          transition3Progress < 0.1
-        ) {
-          // Use fixed rotation as in the standalone effect
-          const DX = 0.006 * Math.sin(time * 0.001);
-          const DY = 0.006 * Math.cos(time * 0.001);
-          this.rotate("x", DX);
-          this.rotate("y", DY);
-        } else if (currentSlide !== 0) {
-          // Original selfRotate for non-slide0 (or during transitions)
-          const timeScale = time * 0.002;
-          this.rotate(
-            "x",
-            this.rotationSpeedX *
-              this.rotationDirectionX *
-              Math.sin(timeScale + this.pulseOffset),
-          );
-          this.rotate(
-            "y",
-            this.rotationSpeedY *
-              this.rotationDirectionY *
-              Math.cos(timeScale + this.pulseOffset * 0.7),
-          );
-          this.rotate(
-            "z",
-            this.rotationSpeedZ *
-              this.rotationDirectionZ *
-              Math.sin(timeScale * 0.5 + this.pulseOffset * 0.3),
-          );
-
-          // Apply orbital movement if character is not at center
-          if (!this.isCenter) {
-            const orbitT = timeScale + this.orbitPhase;
-            const originalPos = new Vector(
-              this.pos.originalX,
-              this.pos.originalY,
-              this.pos.originalZ,
-            );
-
-            if (this.orbitAxis === "x") {
-              this.pos.y = originalPos.y + Math.sin(orbitT) * this.orbitRadius;
-              this.pos.z = originalPos.z + Math.cos(orbitT) * this.orbitRadius;
-            } else if (this.orbitAxis === "y") {
-              this.pos.x = originalPos.x + Math.sin(orbitT) * this.orbitRadius;
-              this.pos.z = originalPos.z + Math.cos(orbitT) * this.orbitRadius;
-            } else {
-              this.pos.x = originalPos.x + Math.sin(orbitT) * this.orbitRadius;
-              this.pos.y = originalPos.y + Math.cos(orbitT) * this.orbitRadius;
-            }
-          }
-        }
-      }
-
       update(progress: number, progress3: number): void {
-        // For slide 0, rely on selfRotate (using fixed rotation)
-        if (currentSlide === 0) {
-          this.selfRotate();
-        }
-        // For other slides, the selfRotate (if any) is applied in the above branch
-
         // Update spiral position for slide 3
         this.assignSpiralPosition();
 
-        // Update character appearance based on slide/transition
-        if (progress3 > 0) {
+        // Determine if this character should behave like slide 0 style
+        const isSlide0Style = currentSlide === 0 && progress < 0.5;
+
+        // Character appearance logic
+        if (isSlide0Style) {
+          // For slide 0, use original ascii-animation behavior
+          if (Math.random() < 0.002) {
+            this.letter = CRAZY_CHARS[Math.floor(Math.random() * CRAZY_CHARS.length)];
+          }
+          
+          // In slide 0 to slide 1 transition, start morphing characters
+          if (progress > 0.2 && progress < 0.5) {
+            const transitionFactor = (progress - 0.2) / 0.3;
+            if (Math.random() < 0.01 * transitionFactor) {
+              if (Math.random() < 0.7) {
+                this.letter = NUMBER_CHARS[Math.floor(Math.random() * NUMBER_CHARS.length)];
+                this.colorType = ColorType.NUMBER;
+              } else {
+                this.letter = MAIN_CHARS[Math.floor(Math.random() * MAIN_CHARS.length)];
+                this.colorType = this.getColorType(this.letter);
+              }
+            }
+          }
+        } 
+        // For transitions and other slides
+        else if (progress3 > 0) {
           // Slide 3 transition - gradually change to spiral chars
           if (Math.random() < 0.03) {
             if (Math.random() < 0.7) {
-              this.letter =
-                SPIRAL_CHARS[Math.floor(Math.random() * SPIRAL_CHARS.length)];
+              this.letter = SPIRAL_CHARS[Math.floor(Math.random() * SPIRAL_CHARS.length)];
               this.colorType = ColorType.SPIRAL;
             } else if (Math.random() < 0.5) {
-              this.letter =
-                BRIGHT_CHARS[Math.floor(Math.random() * BRIGHT_CHARS.length)];
+              this.letter = BRIGHT_CHARS[Math.floor(Math.random() * BRIGHT_CHARS.length)];
               this.colorType = ColorType.BRIGHT;
             } else {
-              this.letter =
-                CRAZY_CHARS[Math.floor(Math.random() * CRAZY_CHARS.length)];
+              this.letter = CRAZY_CHARS[Math.floor(Math.random() * CRAZY_CHARS.length)];
               this.colorType = ColorType.TRANSITION;
             }
           }
-        } else if (progress > 0 && progress < 1) {
+        } else if (progress > 0.5) {
           if (Math.random() < 0.02) {
             const rnd = Math.random();
             if (rnd < 0.6) {
-              this.letter =
-                NUMBER_CHARS[Math.floor(Math.random() * NUMBER_CHARS.length)];
+              this.letter = NUMBER_CHARS[Math.floor(Math.random() * NUMBER_CHARS.length)];
               this.colorType = ColorType.NUMBER;
             } else if (rnd < 0.8) {
-              this.letter =
-                CRAZY_CHARS[Math.floor(Math.random() * CRAZY_CHARS.length)];
+              this.letter = CRAZY_CHARS[Math.floor(Math.random() * CRAZY_CHARS.length)];
               this.colorType = ColorType.TRANSITION;
             } else {
-              this.letter =
-                MAIN_CHARS[Math.floor(Math.random() * MAIN_CHARS.length)];
+              this.letter = MAIN_CHARS[Math.floor(Math.random() * MAIN_CHARS.length)];
               this.colorType = this.getColorType(this.letter);
             }
           }
-        } else if (progress >= 1) {
-          if (Math.random() < 0.05) {
-            if (Math.random() < 0.8) {
-              this.letter =
-                NUMBER_CHARS[Math.floor(Math.random() * NUMBER_CHARS.length)];
-              this.colorType = ColorType.NUMBER;
-            } else {
-              this.letter =
-                CRAZY_CHARS[Math.floor(Math.random() * CRAZY_CHARS.length)];
-              this.colorType = ColorType.TRANSITION;
-            }
-          }
-        } else {
+        } else if (!isSlide0Style) {
           if (Math.random() < 0.002) {
             const rnd = Math.random();
             if (rnd < 0.3) {
-              this.letter =
-                BRIGHT_CHARS[Math.floor(Math.random() * BRIGHT_CHARS.length)];
+              this.letter = BRIGHT_CHARS[Math.floor(Math.random() * BRIGHT_CHARS.length)];
               this.colorType = ColorType.BRIGHT;
             } else {
-              this.letter =
-                MAIN_CHARS[Math.floor(Math.random() * MAIN_CHARS.length)];
+              this.letter = MAIN_CHARS[Math.floor(Math.random() * MAIN_CHARS.length)];
               this.colorType = this.getColorType(this.letter);
             }
           }
@@ -493,7 +332,8 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
         const XP = PIXEL[0];
         const YP = PIXEL[1];
 
-        let MAX_SIZE = 60;
+        // Slide 0 uses larger max size as in original
+        const MAX_SIZE = 70;
         let SIZE = ((1 / PIXEL[2]) * MAX_SIZE) | 0;
 
         if (transitionProgress > 0.8 && transition3Progress < 0.2) {
@@ -505,23 +345,16 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
         if (transition3Progress > 0.5) {
           const distFactor = Math.sqrt(
             Math.pow(this.pos.x, 2) +
-              Math.pow(this.pos.y, 2) +
-              Math.pow(this.pos.z, 2),
+            Math.pow(this.pos.y, 2) +
+            Math.pow(this.pos.z, 2),
           );
           SIZE = SIZE * (1 - 0.3 * distFactor);
         }
 
         let BRIGHTNESS = SIZE / MAX_SIZE;
 
-        if (this.colorType === ColorType.BRIGHT || this.isCenter) {
-          BRIGHTNESS *= 0.8 + 0.2 * Math.sin(time * 0.05 + this.pulseOffset);
-        }
-
-        if (
-          currentSlide === 0 &&
-          transitionProgress === 0 &&
-          transition3Progress === 0
-        ) {
+        // Depth-based brightness adjustments for slide 0
+        if (currentSlide === 0 && transitionProgress < 0.3) {
           const depthFactor = 1 + (this.pos.z / SEPARATION) * 0.3;
           BRIGHTNESS *= depthFactor;
           if (this.pos.z > 0) {
@@ -529,24 +362,57 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
           }
         }
 
+        // For other slides or transitions
+        if (this.colorType === ColorType.BRIGHT || this.isCenter) {
+          BRIGHTNESS *= 0.8 + 0.2 * Math.sin(time * 0.05 + this.pulseOffset);
+        }
+
         if (transitionProgress > 0.8 && transition3Progress < 0.2) {
           const distFromCenter = Math.sqrt(
             Math.pow(this.colIndex - GRID_COLS / 2, 2) +
-              Math.pow(this.rowIndex - GRID_ROWS / 2, 2),
+            Math.pow(this.rowIndex - GRID_ROWS / 2, 2),
           );
           const waveEffect = Math.sin(time * 0.05 - distFromCenter * 0.3);
           BRIGHTNESS *= 0.7 + 0.3 * (0.5 + waveEffect * 0.5);
         }
 
         if (transition3Progress > 0.2) {
-          const spiralPulse = Math.sin(time * 0.03 + this.spiralAngle * 3);
+          const spiralPulse = Math.sin(time * 0.03 + this.pulseOffset * 3);
           BRIGHTNESS *= 0.7 + 0.3 * (0.5 + spiralPulse * 0.5);
         }
 
         BRIGHTNESS = Math.max(BRIGHTNESS, 0.1);
 
-        let colorStr = COLOR_MAP[this.colorType];
-        colorStr = colorStr.replace("$opacity", BRIGHTNESS.toFixed(2));
+        let colorStr;
+        
+        // Determine the color based on slide and transition
+        if (this.useWhiteColor) {
+          // For slide 0-style characters, use white with transition blending
+          if (transitionProgress < 0.5) {
+            // Pure white for slide 0
+            colorStr = `rgba(255, 255, 255, ${BRIGHTNESS})`;
+          } else {
+            // Blend to color during transition
+            const blendFactor = (transitionProgress - 0.5) * 2;
+            const colorFromType = COLOR_MAP[this.colorType].replace("$opacity", BRIGHTNESS.toFixed(2));
+            
+            // Parse color components
+            const whiteColor = [255, 255, 255];
+            const typeColor = colorFromType.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([^\)]+))?\)/);
+            
+            if (typeColor) {
+              const r = Math.round(whiteColor[0] * (1 - blendFactor) + parseInt(typeColor[1]) * blendFactor);
+              const g = Math.round(whiteColor[1] * (1 - blendFactor) + parseInt(typeColor[2]) * blendFactor);
+              const b = Math.round(whiteColor[2] * (1 - blendFactor) + parseInt(typeColor[3]) * blendFactor);
+              colorStr = `rgba(${r}, ${g}, ${b}, ${BRIGHTNESS})`;
+            } else {
+              colorStr = colorFromType;
+            }
+          }
+        } else {
+          // For non-slide-0 characters, use color map
+          colorStr = COLOR_MAP[this.colorType].replace("$opacity", BRIGHTNESS.toFixed(2));
+        }
 
         ctx.beginPath();
         ctx.fillStyle = colorStr;
@@ -557,19 +423,8 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
       }
     }
 
-    // Updated getCenter so that slide 0 uses the canvas center (as in the standalone effect)
     function getCenter(): [number, number] {
-      if (currentSlide === 0) {
-        return [ww / 2, wh / 2];
-      } else if (transitionProgress >= 0.5 || currentSlide > 0) {
-        return [ww / 2, wh / 2];
-      } else {
-        const rightPos = ww * 0.7;
-        const centerPos = ww / 2;
-        const interpolatedX =
-          rightPos * (1 - transitionProgress) + centerPos * transitionProgress;
-        return [interpolatedX, wh / 2];
-      }
+      return [ww / 2, wh / 2]; // Always center
     }
 
     function signedRandom(): number {
@@ -592,10 +447,10 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
     function update(): void {
       ctx.clearRect(0, 0, ww, wh);
       // For a solid black background
-      ctx.fillStyle = currentSlide === 0 ? "black" : "rgba(0, 0, 0, 0.98)";
+      ctx.fillStyle = "black";
       ctx.fillRect(0, 0, ww, wh);
 
-      // Title text remains unchanged
+      // Title text
       ctx.font = "24px sans-serif";
       ctx.fillStyle = "rgba(255, 255, 255, 1)";
       ctx.textAlign = "center";
@@ -627,28 +482,35 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
         lastSlide = currentSlide;
       }
 
-      // For non-slide0, apply global rotation
-      const globalRotationX = Math.sin(time * 0.0003) * 0.002;
-      const globalRotationY = Math.cos(time * 0.0002) * 0.003;
-      const globalRotationZ = Math.sin(time * 0.0001) * 0.001;
+      // For slide 0, apply simplified rotation (from old-ascii-animation)
+      if (currentSlide === 0 && transitionProgress < 0.5) {
+        for (let i = 0; i < CHARS.length; i++) {
+          const DX = 0.006 * Math.sin(time * 0.001);
+          const DY = 0.006 * Math.cos(time * 0.001);
+          CHARS[i].rotate("x", DX);
+          CHARS[i].rotate("y", DY);
+        }
+      } else {
+        // For other slides, apply global rotation
+        const globalRotationX = Math.sin(time * 0.0003) * 0.002;
+        const globalRotationY = Math.cos(time * 0.0002) * 0.003;
+        const globalRotationZ = Math.sin(time * 0.0001) * 0.001;
 
+        for (let i = 0; i < CHARS.length; i++) {
+          if (transitionProgress < 0.7 && transition3Progress < 0.7) {
+            CHARS[i].rotate("x", globalRotationX);
+            CHARS[i].rotate("y", globalRotationY);
+            CHARS[i].rotate("z", globalRotationZ);
+          }
+        }
+      }
+
+      // Update positions and characters
       for (let i = 0; i < CHARS.length; i++) {
         CHARS[i].pos.updateForTransition(
           transitionProgress,
           transition3Progress,
         );
-
-        // For slide 0, we now rely on selfRotate (with fixed rotation) so we skip global rotation
-        if (
-          currentSlide !== 0 &&
-          transitionProgress < 0.7 &&
-          transition3Progress < 0.7
-        ) {
-          CHARS[i].rotate("x", globalRotationX);
-          CHARS[i].rotate("y", globalRotationY);
-          CHARS[i].rotate("z", globalRotationZ);
-        }
-
         CHARS[i].update(transitionProgress, transition3Progress);
       }
 
@@ -670,27 +532,15 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
     }
 
     function createChars(): void {
-      // Create a denser center cluster for the "earth" effect
-      for (let i = 0; i < 20; i++) {
-        const angle = (i / 20) * Math.PI * 2;
-        const X = Math.cos(angle) * 0.2;
-        const Y = Math.sin(angle) * 0.2;
-        const Z = Math.random() * 0.1;
-        const character = Math.random() < 0.5 ? "◉" : "○";
-        const POS = new Vector(X, Y, Z);
-        const CHAR = new Char(character, POS);
-        CHARS.push(CHAR);
-      }
-
-      // Create regular characters
-      for (let i = 0; i < MAX_CHARS - 20; i++) {
-        const CHARACTER =
-          MAIN_CHARS[Math.floor(Math.random() * MAIN_CHARS.length)];
+      // For slide 0, create characters exactly like in old-ascii-animation
+      for (let i = 0; i < MAX_CHARS; i++) {
+        const CHARACTER = CRAZY_CHARS[Math.floor(Math.random() * CRAZY_CHARS.length)];
         const X = signedRandom() * SEPARATION;
         const Y = signedRandom() * SEPARATION;
         const Z = signedRandom() * SEPARATION;
         const POS = new Vector(X, Y, Z);
-        const CHAR = new Char(CHARACTER, POS);
+        // Use white color for slide 0
+        const CHAR = new Char(CHARACTER, POS, true);
         CHARS.push(CHAR);
       }
 
@@ -706,6 +556,7 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
     }
 
     function initCamera(): void {
+      // Use the same camera position as old-ascii-animation
       camera = new Vector(0, 0, SEPARATION + 0.8);
     }
 
