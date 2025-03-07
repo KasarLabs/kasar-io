@@ -13,30 +13,24 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
 
     let ww: number, wh: number, camera: Vector;
     const CHARS: Char[] = [];
-    // Keep parameters consistent with old-ascii-animation for slide 0
-    const MAX_CHARS = 300;
-    const SEPARATION = 1.5;
+    // Parameters for slide 0
+    const MAX_CHARS = 200;
+    const SEPARATION = 1;
     let time = 0;
     let transitionProgress = 0;
-    let transition3Progress = 0;
     const TRANSITION_SPEED = 0.05;
-    const TRANSITION3_SPEED = 0.03;
     let lastSlide = currentSlide;
 
     // 2D grid parameters
     const GRID_ROWS = 25;
     const GRID_COLS = 50;
 
-    // Character sets from original implementation
+    // Character sets
     const NODE_CHARS = ["ﾊ", "ﾐ", "ﾋ", "ｹ", "ﾒ", "ｳ", "ｼ", "ﾅ"];
     const CONNECTION_CHARS = ["│", "─", "┌", "┐", "└", "┘", "┼", "╬"];
     const BRIGHT_CHARS = ["ﾘ", "ｱ", "ｶ", "ｻ", "ﾀ"];
     const NUMBER_CHARS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
-
-    // Combined character sets
     const MAIN_CHARS = [...NODE_CHARS, ...CONNECTION_CHARS];
-
-    // Use the exact same character set as old-ascii-animation for slide 0
     const CRAZY_CHARS = [
       "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "_", "+",
       "=", "{", "}", "[", "]", "|", "\\", ":", ";", "\"", "'", "<",
@@ -44,13 +38,7 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
       "¥", "Γ", "Λ", "Θ", "Ξ", "Π", "Φ", "Ψ"
     ];
 
-    // Spiral characters for slide 3
-    const SPIRAL_CHARS = [
-      "◎", "◉", "●", "◐", "◑", "◒", "◓", "◔", "◕", "◖", "◗", "◌", "◍", 
-      "◎", "◉", "○", "◌", "◍", "◎", "◉", "○", "◌", "◍",
-    ];
-
-    // Color types based on NetworkAsciiArt
+    // Color types
     enum ColorType {
       CENTER = "center",
       NODE = "node",
@@ -58,10 +46,9 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
       CONNECTION = "connection",
       TRANSITION = "transition",
       NUMBER = "number",
-      SPIRAL = "spiral",
     }
 
-    // Color mapping based on NetworkAsciiArt's Tailwind classes
+    // Color mapping
     const COLOR_MAP: Record<ColorType, string> = {
       [ColorType.CENTER]: "rgba(136, 239, 255, $opacity)", // cyan-300
       [ColorType.NODE]: "rgba(192, 132, 252, $opacity)", // purple-400
@@ -69,7 +56,6 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
       [ColorType.CONNECTION]: "rgba(165, 180, 252, $opacity)", // indigo-300
       [ColorType.TRANSITION]: "rgba(134, 239, 172, $opacity)", // green-300
       [ColorType.NUMBER]: "rgba(253, 224, 71, $opacity)", // yellow-300
-      [ColorType.SPIRAL]: "rgba(249, 115, 22, $opacity)", // orange-500
     };
 
     class Vector {
@@ -82,9 +68,6 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
       targetX: number;
       targetY: number;
       targetZ: number;
-      spiral3DX: number;
-      spiral3DY: number;
-      spiral3DZ: number;
 
       constructor(x: number, y: number, z: number) {
         this.x = x;
@@ -93,14 +76,9 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
         this.originalX = x;
         this.originalY = y;
         this.originalZ = z;
-        // Target positions for 2D grid transition - will be set later
         this.targetX = 0;
         this.targetY = 0;
         this.targetZ = 0;
-        // Spiral 3D positions for slide 3 - will be set later
-        this.spiral3DX = 0;
-        this.spiral3DY = 0;
-        this.spiral3DZ = 0;
       }
 
       reset(): void {
@@ -115,27 +93,12 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
         this.targetZ = z;
       }
 
-      setSpiral3D(x: number, y: number, z: number): void {
-        this.spiral3DX = x;
-        this.spiral3DY = y;
-        this.spiral3DZ = z;
-      }
-
-      updateForTransition(progress: number, progress3: number): void {
-        if (progress > 0 && progress3 === 0) {
-          // Slide 0-1 transition: Interpolate between 3D position and 2D grid position
+      updateForTransition(progress: number): void {
+        if (progress > 0) {
+          // Slide 0-1 transition
           this.x = this.originalX * (1 - progress) + this.targetX * progress;
           this.y = this.originalY * (1 - progress) + this.targetY * progress;
           this.z = this.originalZ * (1 - progress) + this.targetZ * progress;
-        } else if (progress3 > 0) {
-          // Slide 2-3 transition: Interpolate between current position and spiral 3D position
-          const baseX = progress > 0 ? this.targetX : this.originalX;
-          const baseY = progress > 0 ? this.targetY : this.originalY;
-          const baseZ = progress > 0 ? this.targetZ : this.originalZ;
-
-          this.x = baseX * (1 - progress3) + this.spiral3DX * progress3;
-          this.y = baseY * (1 - progress3) + this.spiral3DY * progress3;
-          this.z = baseZ * (1 - progress3) + this.spiral3DZ * progress3;
         } else {
           // Reset to original 3D position
           this.reset();
@@ -179,13 +142,13 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
       rowIndex: number;
       colIndex: number;
       originalLetter: string;
-      useWhiteColor: boolean;
+      useSlide0Style: boolean;
 
-      constructor(letter: string, pos: Vector, useWhiteColor = false) {
+      constructor(letter: string, pos: Vector, useSlide0Style = false) {
         this.letter = letter;
         this.originalLetter = letter;
         this.pos = pos;
-        this.useWhiteColor = useWhiteColor;
+        this.useSlide0Style = useSlide0Style;
         this.colorType = this.getColorType(letter);
         this.isCenter =
           Math.abs(pos.x) < 0.2 &&
@@ -198,7 +161,7 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
         this.colIndex = 0;
 
         // Special treatment for characters near center in non-slide-0 mode
-        if (this.isCenter && !useWhiteColor) {
+        if (this.isCenter && !useSlide0Style) {
           this.colorType = ColorType.CENTER;
           if (Math.random() < 0.5) {
             this.letter = "◉";
@@ -214,7 +177,6 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
         if (CONNECTION_CHARS.includes(char)) return ColorType.CONNECTION;
         if (NUMBER_CHARS.includes(char)) return ColorType.NUMBER;
         if (CRAZY_CHARS.includes(char)) return ColorType.TRANSITION;
-        if (SPIRAL_CHARS.includes(char)) return ColorType.SPIRAL;
         return ColorType.NODE; // default
       }
 
@@ -222,7 +184,7 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
         this.rowIndex = rowIndex;
         this.colIndex = colIndex;
 
-        // Calculate grid positions in the same scale as 3D space
+        // Calculate grid positions
         const xSpacing = (SEPARATION * 2) / GRID_COLS;
         const ySpacing = (SEPARATION * 2) / GRID_ROWS;
 
@@ -234,36 +196,21 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
         this.pos.setTarget(gridX, gridY, 0.5);
       }
 
-      assignSpiralPosition(): void {
-        // Calculate spiral positions for slide 3
-        const t = this.pulseOffset + time * 0.001;
-        const radius = Math.random() * 0.5 + 0.5;
-        const height = (Math.random() * 2 - 1) * SEPARATION;
-
-        // Spiral coordinates
-        const spiralX = Math.cos(t) * radius;
-        const spiralY = Math.sin(t) * radius;
-        const spiralZ = height + Math.sin(t * 2) * 0.3;
-
-        this.pos.setSpiral3D(spiralX, spiralY, spiralZ);
-      }
-
       rotate(dir: "x" | "y" | "z", ang: number): void {
         this.pos.rotate(dir, ang);
       }
 
-      update(progress: number, progress3: number): void {
-        // Update spiral position for slide 3
-        this.assignSpiralPosition();
-
-        // Determine if this character should behave like slide 0 style
-        const isSlide0Style = currentSlide === 0 && progress < 0.5;
-
-        // Character appearance logic
-        if (isSlide0Style) {
-          // For slide 0, use original ascii-animation behavior
+      update(progress: number): void {
+        // Character appearance logic based on slide and transition
+        if (currentSlide === 0 && progress < 0.5) {
+          // Special case for slide 0 - periodically change characters randomly
           if (Math.random() < 0.002) {
-            this.letter = CRAZY_CHARS[Math.floor(Math.random() * CRAZY_CHARS.length)];
+            if (this.useSlide0Style) {
+              // Random ASCII character (33-126) for slide 0 style
+              this.letter = String.fromCharCode((Math.random() * 93 + 33) | 0);
+            } else {
+              this.letter = CRAZY_CHARS[Math.floor(Math.random() * CRAZY_CHARS.length)];
+            }
           }
           
           // In slide 0 to slide 1 transition, start morphing characters
@@ -281,21 +228,7 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
           }
         } 
         // For transitions and other slides
-        else if (progress3 > 0) {
-          // Slide 3 transition - gradually change to spiral chars
-          if (Math.random() < 0.03) {
-            if (Math.random() < 0.7) {
-              this.letter = SPIRAL_CHARS[Math.floor(Math.random() * SPIRAL_CHARS.length)];
-              this.colorType = ColorType.SPIRAL;
-            } else if (Math.random() < 0.5) {
-              this.letter = BRIGHT_CHARS[Math.floor(Math.random() * BRIGHT_CHARS.length)];
-              this.colorType = ColorType.BRIGHT;
-            } else {
-              this.letter = CRAZY_CHARS[Math.floor(Math.random() * CRAZY_CHARS.length)];
-              this.colorType = ColorType.TRANSITION;
-            }
-          }
-        } else if (progress > 0.5) {
+        else if (progress > 0.5) {
           if (Math.random() < 0.02) {
             const rnd = Math.random();
             if (rnd < 0.6) {
@@ -309,7 +242,7 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
               this.colorType = this.getColorType(this.letter);
             }
           }
-        } else if (!isSlide0Style) {
+        } else {
           if (Math.random() < 0.002) {
             const rnd = Math.random();
             if (rnd < 0.3) {
@@ -331,29 +264,46 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
         const PIXEL = this.pos.project();
         const XP = PIXEL[0];
         const YP = PIXEL[1];
+        const ZP = PIXEL[2];
 
-        // Slide 0 uses larger max size as in original
-        const MAX_SIZE = 70;
-        let SIZE = ((1 / PIXEL[2]) * MAX_SIZE) | 0;
+        // Determine if this character should use slide 0 style rendering
+        const useSlide0Rendering = this.useSlide0Style && currentSlide === 0 && transitionProgress < 0.5;
+        
+        // Size calculation based on slide
+        const MAX_SIZE = useSlide0Rendering ? 50 : 70;
+        let SIZE = ((1 / ZP) * MAX_SIZE) | 0;
 
-        if (transitionProgress > 0.8 && transition3Progress < 0.2) {
+        // Size adjustments for transitions
+        if (transitionProgress > 0.8) {
           const blendFactor = (transitionProgress - 0.8) * 5;
           const uniformSize = Math.min(ww / GRID_COLS, wh / GRID_ROWS) * 0.4;
           SIZE = SIZE * (1 - blendFactor) + uniformSize * blendFactor;
         }
 
-        if (transition3Progress > 0.5) {
-          const distFactor = Math.sqrt(
-            Math.pow(this.pos.x, 2) +
-            Math.pow(this.pos.y, 2) +
-            Math.pow(this.pos.z, 2),
-          );
-          SIZE = SIZE * (1 - 0.3 * distFactor);
-        }
-
+        // Brightness calculation
         let BRIGHTNESS = SIZE / MAX_SIZE;
 
-        // Depth-based brightness adjustments for slide 0
+        // Special brightness handling for slide 0
+        if (useSlide0Rendering) {
+          // Exaggerate depth perception with stronger brightness variations
+          // Closer characters are brighter, further characters are dimmer
+          const depthFactor = 1.5 - (ZP / (SEPARATION * 3));
+          BRIGHTNESS = Math.max(0.1, Math.min(1.0, BRIGHTNESS * depthFactor));
+          
+          // Enhanced slide0 color with depth-based blue variation
+          const blueValue = Math.min(255, Math.max(100, (200 * BRIGHTNESS) | 0));
+          const slide0Color = `rgba(255, 255, ${blueValue}, ${BRIGHTNESS})`;
+          
+          ctx.beginPath();
+          ctx.fillStyle = slide0Color;
+          ctx.font = SIZE + "px monospace";
+          ctx.fillText(this.letter, XP, YP);
+          ctx.fill();
+          ctx.closePath();
+          return;
+        }
+
+        // Standard brightness adjustments for other slides
         if (currentSlide === 0 && transitionProgress < 0.3) {
           const depthFactor = 1 + (this.pos.z / SEPARATION) * 0.3;
           BRIGHTNESS *= depthFactor;
@@ -362,57 +312,25 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
           }
         }
 
-        // For other slides or transitions
+        // Pulse effect for bright and center characters
         if (this.colorType === ColorType.BRIGHT || this.isCenter) {
           BRIGHTNESS *= 0.8 + 0.2 * Math.sin(time * 0.05 + this.pulseOffset);
         }
 
-        if (transitionProgress > 0.8 && transition3Progress < 0.2) {
+        // Wave effect for grid transition
+        if (transitionProgress > 0.8) {
           const distFromCenter = Math.sqrt(
             Math.pow(this.colIndex - GRID_COLS / 2, 2) +
-            Math.pow(this.rowIndex - GRID_ROWS / 2, 2),
+            Math.pow(this.rowIndex - GRID_ROWS / 2, 2)
           );
           const waveEffect = Math.sin(time * 0.05 - distFromCenter * 0.3);
           BRIGHTNESS *= 0.7 + 0.3 * (0.5 + waveEffect * 0.5);
         }
 
-        if (transition3Progress > 0.2) {
-          const spiralPulse = Math.sin(time * 0.03 + this.pulseOffset * 3);
-          BRIGHTNESS *= 0.7 + 0.3 * (0.5 + spiralPulse * 0.5);
-        }
-
         BRIGHTNESS = Math.max(BRIGHTNESS, 0.1);
 
-        let colorStr;
-        
-        // Determine the color based on slide and transition
-        if (this.useWhiteColor) {
-          // For slide 0-style characters, use white with transition blending
-          if (transitionProgress < 0.5) {
-            // Pure white for slide 0
-            colorStr = `rgba(255, 255, 255, ${BRIGHTNESS})`;
-          } else {
-            // Blend to color during transition
-            const blendFactor = (transitionProgress - 0.5) * 2;
-            const colorFromType = COLOR_MAP[this.colorType].replace("$opacity", BRIGHTNESS.toFixed(2));
-            
-            // Parse color components
-            const whiteColor = [255, 255, 255];
-            const typeColor = colorFromType.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([^\)]+))?\)/);
-            
-            if (typeColor) {
-              const r = Math.round(whiteColor[0] * (1 - blendFactor) + parseInt(typeColor[1]) * blendFactor);
-              const g = Math.round(whiteColor[1] * (1 - blendFactor) + parseInt(typeColor[2]) * blendFactor);
-              const b = Math.round(whiteColor[2] * (1 - blendFactor) + parseInt(typeColor[3]) * blendFactor);
-              colorStr = `rgba(${r}, ${g}, ${b}, ${BRIGHTNESS})`;
-            } else {
-              colorStr = colorFromType;
-            }
-          }
-        } else {
-          // For non-slide-0 characters, use color map
-          colorStr = COLOR_MAP[this.colorType].replace("$opacity", BRIGHTNESS.toFixed(2));
-        }
+        // Standard color rendering for non-slide-0 or during transition
+        const colorStr = COLOR_MAP[this.colorType].replace("$opacity", BRIGHTNESS.toFixed(2));
 
         ctx.beginPath();
         ctx.fillStyle = colorStr;
@@ -424,7 +342,7 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
     }
 
     function getCenter(): [number, number] {
-      return [ww / 2, wh / 2]; // Always center
+      return [ww / 2, wh / 2];
     }
 
     function signedRandom(): number {
@@ -432,12 +350,25 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
     }
 
     function renderAll(): void {
+      // For slide 0, emphasize depth by sorting and adding visual cues
+      const isSlide0 = currentSlide === 0 && transitionProgress < 0.5;
+      
       // Sort characters by z-position for proper depth rendering
-      CHARS.sort((a, b) => {
-        const aPos = a.pos.project();
-        const bPos = b.pos.project();
-        return bPos[2] - aPos[2]; // render far-to-near
-      });
+      if (isSlide0) {
+        // For slide 0, sort from near-to-far (painter's algorithm)
+        CHARS.sort((a, b) => {
+          const aPos = a.pos.project();
+          const bPos = b.pos.project();
+          return aPos[2] - bPos[2]; // Painter's algorithm: render near-to-far
+        });
+      } else {
+        // For other slides, sort from far-to-near
+        CHARS.sort((a, b) => {
+          const aPos = a.pos.project();
+          const bPos = b.pos.project();
+          return bPos[2] - aPos[2]; // render far-to-near
+        });
+      }
 
       for (let i = 0; i < CHARS.length; i++) {
         CHARS[i].render();
@@ -459,20 +390,8 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
       // Handle transition based on slide
       if (currentSlide === 1 && transitionProgress < 1) {
         transitionProgress = Math.min(transitionProgress + TRANSITION_SPEED, 1);
-        transition3Progress = 0;
       } else if (currentSlide === 0 && transitionProgress > 0) {
         transitionProgress = Math.max(transitionProgress - TRANSITION_SPEED, 0);
-        transition3Progress = 0;
-      } else if (currentSlide === 2 && transition3Progress < 1) {
-        transition3Progress = Math.min(
-          transition3Progress + TRANSITION3_SPEED,
-          1,
-        );
-      } else if (currentSlide !== 2 && transition3Progress > 0) {
-        transition3Progress = Math.max(
-          transition3Progress - TRANSITION3_SPEED,
-          0,
-        );
       }
 
       if (lastSlide !== currentSlide) {
@@ -482,13 +401,21 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
         lastSlide = currentSlide;
       }
 
-      // For slide 0, apply simplified rotation (from old-ascii-animation)
+      // For slide 0, apply dramatically enhanced rotation to showcase 3D disposition
       if (currentSlide === 0 && transitionProgress < 0.5) {
+        // Use much larger rotation angles for dramatic effect
+        const angleX = Math.sin(time * 0.0005) * 0.03;
+        const angleY = Math.cos(time * 0.0007) * 0.03;
+        
+        // Apply rotation to each character
         for (let i = 0; i < CHARS.length; i++) {
-          const DX = 0.006 * Math.sin(time * 0.001);
-          const DY = 0.006 * Math.cos(time * 0.001);
-          CHARS[i].rotate("x", DX);
-          CHARS[i].rotate("y", DY);
+          CHARS[i].rotate("x", angleX);
+          CHARS[i].rotate("y", angleY);
+          
+          // Add more z-axis rotation
+          if (i % 2 === 0) {
+            CHARS[i].rotate("z", 0.005 * Math.sin(time * 0.0003));
+          }
         }
       } else {
         // For other slides, apply global rotation
@@ -497,7 +424,7 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
         const globalRotationZ = Math.sin(time * 0.0001) * 0.001;
 
         for (let i = 0; i < CHARS.length; i++) {
-          if (transitionProgress < 0.7 && transition3Progress < 0.7) {
+          if (transitionProgress < 0.7) {
             CHARS[i].rotate("x", globalRotationX);
             CHARS[i].rotate("y", globalRotationY);
             CHARS[i].rotate("z", globalRotationZ);
@@ -507,11 +434,8 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
 
       // Update positions and characters
       for (let i = 0; i < CHARS.length; i++) {
-        CHARS[i].pos.updateForTransition(
-          transitionProgress,
-          transition3Progress,
-        );
-        CHARS[i].update(transitionProgress, transition3Progress);
+        CHARS[i].pos.updateForTransition(transitionProgress);
+        CHARS[i].update(transitionProgress);
       }
 
       time++;
@@ -532,14 +456,53 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
     }
 
     function createChars(): void {
-      // For slide 0, create characters exactly like in old-ascii-animation
-      for (let i = 0; i < MAX_CHARS; i++) {
-        const CHARACTER = CRAZY_CHARS[Math.floor(Math.random() * CRAZY_CHARS.length)];
-        const X = signedRandom() * SEPARATION;
-        const Y = signedRandom() * SEPARATION;
-        const Z = signedRandom() * SEPARATION;
+      // Create a dramatically structured 3D arrangement for better visualization
+      // We'll create characters in a sphere AND a cube lattice to emphasize depth
+      
+      // First, create some characters in cube lattice points
+      const latticeSize = 3; // 3x3x3 cube
+      const latticeSpacing = SEPARATION / (latticeSize - 1);
+      
+      let charCount = 0;
+      
+      // Create cube lattice structure (corners and edges)
+      for (let x = 0; x < latticeSize; x++) {
+        for (let y = 0; y < latticeSize; y++) {
+          for (let z = 0; z < latticeSize; z++) {
+            // Only use points on the edges of the cube for clearer structure
+            if (x === 0 || x === latticeSize-1 || 
+                y === 0 || y === latticeSize-1 || 
+                z === 0 || z === latticeSize-1) {
+              
+              const X = (x * latticeSpacing) - SEPARATION/2;
+              const Y = (y * latticeSpacing) - SEPARATION/2;
+              const Z = (z * latticeSpacing) - SEPARATION/2;
+              
+              // Create character
+              const CHARACTER = String.fromCharCode((Math.random() * 93 + 33) | 0);
+              const POS = new Vector(X, Y, Z);
+              const CHAR = new Char(CHARACTER, POS, true);
+              CHARS.push(CHAR);
+              charCount++;
+            }
+          }
+        }
+      }
+      
+      // Fill the rest with spherical distribution
+      for (let i = charCount; i < MAX_CHARS; i++) {
+        const CHARACTER = String.fromCharCode((Math.random() * 93 + 33) | 0);
+        
+        // Spherical distribution with higher concentration toward the center
+        let theta = Math.random() * Math.PI * 2;
+        let phi = Math.acos(2 * Math.random() - 1);
+        let radius = Math.pow(Math.random(), 1/2) * SEPARATION * 0.8; // Square root for more central concentration
+        
+        const X = radius * Math.sin(phi) * Math.cos(theta);
+        const Y = radius * Math.sin(phi) * Math.sin(theta);
+        const Z = radius * Math.cos(phi);
+        
         const POS = new Vector(X, Y, Z);
-        // Use white color for slide 0
         const CHAR = new Char(CHARACTER, POS, true);
         CHARS.push(CHAR);
       }
@@ -556,8 +519,8 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
     }
 
     function initCamera(): void {
-      // Use the same camera position as old-ascii-animation
-      camera = new Vector(0, 0, SEPARATION + 0.8);
+      // Using a closer camera position for slide 0 to accentuate perspective
+      camera = new Vector(0, 0, SEPARATION * 1.2);
     }
 
     setDim();
