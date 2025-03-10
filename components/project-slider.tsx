@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import VideoAsciiArt from "./video-ascii-art";
 import UnifiedAsciiAnimation from "./ascii-animation";
 
 const slides = [
@@ -10,30 +9,26 @@ const slides = [
     title: "Build your next gen Starknet project with Kasar²",
     description:
       "An engineering and research laboratory of Starknet core devs solving your high and low-level problems.",
-    videoSrc: "/placeholder-kasar.mp4",
-    asciiState: 0, // État pluie
+    asciiState: 0, // Rain state
   },
   {
     id: 1,
     title: "Sn Stack exploration",
     description:
       "L'exploration de solutions client and blockchain for the Starknet Stack.",
-    videoSrc: "/placeholder-stack.mp4",
-    asciiState: 1, // État nuage
+    asciiState: 1, // Cloud state
   },
   {
     id: 2,
     title: "Snak",
     description: "Le Starknet agent kit framework pour build des agents.",
-    videoSrc: "/placeholder-snak.mp4",
-    asciiState: 2, // État grille
+    asciiState: 2, // Grid state
   },
   {
     id: 3,
     title: "Quaza",
     description: "Une L3 Starknet pour agents et développeurs.",
-    videoSrc: "/videos/dragon.webm",
-    asciiState: null, // Pas d'animation ASCII
+    asciiState: 3, // Spiral state - using ASCII animation instead of MP4
   },
 ];
 
@@ -43,9 +38,9 @@ export default function ProjectSlider() {
   const [direction, setDirection] = useState("left");
   const slideContainerRef = useRef<HTMLDivElement>(null);
   
-  // État ASCII séparé pour une meilleure gestion des transitions
+  // ASCII state for animation
   const [asciiState, setAsciiState] = useState(slides[0].asciiState);
-  const [asciiVisible, setAsciiVisible] = useState(slides[0].asciiState !== null);
+  const [asciiVisible, setAsciiVisible] = useState(true); // Always visible now that we use ASCII for all slides
   
   const goToSlide = useCallback(
     (index: number) => {
@@ -65,28 +60,9 @@ export default function ProjectSlider() {
         slideContainerRef.current.classList.add("slide-exit");
       }
       
-      // Gérer les transitions d'animation ASCII
-      const nextAsciiState = slides[index].asciiState;
-      
-      // Si la slide actuelle a un état ASCII et la prochaine aussi
-      if (slides[currentSlide].asciiState !== null && nextAsciiState !== null) {
-        // Mettre à jour l'état ASCII pour déclencher la transition
-        console.log(`Transitioning ASCII from ${slides[currentSlide].asciiState} to ${nextAsciiState}`);
-        setAsciiState(nextAsciiState);
-      } 
-      // Si on passe d'une slide sans ASCII à une slide avec ASCII
-      else if (slides[currentSlide].asciiState === null && nextAsciiState !== null) {
-        // Afficher l'animation ASCII
-        setAsciiState(nextAsciiState);
-        setAsciiVisible(true);
-      }
-      // Si on passe d'une slide avec ASCII à une slide sans ASCII
-      else if (slides[currentSlide].asciiState !== null && nextAsciiState === null) {
-        // Masquer l'animation ASCII après la transition
-        setTimeout(() => {
-          setAsciiVisible(false);
-        }, 500);
-      }
+      // Update ASCII state to trigger transition
+      console.log(`Transitioning ASCII from ${slides[currentSlide].asciiState} to ${slides[index].asciiState}`);
+      setAsciiState(slides[index].asciiState);
 
       setTimeout(() => {
         setCurrentSlide(index);
@@ -120,14 +96,12 @@ export default function ProjectSlider() {
 
   return (
     <div className="w-full min-h-[calc(100vh-5rem)] flex flex-col justify-center overflow-hidden relative">
-      {/* Animation ASCII en arrière-plan - toujours présente mais visible selon l'état */}
+      {/* ASCII Animation - now used for all slides */}
       <div
-        className={`absolute inset-0 w-screen h-screen transition-opacity duration-500 ${
-          asciiVisible ? "opacity-100" : "opacity-0"
-        }`}
+        className="absolute inset-0 w-screen h-screen"
         style={{ top: "-5rem" }}
       >
-        {asciiVisible && <UnifiedAsciiAnimation currentSlide={asciiState} />}
+        <UnifiedAsciiAnimation currentSlide={asciiState} />
       </div>
 
       <div
@@ -148,22 +122,13 @@ export default function ProjectSlider() {
             </p>
           </div>
 
-          {/* Afficher la vidéo ASCII pour la slide 3 uniquement */}
-          {currentSlide === 3 ? (
-            <div className="flex justify-center md:justify-end slide-element slide-element-2 relative">
-              <div className="w-full h-72 md:h-96 relative">
-                <VideoAsciiArt videoSrc={slides[currentSlide].videoSrc} />
-              </div>
-            </div>
-          ) : (
-            <div className="md:block hidden">
-              {/* Intentionnellement vide pour maintenir la mise en page */}
-            </div>
-          )}
+          <div className="md:block hidden">
+            {/* Empty div to maintain layout */}
+          </div>
         </div>
       </div>
 
-      {/* Indicateurs de slide */}
+      {/* Slide indicators */}
       <div className="pb-12 pt-8 flex justify-center space-x-3 relative z-20">
         {slides.map((slide, index) => (
           <button
