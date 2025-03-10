@@ -154,7 +154,7 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
     if (!ctx) return;
 
     // Configuration
-    const MAX_CHARS = 300;
+    const MAX_CHARS = 100;
     
     // Canvas dimensions
     let width = canvas.clientWidth;
@@ -454,20 +454,20 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
       ctx.fillStyle = "black";
       ctx.fillRect(0, 0, width, height);
       
-      // Title
-      ctx.font = "24px sans-serif";
-      ctx.fillStyle = "white";
-      ctx.textAlign = "center";
-      ctx.fillText("STARKNET", width / 2, 40);
+      // // Title
+      // ctx.font = "24px sans-serif";
+      // ctx.fillStyle = "white";
+      // ctx.textAlign = "center";
+      // ctx.fillText("STARKNET", width / 2, 40);
       
-      // Debug info
-      ctx.font = "16px sans-serif";
-      ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
-      ctx.fillText(
-        `State: ${previousSlide}${isTransitioning ? ` → ${currentSlide} (${Math.round(transitionProgress * 100)}%)` : ""}`, 
-        width / 2, 
-        70
-      );
+      // // Debug info
+      // ctx.font = "16px sans-serif";
+      // ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
+      // ctx.fillText(
+      //   `State: ${previousSlide}${isTransitioning ? ` → ${currentSlide} (${Math.round(transitionProgress * 100)}%)` : ""}`, 
+      //   width / 2, 
+      //   70
+      // );
       
       // Update and render characters
       updateCharacters();

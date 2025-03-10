@@ -2,84 +2,109 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import UnifiedAsciiAnimation from "./ascii-animation";
+import Link from "next/link";
+import Image from "next/image";
+import { FiArrowRight } from "react-icons/fi";
 
 const slides = [
   {
     id: 0,
-    title: "Build your next gen Starknet project with Kasar²",
+    title: "Kasar Labs",
+    subtitle: "Engineering & Research Laboratory",
     description:
-      "An engineering and research laboratory of Starknet core devs solving your high and low-level problems.",
-    asciiState: 0, // Rain state
+      "Une équipe d'ingénieurs spécialisés dans le développement Starknet. Nous proposons des services de conseil, de développement et de recherche pour aider les projets à tirer parti de la technologie Starknet.",
+    asciiState: 0,
+    logo: "/images/kasarLogo.webp",
+    isMainSlide: true,
+    primaryLink: {
+      text: "Kasar GitHub",
+      url: "https://github.com/kasarlabs"
+    },
+    secondaryLink: {
+      text: "À propos de nous",
+      url: "https://kasar.io/about"
+    }
   },
   {
     id: 1,
-    title: "Sn Stack exploration",
+    title: "Sn Stack Exploration",
+    subtitle: "Client & Blockchain Solutions",
     description:
-      "L'exploration de solutions client and blockchain for the Starknet Stack.",
-    asciiState: 1, // Cloud state
+      "Notre exploration de la stack Starknet vise à développer des outils et des bibliothèques pour faciliter l'intégration et l'utilisation de Starknet par les développeurs. Nous travaillons sur des solutions client robustes et des implémentations blockchain optimisées.",
+    asciiState: 1,
+    logo: "/images/snstack-logo.webp",
+    isMainSlide: false,
+    primaryLink: {
+      text: "SnStack GitHub",
+      url: "https://github.com/kasarlabs/snstack"
+    },
+    secondaryLink: {
+      text: "Documentation",
+      url: "https://docs.kasar.io/snstack"
+    }
   },
   {
     id: 2,
-    title: "Snak",
-    description: "Le Starknet agent kit framework pour build des agents.",
-    asciiState: 2, // Grid state
+    title: "Snak Framework",
+    subtitle: "Starknet Agent Kit",
+    description: 
+      "Snak est un framework complet pour la création d'agents autonomes sur Starknet. Il fournit les outils nécessaires pour développer, tester et déployer des agents intelligents capables d'interagir avec la blockchain Starknet de manière autonome et efficace.",
+    asciiState: 2,
+    logo: "/images/snak-logo.webp",
+    isMainSlide: false,
+    primaryLink: {
+      text: "Snak GitHub",
+      url: "https://github.com/kasarlabs/snak"
+    },
+    secondaryLink: {
+      text: "Documentation",
+      url: "https://docs.kasar.io/snak"
+    }
   },
   {
     id: 3,
     title: "Quaza",
-    description: "Une L3 Starknet pour agents et développeurs.",
-    asciiState: 3, // Spiral state - using ASCII animation instead of MP4
+    subtitle: "L3 Solution for Starknet",
+    description: 
+      "Quaza est une solution de layer 3 construite sur Starknet, spécialement conçue pour les agents autonomes et les développeurs. Elle offre des performances améliorées, des frais réduits et des fonctionnalités avancées pour les applications décentralisées modernes.",
+    asciiState: 3,
+    logo: "/images/quaza-logo.webp",
+    isMainSlide: false,
+    primaryLink: {
+      text: "Quaza GitHub",
+      url: "https://github.com/kasarlabs/quaza"
+    },
+    secondaryLink: {
+      text: "Documentation",
+      url: "https://docs.quaza.io"
+    }
   },
 ];
 
 export default function ProjectSlider() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [direction, setDirection] = useState("left");
   const slideContainerRef = useRef<HTMLDivElement>(null);
   
-  // ASCII state for animation
   const [asciiState, setAsciiState] = useState(slides[0].asciiState);
-  const [asciiVisible, setAsciiVisible] = useState(true); // Always visible now that we use ASCII for all slides
+  
+  // Style pour l'animation d'horloge numérique
+  const digitClockStyle = {
+    transition: "transform 0.8s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.8s cubic-bezier(0.23, 1, 0.32, 1)",
+  };
   
   const goToSlide = useCallback(
     (index: number) => {
       if (isTransitioning) return;
       setIsTransitioning(true);
-
-      if (
-        index > currentSlide ||
-        (currentSlide === slides.length - 1 && index === 0)
-      ) {
-        setDirection("left");
-      } else {
-        setDirection("right");
-      }
-
-      if (slideContainerRef.current) {
-        slideContainerRef.current.classList.add("slide-exit");
-      }
-      
-      // Update ASCII state to trigger transition
-      console.log(`Transitioning ASCII from ${slides[currentSlide].asciiState} to ${slides[index].asciiState}`);
       setAsciiState(slides[index].asciiState);
 
       setTimeout(() => {
         setCurrentSlide(index);
-        if (slideContainerRef.current) {
-          slideContainerRef.current.classList.remove("slide-exit");
-          slideContainerRef.current.classList.add("slide-enter");
-
-          setTimeout(() => {
-            if (slideContainerRef.current) {
-              slideContainerRef.current.classList.remove("slide-enter");
-            }
-            setIsTransitioning(false);
-          }, 800);
-        }
-      }, 600);
+        setIsTransitioning(false);
+      }, 800);
     },
-    [currentSlide, isTransitioning],
+    [isTransitioning],
   );
 
   const nextSlide = useCallback(() => {
@@ -95,51 +120,193 @@ export default function ProjectSlider() {
   }, [nextSlide]);
 
   return (
-    <div className="w-full min-h-[calc(100vh-5rem)] flex flex-col justify-center overflow-hidden relative">
-      {/* ASCII Animation - now used for all slides */}
-      <div
-        className="absolute inset-0 w-screen h-screen"
-        style={{ top: "-5rem" }}
-      >
+    <div className="w-full min-h-screen flex flex-col justify-center bg-black overflow-hidden relative">
+      {/* Animation en arrière-plan complète */}
+      <div className="absolute inset-0">
         <UnifiedAsciiAnimation currentSlide={asciiState} />
       </div>
 
-      <div
-        ref={slideContainerRef}
-        className={`w-full flex items-center justify-center transition-all duration-800 relative z-10 ${
-          direction === "left"
-            ? "slide-direction-left"
-            : "slide-direction-right"
-        }`}
-      >
-        <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-8 items-center px-6 md:px-20">
-          <div className="text-left slide-element slide-element-1">
-            <h1 className="text-3xl md:text-5xl font-semibold mb-8">
-              {slides[currentSlide].title}
-            </h1>
-            <p className="text-neutral-300 text-lg md:text-xl">
-              {slides[currentSlide].description}
-            </p>
+      <div className="w-full px-6 md:px-12 lg:px-16 py-16 relative z-10">
+        <div className="max-w-4xl mx-auto lg:mx-0 w-full">
+          <div className="flex items-center gap-4 mb-4">
+            {/* Logo intégré avec les informations */}
+            {/* <div 
+              className="w-12 h-12 rounded-full overflow-hidden bg-white flex items-center justify-center flex-shrink-0"
+              style={{
+                transition: "transform 0.5s ease, opacity 0.5s ease",
+                transform: isTransitioning ? "scale(0.9)" : "scale(1)",
+                opacity: isTransitioning ? 0.7 : 1
+              }}
+            >
+              <Image 
+                src={slides[currentSlide].logo} 
+                alt={`Logo ${slides[currentSlide].title}`} 
+                width={36}
+                height={36}
+                className="object-contain"
+              />
+            </div> */}
+            
+            {/* Conteneur pour l'animation du sous-titre */}
+            <div className="h-12 overflow-hidden relative flex-grow">
+              {/* Sous-titre actuel */}
+              <div 
+                className="absolute w-full"
+                style={{
+                  ...digitClockStyle,
+                  transform: isTransitioning ? "translateY(-100%)" : "translateY(0)",
+                  opacity: isTransitioning ? 0 : 1
+                }}
+              >
+                <h2 className="text-lg lg:text-xl text-neutral-400">
+                  {slides[currentSlide].subtitle}
+                </h2>
+              </div>
+              
+              {/* Sous-titre suivant */}
+              {isTransitioning && (
+                <div 
+                  className="absolute w-full"
+                  style={{
+                    ...digitClockStyle,
+                    transform: "translateY(0)",
+                    opacity: 1,
+                    top: "100%",
+                    animation: "slideUp 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards"
+                  }}
+                >
+                  <h2 className="text-lg lg:text-xl text-neutral-400">
+                    {slides[(currentSlide + 1) % slides.length].subtitle}
+                  </h2>
+                </div>
+              )}
+            </div>
           </div>
 
-          <div className="md:block hidden">
-            {/* Empty div to maintain layout */}
+          {/* Conteneur pour l'animation de titre */}
+          <div className="h-16 mb-4 overflow-hidden relative">
+            {/* Titre actuel */}
+            <div 
+              className="absolute w-full"
+              style={{
+                ...digitClockStyle,
+                transform: isTransitioning ? "translateY(-100%)" : "translateY(0)",
+                opacity: isTransitioning ? 0 : 1
+              }}
+            >
+              <h1 className="text-4xl lg:text-5xl font-bold max-w-4xl">
+                {slides[currentSlide].title}
+              </h1>
+            </div>
+            
+            {/* Titre suivant */}
+            {isTransitioning && (
+              <div 
+                className="absolute w-full"
+                style={{
+                  ...digitClockStyle,
+                  transform: "translateY(0)",
+                  opacity: 1,
+                  top: "100%",
+                  animation: "slideUp 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards"
+                }}
+              >
+                <h1 className="text-4xl lg:text-5xl font-bold max-w-4xl">
+                  {slides[(currentSlide + 1) % slides.length].title}
+                </h1>
+              </div>
+            )}
+          </div>
+          
+          {/* Conteneur pour l'animation de description */}
+          <div className="h-24 mb-8 overflow-hidden relative">
+            {/* Description actuelle */}
+            <div 
+              className="absolute w-full"
+              style={{
+                ...digitClockStyle,
+                transform: isTransitioning ? "translateY(-100%)" : "translateY(0)",
+                opacity: isTransitioning ? 0 : 1
+              }}
+            >
+              <p className="text-base lg:text-lg text-neutral-300 max-w-2xl leading-relaxed">
+                {slides[currentSlide].description}
+              </p>
+            </div>
+            
+            {/* Description suivante */}
+            {isTransitioning && (
+              <div 
+                className="absolute w-full"
+                style={{
+                  ...digitClockStyle,
+                  transform: "translateY(0)",
+                  opacity: 1,
+                  top: "100%",
+                  animation: "slideUp 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards"
+                }}
+              >
+                <p className="text-base lg:text-lg text-neutral-300 max-w-2xl leading-relaxed">
+                  {slides[(currentSlide + 1) % slides.length].description}
+                </p>
+              </div>
+            )}
+          </div>
+          
+          {/* Boutons - avec animation de fondu simple */}
+          <div 
+            className="flex flex-col sm:flex-row gap-3"
+            style={{
+              transition: "opacity 0.5s ease",
+              opacity: isTransitioning ? 0.5 : 1
+            }}
+          >
+            <Link 
+              href={slides[currentSlide].primaryLink.url}
+              target="_blank"
+              className="inline-flex items-center px-6 py-3 rounded-2xl bg-white text-black font-medium transition-all hover:bg-neutral-200 hover:scale-105 text-sm"
+            >
+              {slides[currentSlide].primaryLink.text} <FiArrowRight className="ml-2" />
+            </Link>
+            
+            <Link 
+              href={slides[currentSlide].secondaryLink.url}
+              target="_blank"
+              className="inline-flex items-center px-6 py-3 rounded-2xl bg-transparent border border-white text-white font-medium transition-all hover:bg-white hover:bg-opacity-5 hover:scale-105 text-sm"
+            >
+              {slides[currentSlide].secondaryLink.text} <FiArrowRight className="ml-2" />
+            </Link>
           </div>
         </div>
       </div>
-
-      {/* Slide indicators */}
-      <div className="pb-12 pt-8 flex justify-center space-x-3 relative z-20">
+      
+      {/* Indicateurs de slide en bas */}
+      <div className="absolute bottom-8 left-0 right-0 flex justify-center space-x-2">
         {slides.map((slide, index) => (
           <button
             key={slide.id}
-            className={`w-2 h-2 rounded-full transition-all duration-300 ${
+            className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
               index === currentSlide ? "bg-white w-4" : "bg-neutral-600"
             }`}
             onClick={() => goToSlide(index)}
+            aria-label={`Go to slide ${index + 1}`}
           />
         ))}
       </div>
+      
+      {/* Animation CSS pour le défilement vertical */}
+      <style jsx global>{`
+        @keyframes slideUp {
+          0% {
+            transform: translateY(100%);
+            opacity: 0;
+          }
+          100% {
+            transform: translateY(0);
+            opacity: 1;
+          }
+        }
+      `}</style>
     </div>
   );
 }
