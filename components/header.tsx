@@ -33,7 +33,7 @@ export default function Header() {
             </Link>
           </div>
 
-          {/* Desktop Navigation */}
+          {/* Desktop Navigation
           <div className="hidden md:flex items-center gap-8">
             <Link
               href="/projects"
@@ -61,7 +61,7 @@ export default function Header() {
             >
               GitHub
             </a>
-          </div>
+          </div> */}
 
           {/* Mobile Menu Button */}
           <button

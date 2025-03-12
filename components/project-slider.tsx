@@ -8,24 +8,6 @@ import { FiArrowRight } from "react-icons/fi";
 
 const slides = [
   {
-    id: 0,
-    title: "Kasar Labs",
-    subtitle: "Engineering & Research Laboratory",
-    description:
-      "Une équipe d'ingénieurs spécialisés dans le développement Starknet. Nous proposons des services de conseil, de développement et de recherche pour aider les projets à tirer parti de la technologie Starknet.",
-    asciiState: 0,
-    logo: "/images/kasarLogoNoBg.png",
-    isMainSlide: true,
-    primaryLink: {
-      text: "Kasar GitHub",
-      url: "https://github.com/kasarlabs"
-    },
-    secondaryLink: {
-      text: "À propos de nous",
-      url: "https://kasar.io/about"
-    }
-  },
-  {
     id: 1,
     title: "Sn Stack Exploration",
     subtitle: "Client & Blockchain Solutions",
@@ -81,12 +63,18 @@ const slides = [
   },
 ];
 
-export default function ProjectSlider() {
+interface ProjectSliderProps {
+  // You can add custom props if needed
+}
+
+export default function ProjectSlider({}: ProjectSliderProps) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const slideContainerRef = useRef<HTMLDivElement>(null);
+  const scrollControlRef = useRef<HTMLDivElement>(null);
   
   const [asciiState, setAsciiState] = useState(slides[0].asciiState);
+  const [hasInitialized, setHasInitialized] = useState(false);
   
   // Style pour l'animation d'horloge numérique
   const digitClockStyle = {
@@ -95,7 +83,7 @@ export default function ProjectSlider() {
   
   const goToSlide = useCallback(
     (index: number) => {
-      if (isTransitioning) return;
+      if (isTransitioning || index === currentSlide) return;
       setIsTransitioning(true);
       setAsciiState(slides[index].asciiState);
 
@@ -104,49 +92,99 @@ export default function ProjectSlider() {
         setIsTransitioning(false);
       }, 800);
     },
-    [isTransitioning],
+    [isTransitioning, currentSlide],
   );
 
-  const nextSlide = useCallback(() => {
-    const nextIndex = currentSlide === slides.length - 1 ? 0 : currentSlide + 1;
-    goToSlide(nextIndex);
-  }, [currentSlide, goToSlide]);
-
+  // Setup scroll-based slide changes
   useEffect(() => {
-    const interval = setInterval(() => {
-      nextSlide();
-    }, 6000);
-    return () => clearInterval(interval);
-  }, [nextSlide]);
+    // Wait a moment before initializing to ensure that the component is fully mounted
+    // and visible (after ScrollAnimation completes)
+    const initTimer = setTimeout(() => {
+      setHasInitialized(true);
+    }, 1000);
+    
+    return () => clearTimeout(initTimer);
+  }, []);
+  
+  // Set up scroll control after initialization
+  useEffect(() => {
+    if (!hasInitialized || !scrollControlRef.current) return;
+    
+    // Calculate the height needed for scrolling - ensure enough space for all slides
+    // Since the component is fixed, we need significantly more height to ensure all slides can be reached
+    const slideHeight = window.innerHeight; // Full viewport height per slide
+    const totalHeight = slideHeight * (slides.length * 2); // Significantly more space to ensure scrolling works
+    
+    // Set height of scroll control element
+    scrollControlRef.current.style.height = `${totalHeight}px`;
+    
+    const handleScroll = () => {
+      if (!slideContainerRef.current || !scrollControlRef.current) return;
+      
+      // Get current scroll position
+      const scrollPosition = window.pageYOffset;
+      
+      // Find where the scroll animation ends - we need to find the parent element
+      // that contains the ScrollAnimation and get its height
+      const parentElement = slideContainerRef.current.parentElement;
+      const scrollAnimationHeight = parentElement ? 
+        parentElement.previousElementSibling?.getBoundingClientRect().height || window.innerHeight : 
+        window.innerHeight;
+        
+      // If we haven't scrolled past the animation section yet, reset to first slide
+      if (scrollPosition < scrollAnimationHeight * 0.9) {
+        if (currentSlide !== 0 && !isTransitioning) {
+          goToSlide(0); // Reset to first slide when scrolling back to animation
+        }
+        return;
+      }
+      
+      // Calculate relative scroll position after the ScrollAnimation
+      const sliderStart = scrollPosition - scrollAnimationHeight;
+      const viewportHeight = window.innerHeight;
+      
+      // Calculate which slide to show based on scroll position
+      // Using a smaller divisor to ensure all slides can be reached
+      const slideIndex = Math.min(
+        Math.floor(sliderStart / (viewportHeight * 0.5)), // Reduced threshold to ensure all slides are reachable
+        slides.length - 1
+      );
+      
+      // Ensure we're working with valid values
+      const validSlideIndex = Math.max(0, Math.min(slideIndex, slides.length - 1));
+      
+      // Only change if we're moving to a different slide
+      if (validSlideIndex !== currentSlide && !isTransitioning) {
+        goToSlide(validSlideIndex);
+      }
+    };
+    
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    
+    // Initial check
+    handleScroll();
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [currentSlide, goToSlide, isTransitioning, hasInitialized]);
 
   return (
-    <div className="w-full min-h-screen flex flex-col justify-center bg-black overflow-hidden relative">
-      {/* Animation en arrière-plan complète */}
-      <div className="absolute inset-0">
+    <div 
+      ref={slideContainerRef}
+      className="w-full min-h-screen flex flex-col justify-center bg-black overflow-hidden relative"
+    >
+      {/* Scroll control div - invisible but controls height for scrolling */}
+      <div ref={scrollControlRef} className="w-full absolute top-0 left-0" />
+      
+      {/* Animation en arrière-plan complète - fixed to keep it on screen while scrolling */}
+      <div className="fixed inset-0">
         <UnifiedAsciiAnimation currentSlide={asciiState} />
       </div>
 
-      <div className="w-full px-6 md:px-12 lg:px-16 py-16 relative z-10">
+      <div className="w-full px-6 md:px-12 lg:px-16 py-16 fixed top-0 left-0 z-10 min-h-screen flex flex-col justify-center">
         <div className="max-w-4xl mx-auto lg:mx-0 w-full">
           <div className="flex items-center gap-4 mb-4">
-            {/* Logo intégré avec les informations */}
-            {/* <div 
-              className="w-12 h-12 rounded-full overflow-hidden bg-white flex items-center justify-center flex-shrink-0"
-              style={{
-                transition: "transform 0.5s ease, opacity 0.5s ease",
-                transform: isTransitioning ? "scale(0.9)" : "scale(1)",
-                opacity: isTransitioning ? 0.7 : 1
-              }}
-            >
-              <Image 
-                src={slides[currentSlide].logo} 
-                alt={`Logo ${slides[currentSlide].title}`} 
-                width={36}
-                height={36}
-                className="object-contain"
-              />
-            </div> */}
-            
             {/* Conteneur pour l'animation du sous-titre */}
             <div className="h-12 overflow-hidden relative flex-grow">
               {/* Sous-titre actuel */}
@@ -219,7 +257,7 @@ export default function ProjectSlider() {
           </div>
           
           {/* Conteneur pour l'animation de description */}
-          <div className="h-24 mb-8 overflow-hidden relative">
+          <div className="h-32 mb-8 overflow-hidden relative">
             {/* Description actuelle */}
             <div 
               className="absolute w-full"
@@ -280,8 +318,8 @@ export default function ProjectSlider() {
         </div>
       </div>
       
-      {/* Indicateurs de slide en bas */}
-      <div className="absolute bottom-8 left-0 right-0 flex justify-center space-x-2">
+      {/* Indicateurs de slide en bas avec possibilité de cliquer */}
+      <div className="fixed bottom-8 left-0 right-0 flex justify-center space-x-2">
         {slides.map((slide, index) => (
           <button
             key={slide.id}
@@ -294,7 +332,22 @@ export default function ProjectSlider() {
         ))}
       </div>
       
-      {/* Animation CSS pour le défilement vertical */}
+      {/* Scroll indicator - shows which slide you'll see next */}
+      <div className="fixed bottom-24 right-8 hidden md:block">
+        <div className="flex flex-col items-center space-y-2">
+          <span className="text-xs text-neutral-400">Scroll</span>
+          <div className="w-0.5 h-16 bg-neutral-800 relative overflow-hidden">
+            <div 
+              className="w-full bg-white absolute top-0 h-8"
+              style={{
+                animation: "scrollDown 2s infinite",
+              }}
+            />
+          </div>
+        </div>
+      </div>
+      
+      {/* Animation CSS pour le défilement vertical et scroll indicator */}
       <style jsx global>{`
         @keyframes slideUp {
           0% {
@@ -304,6 +357,15 @@ export default function ProjectSlider() {
           100% {
             transform: translateY(0);
             opacity: 1;
+          }
+        }
+
+        @keyframes scrollDown {
+          0% {
+            transform: translateY(-100%);
+          }
+          100% {
+            transform: translateY(200%);
           }
         }
       `}</style>

@@ -41,6 +41,9 @@ const ScrollAnimation: React.FC<ScrollAnimationProps> = ({ onScrollComplete }) =
       const scrollHeight = window.innerHeight * words.length * 0.35 * 1.5;
       scrollControlRef.current.style.height = `${scrollHeight}px`;
     }
+    
+    // Set initial scroll
+    window.scrollTo(0, 0);
   }, [words.length]);
   
   // Gestionnaire de défilement avec détection du mot actif
@@ -68,8 +71,8 @@ const ScrollAnimation: React.FC<ScrollAnimationProps> = ({ onScrollComplete }) =
       setActiveWordIndex(wordIndex);
       
       // Vérification si la section est complètement défilée
-      // Considérer la section comme complète quand on a atteint ~90% du scroll
-      const isComplete = relativeScroll >= 0.9;
+      // Augmenté à 100% pour s'assurer que l'animation est vraiment terminée
+      const isComplete = relativeScroll >= 1.0;
       
       if (isComplete && !isScrollComplete) {
         setIsScrollComplete(true);
