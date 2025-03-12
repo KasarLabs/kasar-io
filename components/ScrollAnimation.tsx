@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useImperativeHandle } from 'react';
 
 // Interface pour les propriétés du composant
 interface ScrollAnimationProps {
@@ -104,8 +104,20 @@ const ScrollAnimation: React.FC<ScrollAnimationProps> = ({ onScrollComplete }) =
   // Augmente l'espacement vertical entre les mots
   const verticalSpacing = 90; // Augmenté depuis 80px
   
+  const animationRef = useRef(null);
+  
+  // Exposer une méthode pour inverser l'animation
+  useImperativeHandle(animationRef, () => ({
+    reverseAnimation: (progress) => {
+      // Calculer l'index du mot basé sur la progression
+      const wordIndex = Math.min(Math.floor(progress * words.length), words.length - 1);
+      // Mettre à jour l'index du mot actif
+      setActiveWordIndex(wordIndex);
+    }
+  }));
+  
   return (
-    <div ref={containerRef} className="relative w-full">
+    <div ref={containerRef} className="relative w-full ScrollAnimation">
       {/* Élément qui contrôle la hauteur totale de défilement */}
       <div ref={scrollControlRef} className="w-full" />
       
@@ -116,7 +128,7 @@ const ScrollAnimation: React.FC<ScrollAnimationProps> = ({ onScrollComplete }) =
           backgroundImage: 'linear-gradient(to right, rgba(50, 50, 50, 0.1) 1px, transparent 1px), linear-gradient(to bottom, rgba(50, 50, 50, 0.1) 1px, transparent 1px)',
           backgroundSize: '50px 50px',
           opacity: isScrollComplete ? 0 : 1,
-          transition: 'opacity 0.5s ease',
+          transition: 'opacity 0.5s ease-in-out',
           pointerEvents: isScrollComplete ? 'none' : 'auto',
           zIndex: 10
         }}
