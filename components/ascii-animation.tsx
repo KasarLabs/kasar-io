@@ -94,14 +94,25 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
           char.targetZ = radius * Math.cos(phi);
         }
       } else if (targetState === 2) {
-        // Target: Grid state
-        const gridSize = Math.ceil(Math.sqrt(characters.length));
-        const row = index % gridSize;
-        const col = Math.floor(index / gridSize) % gridSize;
-
-        char.targetX = -2 + (col / gridSize) * 4;
-        char.targetY = -2 + (row / gridSize) * 4;
+        // Target: Grid state - matrix style with 30% margin from right
+        // Calculate a more square-like grid
+        const gridWidth = Math.ceil(Math.sqrt(characters.length) * 0.5); // Fewer columns for density
+        const gridHeight = Math.ceil(characters.length / gridWidth);
+        
+        const col = index % gridWidth;
+        const row = Math.floor(index / gridWidth) % gridHeight;
+        
+        // Position the grid with 30% margin from right
+        const rightOffset = 0.8; // Adjusted to be more to the left (30% from right)
+        const narrowWidth = 0.3; // Make the grid narrower (15% of width)
+        
+        // Create a more matrix-like appearance with proper spacing
+        char.targetX = rightOffset + (col / (gridWidth - 1)) * narrowWidth;
+        char.targetY = -1.5 + (row / (gridHeight - 1)) * 3; // Better vertical distribution
         char.targetZ = 0;
+        
+        // Set character to 0 or 1 for matrix effect
+        char.char = Math.random() > 0.5 ? "0" : "1";
       } else if (targetState === 3) {
         // Target: Spiral state for slide 4
         // Instead of video, create a dynamic spiral pattern
@@ -245,13 +256,21 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
           y = radius * Math.sin(phi) * Math.sin(theta);
           z = radius * Math.cos(phi);
         } else {
-          // Grid state - organized in a grid pattern
-          const gridSize = Math.ceil(Math.sqrt(count));
-          const row = i % gridSize;
-          const col = Math.floor(i / gridSize) % gridSize;
-
-          x = -2 + (col / gridSize) * 4;
-          y = -2 + (row / gridSize) * 4;
+          // Grid state - matrix style with 30% margin from right
+          // Calculate a more square-like grid
+          const gridWidth = Math.ceil(Math.sqrt(count) * 0.5); // Fewer columns for density
+          const gridHeight = Math.ceil(count / gridWidth);
+          
+          const col = i % gridWidth;
+          const row = Math.floor(i / gridWidth) % gridHeight;
+          
+          // Position the grid with 30% margin from right
+          const rightOffset = 0.8; // Adjusted to be more to the left (30% from right)
+          const narrowWidth = 0.3; // Make the grid narrower (15% of width)
+          
+          // Create a more matrix-like appearance with proper spacing
+          x = rightOffset + (col / (gridWidth - 1)) * narrowWidth;
+          y = -1.5 + (row / (gridHeight - 1)) * 3; // Better vertical distribution
           z = 0;
         }
 
