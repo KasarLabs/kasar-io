@@ -24,7 +24,7 @@ export default function Header() {
               className="relative w-15 h-15 rounded-full overflow-hidden"
             >
               <Image
-                src="/images/kasarLogo.webp"
+                src="/images/kasarLogoNoBg.png"
                 alt="Logo"
                 width={60}
                 height={60}

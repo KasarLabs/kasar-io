@@ -14,7 +14,7 @@ const slides = [
     description:
       "Une équipe d'ingénieurs spécialisés dans le développement Starknet. Nous proposons des services de conseil, de développement et de recherche pour aider les projets à tirer parti de la technologie Starknet.",
     asciiState: 0,
-    logo: "/images/kasarLogo.webp",
+    logo: "/images/kasarLogoNoBg.png",
     isMainSlide: true,
     primaryLink: {
       text: "Kasar GitHub",

@@ -11,15 +11,19 @@
   "dependencies": {
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "framer-motion": "^12.5.0",
+    "gsap": "^3.12.0",
     "lucide-react": "^0.477.0",
     "next": "14.2.16",
     "react": "^18",
     "react-dom": "^18",
     "react-icons": "^5.5.0",
     "tailwind-merge": "^3.0.2",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "tweakpane": "^4.0.5"
   },
   "devDependencies": {
+    "@types/gsap": "^1.20.2",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
