@@ -72,18 +72,24 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
           const normalizedX = char.x / width; // 0 to 1 based on screen position
           const phi = Math.PI * normalizedX;
           const theta = Math.PI * 2 * (index / characters.length);
-          const radius = 1 + Math.random();
+          const radius = 0.7 + Math.random() * 0.5; // Réduit la dispersion (était 1 + Math.random())
 
-          char.targetX = radius * Math.sin(phi) * Math.cos(theta);
+          // Shift the center point to the right by adding an offset
+          const rightOffset = 0.7; // Ajusté de 1.0 à 0.7 pour être encore moins à droite
+          
+          char.targetX = radius * Math.sin(phi) * Math.cos(theta) + rightOffset;
           char.targetY = radius * Math.sin(phi) * Math.sin(theta);
           char.targetZ = radius * Math.cos(phi);
         } else {
           // Normal cloud positioning (sphere)
           const phi = Math.acos(2 * Math.random() - 1);
           const theta = Math.random() * Math.PI * 2;
-          const radius = Math.random() * 2;
+          const radius = Math.random() * 1.2; // Réduit de 2 à 1.2 pour moins de dispersion
 
-          char.targetX = radius * Math.sin(phi) * Math.cos(theta);
+          // Shift the center point to the right by adding an offset
+          const rightOffset = 0.7; // Ajusté de 1.0 à 0.7 pour être encore moins à droite
+          
+          char.targetX = radius * Math.sin(phi) * Math.cos(theta) + rightOffset;
           char.targetY = radius * Math.sin(phi) * Math.sin(theta);
           char.targetZ = radius * Math.cos(phi);
         }
@@ -230,9 +236,12 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
           // Cloud state - positions on a sphere
           const phi = Math.acos(2 * Math.random() - 1);
           const theta = Math.random() * Math.PI * 2;
-          const radius = Math.random() * 2;
+          const radius = Math.random() * 1.2; // Réduit de 2 à 1.2 pour moins de dispersion
 
-          x = radius * Math.sin(phi) * Math.cos(theta);
+          // Shift the center point to the right by adding an offset
+          const rightOffset = 0.7; // Ajusté de 1.0 à 0.7 pour être encore moins à droite
+          
+          x = radius * Math.sin(phi) * Math.cos(theta) + rightOffset;
           y = radius * Math.sin(phi) * Math.sin(theta);
           z = radius * Math.cos(phi);
         } else {
@@ -362,9 +371,15 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
             const y = char.y;
             const z = char.z;
 
+            // Define the center of rotation (shifted to the right)
+            const centerX = 0.7;  // Ajusté de 1.0 à 0.7 pour être encore moins à droite
+            
+            // Calculate position relative to the center
+            const relX = x - centerX;
+            
             // X-Z rotation
-            char.x = x * Math.cos(0.003) + z * Math.sin(0.003);
-            char.z = -x * Math.sin(0.003) + z * Math.cos(0.003);
+            char.x = centerX + relX * Math.cos(0.003) + z * Math.sin(0.003);
+            char.z = -relX * Math.sin(0.003) + z * Math.cos(0.003);
 
             // Y-Z rotation
             const newY = y * Math.cos(0.002) - char.z * Math.sin(0.002);
@@ -375,7 +390,7 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
             // Occasionally change characters
             if (Math.random() < 0.003) {
               char.char = String.fromCharCode(
-                Math.floor(Math.random() * 93) + 33,
+                Math.floor(Math.random() * 93) + 33
               );
             }
           });
