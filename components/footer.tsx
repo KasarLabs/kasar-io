@@ -6,7 +6,7 @@ import { BsTelegram, BsTwitter, BsGithub } from "react-icons/bs";
 
 const Footer = () => {
   return (
-    <footer className="w-full bg-neutral-900 border-t border-neutral-800 mt-auto">
+    <footer className="w-full bg-neutral-900 border-t border-neutral-800 mt-auto relative z-40">
       {" "}
       {/* Changed from fixed to relative, added mt-auto */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
