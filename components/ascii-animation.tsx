@@ -76,7 +76,7 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
 
           // Shift the center point to the right by adding an offset
           const rightOffset = 0.7; // Ajusté de 1.0 à 0.7 pour être encore moins à droite
-          
+
           char.targetX = radius * Math.sin(phi) * Math.cos(theta) + rightOffset;
           char.targetY = radius * Math.sin(phi) * Math.sin(theta);
           char.targetZ = radius * Math.cos(phi);
@@ -88,7 +88,7 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
 
           // Shift the center point to the right by adding an offset
           const rightOffset = 0.7; // Ajusté de 1.0 à 0.7 pour être encore moins à droite
-          
+
           char.targetX = radius * Math.sin(phi) * Math.cos(theta) + rightOffset;
           char.targetY = radius * Math.sin(phi) * Math.sin(theta);
           char.targetZ = radius * Math.cos(phi);
@@ -98,19 +98,19 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
         // Calculate a more square-like grid
         const gridWidth = Math.ceil(Math.sqrt(characters.length) * 0.5); // Fewer columns for density
         const gridHeight = Math.ceil(characters.length / gridWidth);
-        
+
         const col = index % gridWidth;
         const row = Math.floor(index / gridWidth) % gridHeight;
-        
+
         // Position the grid with 30% margin from right
         const rightOffset = 0.8; // Adjusted to be more to the left (30% from right)
         const narrowWidth = 0.3; // Make the grid narrower (15% of width)
-        
+
         // Create a more matrix-like appearance with proper spacing
         char.targetX = rightOffset + (col / (gridWidth - 1)) * narrowWidth;
         char.targetY = -1.5 + (row / (gridHeight - 1)) * 3; // Better vertical distribution
         char.targetZ = 0;
-        
+
         // Set character to 0 or 1 for matrix effect
         char.char = Math.random() > 0.5 ? "0" : "1";
       } else if (targetState === 3) {
@@ -184,7 +184,7 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
         setIsTransitioning(false);
       }, transitionDuration);
     }
-  }, [currentSlide, previousSlide, isTransitioning]);
+  }, [currentSlide, previousSlide, isTransitioning, calculateTargetPositions]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -202,11 +202,16 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
 
     // Setup canvas with proper resolution
     function setupCanvas() {
+      if (!canvas) return;
+
       width = canvas.clientWidth;
       height = canvas.clientHeight;
       canvas.width = width * window.devicePixelRatio;
       canvas.height = height * window.devicePixelRatio;
-      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+
+      if (ctx) {
+        ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+      }
     }
 
     setupCanvas();
@@ -251,7 +256,7 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
 
           // Shift the center point to the right by adding an offset
           const rightOffset = 0.7; // Ajusté de 1.0 à 0.7 pour être encore moins à droite
-          
+
           x = radius * Math.sin(phi) * Math.cos(theta) + rightOffset;
           y = radius * Math.sin(phi) * Math.sin(theta);
           z = radius * Math.cos(phi);
@@ -260,14 +265,14 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
           // Calculate a more square-like grid
           const gridWidth = Math.ceil(Math.sqrt(count) * 0.5); // Fewer columns for density
           const gridHeight = Math.ceil(count / gridWidth);
-          
+
           const col = i % gridWidth;
           const row = Math.floor(i / gridWidth) % gridHeight;
-          
+
           // Position the grid with 30% margin from right
           const rightOffset = 0.8; // Adjusted to be more to the left (30% from right)
           const narrowWidth = 0.3; // Make the grid narrower (15% of width)
-          
+
           // Create a more matrix-like appearance with proper spacing
           x = rightOffset + (col / (gridWidth - 1)) * narrowWidth;
           y = -1.5 + (row / (gridHeight - 1)) * 3; // Better vertical distribution
@@ -391,11 +396,11 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
             const z = char.z;
 
             // Define the center of rotation (shifted to the right)
-            const centerX = 0.7;  // Ajusté de 1.0 à 0.7 pour être encore moins à droite
-            
+            const centerX = 0.7; // Ajusté de 1.0 à 0.7 pour être encore moins à droite
+
             // Calculate position relative to the center
             const relX = x - centerX;
-            
+
             // X-Z rotation
             char.x = centerX + relX * Math.cos(0.003) + z * Math.sin(0.003);
             char.z = -relX * Math.sin(0.003) + z * Math.cos(0.003);
@@ -409,7 +414,7 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
             // Occasionally change characters
             if (Math.random() < 0.003) {
               char.char = String.fromCharCode(
-                Math.floor(Math.random() * 93) + 33
+                Math.floor(Math.random() * 93) + 33,
               );
             }
           });
@@ -460,11 +465,14 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
         characters.sort((a, b) => b.z - a.z);
       }
 
+      // Vérifier que ctx n'est pas null avant de l'utiliser
+      if (!ctx) return;
+
       // Render each character
       characters.forEach((char) => {
         let x, y, size, color;
 
-        // For rain state without transition
+        // Pour rain state without transition
         if (previousSlide === 0 && !isTransitioning) {
           x = char.x;
           y = char.y;
@@ -542,25 +550,13 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
 
     // Main render loop
     function render() {
+      // Vérifier que ctx n'est pas null avant de l'utiliser
+      if (!ctx) return;
+
       // Clear canvas
       ctx.clearRect(0, 0, width, height);
       ctx.fillStyle = "black";
       ctx.fillRect(0, 0, width, height);
-
-      // // Title
-      // ctx.font = "24px sans-serif";
-      // ctx.fillStyle = "white";
-      // ctx.textAlign = "center";
-      // ctx.fillText("STARKNET", width / 2, 40);
-
-      // // Debug info
-      // ctx.font = "16px sans-serif";
-      // ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
-      // ctx.fillText(
-      //   `State: ${previousSlide}${isTransitioning ? ` → ${currentSlide} (${Math.round(transitionProgress * 100)}%)` : ""}`,
-      //   width / 2,
-      //   70
-      // );
 
       // Update and render characters
       updateCharacters();
@@ -578,13 +574,16 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
 
     window.addEventListener("resize", handleResize);
 
+    // Stocker la référence dans une variable locale
+    const animationFrameRef = animationRef.current;
+
     // Start the animation
     animationRef.current.animationFrame = requestAnimationFrame(render);
 
     // Cleanup
     return () => {
       window.removeEventListener("resize", handleResize);
-      cancelAnimationFrame(animationRef.current.animationFrame);
+      cancelAnimationFrame(animationFrameRef.animationFrame);
     };
   }, [currentSlide, previousSlide, isTransitioning, transitionProgress]);
 

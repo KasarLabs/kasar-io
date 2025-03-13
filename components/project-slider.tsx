@@ -9,56 +9,64 @@ import { FiArrowRight } from "react-icons/fi";
 const slides = [
   {
     id: 1,
-    title: "Sn Stack Exploration",
-    subtitle: "Client & Blockchain Solutions",
+    title: "SN Stack",
     description:
-      "Notre exploration de la stack Starknet vise à développer des outils et des bibliothèques pour faciliter l'intégration et l'utilisation de Starknet par les développeurs. Nous travaillons sur des solutions client robustes et des implémentations blockchain optimisées.",
+      "As Core Developers of Starknet, we built Madara, the open-source Rust client for the SN Stack. Designed for performance, security, and ease of use as a Sequencer or Full Node, it ensures efficiency and reliability. By defining next-gen specifications for decentralization, scalability, and privacy, we further strengthen the AppChain ecosystem.",
     asciiState: 1,
-    logo: "/images/snstack-logo.webp",
+    logo: "/images/sn-logo-white.png",
     isMainSlide: false,
     primaryLink: {
-      text: "SnStack GitHub",
-      url: "https://github.com/kasarlabs/snstack",
+      text: "GitHub",
+      url: "https://github.com/madara-alliance/madara",
     },
     secondaryLink: {
-      text: "Documentation",
-      url: "https://docs.kasar.io/snstack",
+      text: "Docs",
+      url: "https://docs.madara.build",
+    },
+    terceraryLink: {
+      text: "Blog",
+      url: "https://blog.kasar.io",
     },
   },
   {
     id: 2,
-    title: "Snak Framework",
-    subtitle: "Starknet Agent Kit",
     description:
       "Snak est un framework complet pour la création d'agents autonomes sur Starknet. Il fournit les outils nécessaires pour développer, tester et déployer des agents intelligents capables d'interagir avec la blockchain Starknet de manière autonome et efficace.",
     asciiState: 2,
     logo: "/images/snak-logo.webp",
     isMainSlide: false,
     primaryLink: {
-      text: "Snak GitHub",
+      text: "GitHub",
       url: "https://github.com/kasarlabs/snak",
     },
     secondaryLink: {
-      text: "Documentation",
+      text: "Docs",
       url: "https://docs.kasar.io/snak",
+    },
+    terceraryLink: {
+      text: "Blog",
+      url: "https://blog.kasar.io",
     },
   },
   {
     id: 3,
     title: "Quaza",
-    subtitle: "L3 Solution for Starknet",
     description:
       "Quaza est une solution de layer 3 construite sur Starknet, spécialement conçue pour les agents autonomes et les développeurs. Elle offre des performances améliorées, des frais réduits et des fonctionnalités avancées pour les applications décentralisées modernes.",
     asciiState: 3,
     logo: "/images/quaza-logo.webp",
     isMainSlide: false,
     primaryLink: {
-      text: "Quaza GitHub",
+      text: "GitHub",
       url: "https://github.com/kasarlabs/quaza",
     },
     secondaryLink: {
-      text: "Documentation",
+      text: "Docsn",
       url: "https://docs.quaza.io",
+    },
+    terceraryLink: {
+      text: "Blog",
+      url: "https://blog.kasar.io",
     },
   },
 ];
@@ -244,9 +252,36 @@ export default function ProjectSlider({}: ProjectSliderProps) {
                 opacity: isTransitioning ? 0 : 1,
               }}
             >
-              <h1 className="text-4xl lg:text-5xl font-bold max-w-4xl">
-                {slides[currentSlide].title}
-              </h1>
+              <div className="flex items-center gap-4">
+                {currentSlide === 0 && (
+                  <div>
+                    <img
+                      src="/images/sn-logo-white.png"
+                      alt="SN Stack Logo"
+                      className="h-16 object-contain"
+                    />
+                  </div>
+                )}
+                {currentSlide === 1 && (
+                  <a
+                    href="https://www.starkagent.ai"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center"
+                  >
+                    <Image
+                      src="/images/snak-logo.png"
+                      alt="SNAK Logo"
+                      width={84}
+                      height={84}
+                      className="hover:opacity-80 transition-opacity"
+                    />
+                  </a>
+                )}
+                <h1 className="text-4xl lg:text-5xl font-bold">
+                  {slides[currentSlide].title}
+                </h1>
+              </div>
             </div>
 
             {/* Titre suivant */}
@@ -262,27 +297,55 @@ export default function ProjectSlider({}: ProjectSliderProps) {
                     "slideUp 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards",
                 }}
               >
-                <h1 className="text-4xl lg:text-5xl font-bold max-w-4xl">
-                  {slides[(currentSlide + 1) % slides.length].title}
-                </h1>
+                <div className="flex items-center gap-4">
+                  {(currentSlide + 1) % slides.length === 0 && (
+                    <div className="mr-3">
+                      <img
+                        src="/images/sn-logo-white.png"
+                        alt="SN Stack Logo"
+                        className="w-40 h-16 object-contain"
+                      />
+                    </div>
+                  )}
+                  {(currentSlide + 1) % slides.length === 1 && (
+                    <a
+                      href="https://www.starkagent.ai"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center"
+                    >
+                      <Image
+                        src="/images/snak-logo.png"
+                        alt="SNAK Logo"
+                        width={48}
+                        height={48}
+                        className="hover:opacity-80 transition-opacity mr-3"
+                      />
+                    </a>
+                  )}
+                  <h1 className="text-4xl lg:text-5xl font-bold">
+                    {slides[(currentSlide + 1) % slides.length].title}
+                  </h1>
+                </div>
               </div>
             )}
           </div>
 
-          {/* Conteneur pour l'animation de description */}
-          <div className="h-32 mb-8 overflow-hidden relative">
+          {/* Conteneur pour l'animation de description avec hauteur auto */}
+          <div className="mb-8 overflow-hidden relative">
             {/* Description actuelle */}
             <div
-              className="absolute w-full"
+              className="w-full"
               style={{
                 ...digitClockStyle,
                 transform: isTransitioning
                   ? "translateY(-100%)"
                   : "translateY(0)",
                 opacity: isTransitioning ? 0 : 1,
+                position: isTransitioning ? "absolute" : "relative",
               }}
             >
-              <p className="text-base lg:text-lg text-neutral-300 max-w-2xl leading-relaxed">
+              <p className="text-base text-neutral-300 max-w-2xl leading-relaxed">
                 {slides[currentSlide].description}
               </p>
             </div>
@@ -290,7 +353,7 @@ export default function ProjectSlider({}: ProjectSliderProps) {
             {/* Description suivante */}
             {isTransitioning && (
               <div
-                className="absolute w-full"
+                className="w-full absolute"
                 style={{
                   ...digitClockStyle,
                   transform: "translateY(0)",
@@ -321,7 +384,6 @@ export default function ProjectSlider({}: ProjectSliderProps) {
               className="inline-flex items-center px-6 py-3 rounded-2xl bg-white text-black font-medium transition-all hover:bg-neutral-200 hover:scale-105 text-sm"
             >
               {slides[currentSlide].primaryLink.text}{" "}
-              <FiArrowRight className="ml-2" />
             </Link>
 
             <Link
@@ -330,29 +392,40 @@ export default function ProjectSlider({}: ProjectSliderProps) {
               className="inline-flex items-center px-6 py-3 rounded-2xl bg-transparent border border-white text-white font-medium transition-all hover:bg-white hover:bg-opacity-5 hover:scale-105 text-sm"
             >
               {slides[currentSlide].secondaryLink.text}{" "}
-              <FiArrowRight className="ml-2" />
             </Link>
+
+            {/* Afficher le troisième lien seulement s'il existe */}
+            {slides[currentSlide].terceraryLink && (
+              <Link
+                href={slides[currentSlide].terceraryLink.url}
+                target="_blank"
+                className="inline-flex items-center px-6 py-3 rounded-2xl bg-transparent border border-white text-white font-medium transition-all hover:bg-white hover:bg-opacity-5 hover:scale-105 text-sm"
+              >
+                {slides[currentSlide].terceraryLink.text}{" "}
+              </Link>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Indicateurs de slide en bas avec possibilité de cliquer */}
-      <div className="fixed bottom-8 left-0 right-0 flex justify-center space-x-2">
+      {/* Indicateurs de slide déplacés à gauche */}
+      <div className="fixed left-8 top-1/2 transform -translate-y-1/2 flex flex-col space-y-2">
         {slides.map((slide, index) => (
           <button
             key={slide.id}
-            className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
-              index === currentSlide ? "bg-white w-4" : "bg-neutral-600"
-            }`}
+            className={`h-1.5 transition-all duration-300 ${
+              index === currentSlide ? "bg-white w-4" : "bg-neutral-600 w-1.5"
+            } rounded-full`}
             onClick={() => goToSlide(index)}
             aria-label={`Go to slide ${index + 1}`}
           />
         ))}
       </div>
 
-      {/* Scroll indicator - shows which slide you'll see next */}
-      <div className="fixed bottom-24 right-8 hidden md:block">
-        <div className="flex flex-col items-center space-y-2">
+      {/* Indicateur de défilement combiné (original + icône) */}
+      <div className="fixed bottom-24 right-8 hidden md:flex items-center gap-3">
+        {/* Animation originale de défilement */}
+        {/* <div className="flex flex-col items-center space-y-2 bg-black bg-opacity-30 p-3 rounded-full backdrop-blur-sm">
           <span className="text-xs text-neutral-400">Scroll</span>
           <div className="w-0.5 h-16 bg-neutral-800 relative overflow-hidden">
             <div
@@ -362,10 +435,10 @@ export default function ProjectSlider({}: ProjectSliderProps) {
               }}
             />
           </div>
-        </div>
+        </div> */}
       </div>
 
-      {/* Animation CSS pour le défilement vertical et scroll indicator */}
+      {/* Animation CSS pour le défilement vertical, scroll indicator et scrollbar personnalisée */}
       <style jsx global>{`
         @keyframes slideUp {
           0% {
@@ -385,6 +458,47 @@ export default function ProjectSlider({}: ProjectSliderProps) {
           100% {
             transform: translateY(200%);
           }
+        }
+
+        @keyframes bounce-subtle {
+          0%,
+          100% {
+            transform: translateY(0);
+          }
+          50% {
+            transform: translateY(3px);
+          }
+        }
+
+        .animate-bounce-subtle {
+          animation: bounce-subtle 1.5s infinite ease-in-out;
+        }
+
+        /* Personnalisation de la barre de défilement */
+        ::-webkit-scrollbar {
+          width: 8px;
+          height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+          background: rgba(0, 0, 0, 0.2);
+          border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+          background: rgba(255, 255, 255, 0.3);
+          border-radius: 4px;
+          transition: background 0.3s ease;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+          background: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Pour Firefox */
+        html {
+          scrollbar-width: thin;
+          scrollbar-color: rgba(255, 255, 255, 0.3) rgba(0, 0, 0, 0.2);
         }
       `}</style>
     </div>

@@ -15,7 +15,10 @@ export default function Header() {
   // Handle clicking outside to close dropdown
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setDropdownOpen(false);
       }
     }
@@ -51,12 +54,12 @@ export default function Header() {
             <button
               onMouseEnter={() => setDropdownOpen(true)}
               onClick={() => setDropdownOpen(!dropdownOpen)}
-              className="w-36 h-12 bg-gray-100 rounded-xl hover:bg-gray-200 transition-all"
+              className="w-36 h-12 bg-transparent border border-white rounded-2xl hover:bg-gray-200 transition-all"
               aria-label="Menu"
             ></button>
-            
+
             {dropdownOpen && (
-              <div 
+              <div
                 className="absolute right-0 mt-2 w-80 bg-black/90 backdrop-blur-sm rounded-md shadow-lg py-4 z-50"
                 onMouseLeave={() => setDropdownOpen(false)}
               >

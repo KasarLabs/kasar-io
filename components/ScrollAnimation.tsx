@@ -16,7 +16,7 @@ const ScrollAnimation: React.FC<ScrollAnimationProps> = ({
   // Définition de la liste des mots qui vont défiler (points retirés)
   const words = [
     "Infrastructure",
-    "Decentralized",
+    "Rust Project",
     "Full Node Client",
     "App Chain",
     "Sequencer",
