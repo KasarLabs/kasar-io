@@ -5,9 +5,7 @@ interface ScrollAnimationProps {
   onScrollComplete?: () => void; // Callback when scroll is complete
 }
 
-const HeroSection: React.FC<ScrollAnimationProps> = ({
-  onScrollComplete,
-}) => {
+const HeroSection: React.FC<ScrollAnimationProps> = ({ onScrollComplete }) => {
   // Référence au conteneur principal
   const containerRef = useRef<HTMLDivElement>(null);
   // Référence à l'élément de contrôle de défilement

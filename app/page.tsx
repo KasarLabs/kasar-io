@@ -22,20 +22,20 @@ export default function Home() {
   useEffect(() => {
     // Set window height after component mounts (client-side only)
     setWindowHeight(window.innerHeight);
-    
+
     // Handle window resize
     const handleResize = () => {
       setWindowHeight(window.innerHeight);
     };
-    
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   // Pre-render the ProjectSlider to avoid black screen
   useEffect(() => {
-    if (typeof window === 'undefined') return; // Skip on server-side
-    
+    if (typeof window === "undefined") return; // Skip on server-side
+
     // Set a very short timeout to ensure the ProjectSlider is ready to be shown
     const timer = setTimeout(() => {
       // Preload the ProjectSlider with very low opacity to prevent the black flash
@@ -54,12 +54,11 @@ export default function Home() {
 
   // Calculate heights and set up scroll areas
   useEffect(() => {
-    if (typeof window === 'undefined' || !mainRef.current) return;
+    if (typeof window === "undefined" || !mainRef.current) return;
 
     // Ensure the document has enough height for all scrolling sections
-    const scrollAnimationElement = document.querySelector(
-      ".HeroSection"
-    )?.parentElement as HTMLElement | null;
+    const scrollAnimationElement = document.querySelector(".HeroSection")
+      ?.parentElement as HTMLElement | null;
     const scrollAnimationHeight = scrollAnimationElement
       ? scrollAnimationElement.getBoundingClientRect().height
       : windowHeight * 2;
@@ -101,8 +100,8 @@ export default function Home() {
 
   // Monitor scroll position to control visibility and transitions
   useEffect(() => {
-    if (typeof window === 'undefined') return; // Skip on server-side
-    
+    if (typeof window === "undefined") return; // Skip on server-side
+
     let lastScrollPosition = window.pageYOffset;
 
     const handleScroll = () => {
@@ -115,9 +114,8 @@ export default function Home() {
       lastScrollPosition = scrollPosition;
 
       // Calculate the height of the scroll animation section
-      const scrollAnimationElement = document.querySelector(
-        ".HeroSection"
-      )?.parentElement as HTMLElement | null;
+      const scrollAnimationElement = document.querySelector(".HeroSection")
+        ?.parentElement as HTMLElement | null;
       const scrollAnimationHeight = scrollAnimationElement
         ? scrollAnimationElement.getBoundingClientRect().height
         : windowHeight * 2;
@@ -187,9 +185,11 @@ export default function Home() {
             scrollAnimationComponent &&
             "reverseAnimation" in scrollAnimationComponent
           ) {
-            (scrollAnimationComponent as { reverseAnimation: (progress: number) => void }).reverseAnimation(
-              scrollPosition / scrollAnimationHeight,
-            );
+            (
+              scrollAnimationComponent as {
+                reverseAnimation: (progress: number) => void;
+              }
+            ).reverseAnimation(scrollPosition / scrollAnimationHeight);
           }
         }
       }

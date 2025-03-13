@@ -52,7 +52,7 @@ export default function Header() {
             <button
               onMouseEnter={() => setDropdownOpen(true)}
               onClick={() => setDropdownOpen(!dropdownOpen)}
-              className="w-36 h-12 bg-transparent border border-white rounded-2xl hover:bg-gray-200 transition-all"
+              className="w-36 h-12 bg-transparent border border-white border-2 rounded-2xl hover:bg-gray-200 transition-all"
               aria-label="Menu"
             ></button>
 
