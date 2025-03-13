@@ -9,6 +9,7 @@ const slides = [
   {
     id: 1,
     title: "SN Stack",
+    subtitle: "",
     description:
       "As Core Developers of Starknet, we built Madara, the open-source Rust client for the SN Stack. Designed for performance, security, and ease of use as a Sequencer or Full Node, it ensures efficiency and reliability. By defining next-gen specifications for decentralization, scalability, and privacy, we further strengthen the AppChain ecosystem.",
     asciiState: 1,
@@ -29,6 +30,8 @@ const slides = [
   },
   {
     id: 2,
+    title: "Snak",
+    subtitle: "",
     description:
       "Snak est un framework complet pour la création d'agents autonomes sur Starknet. Il fournit les outils nécessaires pour développer, tester et déployer des agents intelligents capables d'interagir avec la blockchain Starknet de manière autonome et efficace.",
     asciiState: 2,
@@ -50,6 +53,7 @@ const slides = [
   {
     id: 3,
     title: "Quaza",
+    subtitle: "",
     description:
       "Quaza est une solution de layer 3 construite sur Starknet, spécialement conçue pour les agents autonomes et les développeurs. Elle offre des performances améliorées, des frais réduits et des fonctionnalités avancées pour les applications décentralisées modernes.",
     asciiState: 3,
@@ -70,11 +74,15 @@ const slides = [
   },
 ];
 
-interface ProjectSliderProps {
-  // You can add custom props if needed
+interface ProjectProps {
+  // Ajoutez les propriétés nécessaires ici
+  // Par exemple:
+  id?: string;
+  title?: string;
+  // etc.
 }
 
-export default function ProjectSlider({}: ProjectSliderProps) {
+export default function ProjectSlider({}: ProjectProps) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const slideContainerRef = useRef<HTMLDivElement>(null);
@@ -213,7 +221,7 @@ export default function ProjectSlider({}: ProjectSliderProps) {
                 }}
               >
                 <h2 className="text-lg lg:text-xl text-neutral-400">
-                  {slides[currentSlide].subtitle}
+                  {slides[currentSlide].subtitle && slides[currentSlide].subtitle}
                 </h2>
               </div>
 
@@ -231,7 +239,8 @@ export default function ProjectSlider({}: ProjectSliderProps) {
                   }}
                 >
                   <h2 className="text-lg lg:text-xl text-neutral-400">
-                    {slides[(currentSlide + 1) % slides.length].subtitle}
+                    {slides[(currentSlide + 1) % slides.length].subtitle && 
+                     slides[(currentSlide + 1) % slides.length].subtitle}
                   </h2>
                 </div>
               )}
@@ -254,9 +263,11 @@ export default function ProjectSlider({}: ProjectSliderProps) {
               <div className="flex items-center gap-4">
                 {currentSlide === 0 && (
                   <div>
-                    <img
+                    <Image
                       src="/images/sn-logo-white.png"
                       alt="SN Stack Logo"
+                      width={128}
+                      height={128}
                       className="h-16 object-contain"
                     />
                   </div>
@@ -299,10 +310,11 @@ export default function ProjectSlider({}: ProjectSliderProps) {
                 <div className="flex items-center gap-4">
                   {(currentSlide + 1) % slides.length === 0 && (
                     <div className="mr-3">
-                      <img
+                      <Image
                         src="/images/sn-logo-white.png"
                         alt="SN Stack Logo"
-                        className="w-40 h-16 object-contain"
+                        width={128}
+                        height={128}
                       />
                     </div>
                   )}

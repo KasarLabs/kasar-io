@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 
 export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -34,8 +34,8 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
     opacity: number;
   };
 
-  // Calculate target positions for the new state
-  const calculateTargetPositions = (targetState: number) => {
+  // Utiliser useCallback pour la fonction calculateTargetPositions
+  const calculateTargetPositions = useCallback(() => {
     const characters = animationRef.current.characters;
     if (!characters.length) return;
 
@@ -51,7 +51,7 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
       char.startZ = char.z;
 
       // Calculate target position based on the target state
-      if (targetState === 0) {
+      if (currentSlide === 0) {
         // Target: Rain state - maintain vertical alignment from previous state
         if (previousSlide === 1) {
           // When coming from cloud, maintain some of the x position to make transition smoother
@@ -65,7 +65,7 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
           char.targetY = Math.random() * height;
           char.targetZ = 0;
         }
-      } else if (targetState === 1) {
+      } else if (currentSlide === 1) {
         // Target: Cloud state - maintain some positional relationship from rain state
         if (previousSlide === 0) {
           // When coming from rain, use x position to inform the cloud position
@@ -93,7 +93,7 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
           char.targetY = radius * Math.sin(phi) * Math.sin(theta);
           char.targetZ = radius * Math.cos(phi);
         }
-      } else if (targetState === 2) {
+      } else if (currentSlide === 2) {
         // Target: Grid state - matrix style with 30% margin from right
         // Calculate a more square-like grid
         const gridWidth = Math.ceil(Math.sqrt(characters.length) * 0.5); // Fewer columns for density
@@ -113,7 +113,7 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
 
         // Set character to 0 or 1 for matrix effect
         char.char = Math.random() > 0.5 ? "0" : "1";
-      } else if (targetState === 3) {
+      } else if (currentSlide === 3) {
         // Target: Spiral state for slide 4
         // Instead of video, create a dynamic spiral pattern
         const angle = index * 0.1; // Controls spiral spacing
@@ -128,7 +128,7 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
       // Character appearance transitions
       // If transitioning to grid state, start changing characters to 0/1
       if (
-        targetState === 2 &&
+        currentSlide === 2 &&
         (previousSlide === 0 || previousSlide === 1 || previousSlide === 3)
       ) {
         char.char = Math.random() > 0.5 ? "0" : "1";
@@ -137,13 +137,13 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
       // If transitioning from grid state, change characters back to varied ASCII
       if (
         previousSlide === 2 &&
-        (targetState === 0 || targetState === 1 || targetState === 3)
+        (currentSlide === 0 || currentSlide === 1 || currentSlide === 3)
       ) {
         char.char = String.fromCharCode(Math.floor(Math.random() * 93) + 33);
       }
 
       // For spiral state (slide 4), use special characters
-      if (targetState === 3 && previousSlide !== 3) {
+      if (currentSlide === 3 && previousSlide !== 3) {
         const specialChars = [
           "*",
           "+",
@@ -163,7 +163,7 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
           specialChars[Math.floor(Math.random() * specialChars.length)];
       }
     });
-  };
+  }, [currentSlide, previousSlide]);
 
   useEffect(() => {
     // Start transition when currentSlide changes
@@ -175,7 +175,7 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
       setTransitionProgress(0);
 
       // Calculate target positions for the new state
-      calculateTargetPositions(currentSlide);
+      calculateTargetPositions();
 
       // Update previous slide after transition completes
       const transitionDuration = 2000; // 2 seconds
@@ -299,9 +299,6 @@ export default function UnifiedAsciiAnimation({ currentSlide = 0 }) {
 
       animationRef.current.characters = characters;
     }
-
-    // This is now a duplicate - we've moved the calculateTargetPositions function outside
-    // of this useEffect to make it accessible from the transition useEffect
 
     // Update characters each frame
     function updateCharacters() {
