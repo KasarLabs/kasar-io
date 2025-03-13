@@ -108,16 +108,21 @@ const ScrollAnimation: React.FC<ScrollAnimationProps> = ({
 
   // Calculer la nouvelle taille de police (80% de l'original)
   const baseFontSize = 4.8; // 6rem * 0.8 = 4.8rem (réduction de 20%)
-  const secondaryFontSize = 3.5; // Taille pour "with us"
 
   // Augmente l'espacement vertical entre les mots
   const verticalSpacing = 90; // Augmenté depuis 80px
 
-  const animationRef = useRef(null);
+  // Définition d'une interface pour la référence
+  interface AnimationRefType {
+    reverseAnimation: (progress: number) => void;
+  }
+
+  // Correction du type de la référence
+  const animationRef = useRef<AnimationRefType | null>(null);
 
   // Exposer une méthode pour inverser l'animation
   useImperativeHandle(animationRef, () => ({
-    reverseAnimation: (progress) => {
+    reverseAnimation: (progress: number) => {
       // Calculer l'index du mot basé sur la progression
       const wordIndex = Math.min(
         Math.floor(progress * words.length),

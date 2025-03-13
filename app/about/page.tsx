@@ -1,5 +1,3 @@
-import AsciiArt from "@/components/ascii-art";
-
 export default function About() {
   return (
     <div className="w-full  flex items-center overflow-auto">
@@ -25,7 +23,7 @@ export default function About() {
             </div>
             <div className="flex items-center justify-center">
               <div className="w-64 h-64">
-                <AsciiArt type="kasar" />
+                <h1 className="text-6xl font-semibold text-center">🔬</h1>
               </div>
             </div>
           </div>
@@ -39,7 +37,7 @@ export default function About() {
               {[1, 2, 3].map((i) => (
                 <div key={i} className="text-center">
                   <div className="w-32 h-32 mx-auto mb-4 bg-neutral-900 rounded-full flex items-center justify-center">
-                    <AsciiArt type="person" small />
+                    <h1 className="text-3xl">👨‍💻</h1>
                   </div>
                   <h3 className="text-lg font-semibold">Développeur {i}</h3>
                   <p className="text-neutral-400">Core Starknet Developer</p>

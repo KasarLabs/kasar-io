@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import UnifiedAsciiAnimation from "./AsciiAnimation";
 import Link from "next/link";
 import Image from "next/image";
-import { FiArrowRight } from "react-icons/fi";
 
 const slides = [
   {

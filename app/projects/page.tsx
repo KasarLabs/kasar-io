@@ -1,5 +1,3 @@
-import ProjectCard from "@/components/project-card";
-
 const projects = [
   {
     id: 1,
@@ -27,10 +25,8 @@ export default function Projects() {
     <div className="w-full  flex items-center overflow-auto">
       <div className="w-full px-4 py-8">
         <h1 className="text-3xl font-semibold mb-8 text-center">Nos Projets</h1>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mx-auto max-w-6xl">
-          {projects.map((project) => (
-            <ProjectCard key={project.id} project={project} />
-          ))}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+          <h1 className="text-6xl font-semibold text-center">🔬</h1>
         </div>
       </div>
     </div>
