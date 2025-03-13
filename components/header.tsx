@@ -1,20 +1,33 @@
-// components/header.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ChevronDown } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const pathname = usePathname();
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Handle clicking outside to close dropdown
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setDropdownOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
     <header className="w-full z-50 sticky top-0">
-      {" "}
-      {/* Changed from fixed to sticky */}
       <nav className="h-20 px-4 backdrop-blur-sm md:px-6">
         <div className="flex items-center justify-between h-full">
           {/* Logo */}
@@ -33,35 +46,49 @@ export default function Header() {
             </Link>
           </div>
 
-          {/* Desktop Navigation
-          <div className="hidden md:flex items-center gap-8">
-            <Link
-              href="/projects"
-              className="text-gray-300 hover:text-white font-calibre-medium text-2xl hover:scale-105 transition-all"
-            >
-              Projects
-            </Link>
-            <Link
-              href="/about"
-              className="text-gray-300 hover:text-white font-calibre-medium text-2xl hover:scale-105 transition-all"
-            >
-              About
-            </Link>
-            <Link
-              href="/blog"
-              className="text-gray-300 hover:text-white font-calibre-medium text-2xl hover:scale-105 transition-all"
-            >
-              Blog
-            </Link>
-            <a
-              href="https://github.com/kasarlabs"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-gray-300 hover:text-white font-calibre-medium text-2xl hover:scale-105 transition-all"
-            >
-              GitHub
-            </a>
-          </div> */}
+          {/* Desktop Dropdown Menu */}
+          <div className="hidden md:block relative" ref={dropdownRef}>
+            <button
+              onMouseEnter={() => setDropdownOpen(true)}
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+              className="w-36 h-12 bg-gray-100 rounded-xl hover:bg-gray-200 transition-all"
+              aria-label="Menu"
+            ></button>
+            
+            {dropdownOpen && (
+              <div 
+                className="absolute right-0 mt-2 w-80 bg-black/90 backdrop-blur-sm rounded-md shadow-lg py-4 z-50"
+                onMouseLeave={() => setDropdownOpen(false)}
+              >
+                <Link
+                  href="/projects"
+                  className="block px-6 py-3 text-gray-300 hover:text-white hover:bg-black/80 font-calibre-medium text-[40px] text-right transition-all"
+                >
+                  Projects
+                </Link>
+                <Link
+                  href="/about"
+                  className="block px-6 py-3 text-gray-300 hover:text-white hover:bg-black/80 font-calibre-medium text-[40px] text-right transition-all"
+                >
+                  About
+                </Link>
+                <Link
+                  href="/blog"
+                  className="block px-6 py-3 text-gray-300 hover:text-white hover:bg-black/80 font-calibre-medium text-[40px] text-right transition-all"
+                >
+                  Blog
+                </Link>
+                <a
+                  href="https://github.com/kasarlabs"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block px-6 py-3 text-gray-300 hover:text-white hover:bg-black/80 font-calibre-medium text-[40px] text-right transition-all"
+                >
+                  GitHub
+                </a>
+              </div>
+            )}
+          </div>
 
           {/* Mobile Menu Button */}
           <button
