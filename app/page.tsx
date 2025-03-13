@@ -7,6 +7,7 @@ import ProjectSlider from "@/components/ProjectsSlider";
 export default function Home() {
   const [showProjectSlider, setShowProjectSlider] = useState(false);
   const [hasScrolledToFooter, setHasScrolledToFooter] = useState(false);
+  const [windowHeight, setWindowHeight] = useState(0);
   const mainRef = useRef(null);
   const footerSpacerRef = useRef(null);
   const projectSliderRef = useRef(null);
@@ -17,8 +18,24 @@ export default function Home() {
     setShowProjectSlider(true);
   };
 
+  // Set up window height state once component mounts
+  useEffect(() => {
+    // Set window height after component mounts (client-side only)
+    setWindowHeight(window.innerHeight);
+    
+    // Handle window resize
+    const handleResize = () => {
+      setWindowHeight(window.innerHeight);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   // Pre-render the ProjectSlider to avoid black screen
   useEffect(() => {
+    if (typeof window === 'undefined') return; // Skip on server-side
+    
     // Set a very short timeout to ensure the ProjectSlider is ready to be shown
     const timer = setTimeout(() => {
       // Preload the ProjectSlider with very low opacity to prevent the black flash
@@ -37,7 +54,7 @@ export default function Home() {
 
   // Calculate heights and set up scroll areas
   useEffect(() => {
-    if (!mainRef.current) return;
+    if (typeof window === 'undefined' || !mainRef.current) return;
 
     // Ensure the document has enough height for all scrolling sections
     const scrollAnimationElement = document.querySelector(
@@ -45,7 +62,7 @@ export default function Home() {
     )?.parentElement as HTMLElement | null;
     const scrollAnimationHeight = scrollAnimationElement
       ? scrollAnimationElement.getBoundingClientRect().height
-      : window.innerHeight * 2;
+      : windowHeight * 2;
 
     // Ensure there's enough room for the main content
     const documentHeight = Math.max(
@@ -58,9 +75,9 @@ export default function Home() {
 
     // Calculer la hauteur nécessaire pour le slider et le footer
     const slidesCount = 3; // Nombre de slides dans ProjectSlider
-    const slideHeight = window.innerHeight * 0.7; // Hauteur par slide
+    const slideHeight = windowHeight * 0.7; // Hauteur par slide
     const projectSliderHeight = slideHeight * slidesCount;
-    const footerHeight = window.innerHeight; // Hauteur approximative pour le footer
+    const footerHeight = windowHeight; // Hauteur approximative pour le footer
 
     // Hauteur totale nécessaire
     const minRequiredHeight =
@@ -80,10 +97,12 @@ export default function Home() {
 
       document.body.appendChild(spacerElement);
     }
-  }, []);
+  }, [windowHeight]);
 
   // Monitor scroll position to control visibility and transitions
   useEffect(() => {
+    if (typeof window === 'undefined') return; // Skip on server-side
+    
     let lastScrollPosition = window.pageYOffset;
 
     const handleScroll = () => {
@@ -101,11 +120,11 @@ export default function Home() {
       )?.parentElement as HTMLElement | null;
       const scrollAnimationHeight = scrollAnimationElement
         ? scrollAnimationElement.getBoundingClientRect().height
-        : window.innerHeight * 2;
+        : windowHeight * 2;
 
       // Calculate the total height for all slides in the ProjectSlider
       const slidesCount = 3; // Number of slides in ProjectSlider
-      const slideTransitionHeight = window.innerHeight * 0.7; // Increased height to slow down transition
+      const slideTransitionHeight = windowHeight * 0.7; // Increased height to slow down transition
       const projectSliderScrollSpace = slideTransitionHeight * slidesCount;
 
       // Calculate where the footer should start - réduire cette valeur pour atteindre le footer plus tôt
@@ -120,7 +139,7 @@ export default function Home() {
         // Masquer progressivement le slider lorsqu'on approche du footer
         if (projectSliderRef.current) {
           const fadeOutStart = footerThreshold;
-          const fadeOutEnd = footerThreshold + window.innerHeight * 0.3;
+          const fadeOutEnd = footerThreshold + windowHeight * 0.3;
           const fadeProgress = Math.min(
             1,
             Math.max(
@@ -185,7 +204,7 @@ export default function Home() {
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, [showProjectSlider]);
+  }, [showProjectSlider, windowHeight]);
 
   return (
     <div ref={mainRef} className="bg-black text-white">
@@ -204,7 +223,7 @@ export default function Home() {
           transition: "opacity 0.8s ease-in-out",
           pointerEvents: showProjectSlider ? "auto" : "none",
           // Réduire encore plus la hauteur minimale
-          minHeight: `${window.innerHeight * 2}px`,
+          minHeight: windowHeight ? `${windowHeight * 2}px` : "200vh",
         }}
       >
         <ProjectSlider />
