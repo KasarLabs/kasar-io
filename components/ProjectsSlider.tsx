@@ -106,7 +106,7 @@ export default function ProjectSlider({}: ProjectSliderProps) {
   // Setup scroll-based slide changes
   useEffect(() => {
     // Wait a moment before initializing to ensure that the component is fully mounted
-    // and visible (after ScrollAnimation completes)
+    // and visible (after HeroSection completes)
     const initTimer = setTimeout(() => {
       setHasInitialized(true);
     }, 1000);
@@ -132,7 +132,7 @@ export default function ProjectSlider({}: ProjectSliderProps) {
       const scrollPosition = window.pageYOffset;
 
       // Find where the scroll animation ends - we need to find the parent element
-      // that contains the ScrollAnimation and get its height
+      // that contains the HeroSection and get its height
       const parentElement = slideContainerRef.current.parentElement;
       const scrollAnimationHeight = parentElement
         ? parentElement.previousElementSibling?.getBoundingClientRect()
@@ -147,7 +147,7 @@ export default function ProjectSlider({}: ProjectSliderProps) {
         return;
       }
 
-      // Calculate relative scroll position after the ScrollAnimation
+      // Calculate relative scroll position after the HeroSection
       const sliderStart = scrollPosition - scrollAnimationHeight;
       const viewportHeight = window.innerHeight;
 

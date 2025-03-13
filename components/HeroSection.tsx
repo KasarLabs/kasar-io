@@ -5,7 +5,7 @@ interface ScrollAnimationProps {
   onScrollComplete?: () => void; // Callback when scroll is complete
 }
 
-const ScrollAnimation: React.FC<ScrollAnimationProps> = ({
+const HeroSection: React.FC<ScrollAnimationProps> = ({
   onScrollComplete,
 }) => {
   // Référence au conteneur principal
@@ -134,7 +134,7 @@ const ScrollAnimation: React.FC<ScrollAnimationProps> = ({
   }));
 
   return (
-    <div ref={containerRef} className="relative w-full ScrollAnimation">
+    <div ref={containerRef} className="relative w-full HeroSection">
       {/* Élément qui contrôle la hauteur totale de défilement */}
       <div ref={scrollControlRef} className="w-full" />
 
@@ -204,4 +204,4 @@ const ScrollAnimation: React.FC<ScrollAnimationProps> = ({
   );
 };
 
-export default ScrollAnimation;
+export default HeroSection;

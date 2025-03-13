@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import ScrollAnimation from "@/components/ScrollAnimation";
+import HeroSection from "@/components/HeroSection";
 import ProjectSlider from "@/components/ProjectsSlider";
 
 export default function Home() {
@@ -40,11 +40,9 @@ export default function Home() {
     if (!mainRef.current) return;
 
     // Ensure the document has enough height for all scrolling sections
-    const scrollAnimationElement =
-      mainRef.current &&
-      ((mainRef.current as HTMLElement).querySelector(
-        '[class*="ScrollAnimation"]',
-      )?.parentElement as HTMLElement | null);
+    const scrollAnimationElement = document.querySelector(
+      ".HeroSection"
+    )?.parentElement as HTMLElement | null;
     const scrollAnimationHeight = scrollAnimationElement
       ? scrollAnimationElement.getBoundingClientRect().height
       : window.innerHeight * 2;
@@ -98,11 +96,9 @@ export default function Home() {
       lastScrollPosition = scrollPosition;
 
       // Calculate the height of the scroll animation section
-      const scrollAnimationElement =
-        mainRef.current &&
-        ((mainRef.current as HTMLElement).querySelector(
-          '[class*="ScrollAnimation"]',
-        )?.parentElement as HTMLElement | null);
+      const scrollAnimationElement = document.querySelector(
+        ".HeroSection"
+      )?.parentElement as HTMLElement | null;
       const scrollAnimationHeight = scrollAnimationElement
         ? scrollAnimationElement.getBoundingClientRect().height
         : window.innerHeight * 2;
@@ -138,7 +134,7 @@ export default function Home() {
             `${1 - fadeProgress}`;
         }
       } else if (scrollPosition >= scrollAnimationHeight * 0.97) {
-        // Start showing ProjectSlider slightly before ScrollAnimation ends
+        // Start showing ProjectSlider slightly before HeroSection ends
         // This avoids the black screen gap
         setHasScrolledToFooter(false);
 
@@ -152,11 +148,11 @@ export default function Home() {
           (projectSliderRef.current as HTMLElement).style.opacity = "1";
         }
       } else if (scrollPosition < scrollAnimationHeight * 0.8) {
-        // Still firmly in the ScrollAnimation section
+        // Still firmly in the HeroSection section
 
-        // If scrolling up and we're back in the ScrollAnimation area
+        // If scrolling up and we're back in the HeroSection area
         if (!scrollingDown) {
-          // Hide ProjectSlider when scrolling back up to ScrollAnimation
+          // Hide ProjectSlider when scrolling back up to HeroSection
           if (
             showProjectSlider &&
             scrollPosition < scrollAnimationHeight * 0.7
@@ -164,15 +160,15 @@ export default function Home() {
             setShowProjectSlider(false);
           }
 
-          // Find the ScrollAnimation component and call its reverse method if available
+          // Find the HeroSection component and call its reverse method if available
           const scrollAnimationComponent =
             mainRef.current &&
-            (mainRef.current as HTMLElement).querySelector(".ScrollAnimation");
+            (mainRef.current as HTMLElement).querySelector(".HeroSection");
           if (
             scrollAnimationComponent &&
             "reverseAnimation" in scrollAnimationComponent
           ) {
-            (scrollAnimationComponent as any).reverseAnimation(
+            (scrollAnimationComponent as { reverseAnimation: (progress: number) => void }).reverseAnimation(
               scrollPosition / scrollAnimationHeight,
             );
           }
@@ -195,7 +191,7 @@ export default function Home() {
     <div ref={mainRef} className="bg-black text-white">
       {/* First section with scroll animation */}
       <div className="relative">
-        <ScrollAnimation onScrollComplete={handleScrollComplete} />
+        <HeroSection onScrollComplete={handleScrollComplete} />
       </div>
 
       {/* Project slider section */}
