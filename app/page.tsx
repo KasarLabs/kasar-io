@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import ScrollAnimation from "@/components/ScrollAnimation";
-import ProjectSlider from "@/components/project-slider";
+import ProjectSlider from "@/components/ProjectsSlider";
 
 export default function Home() {
   const [showProjectSlider, setShowProjectSlider] = useState(false);
