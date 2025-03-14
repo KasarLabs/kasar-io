@@ -33,19 +33,23 @@ const slides = [
     title: "",
     subtitle: "",
     description:
-      "Snak est un framework complet pour la création d'agents autonomes sur Starknet. Il fournit les outils nécessaires pour développer, tester et déployer des agents intelligents capables d'interagir avec la blockchain Starknet de manière autonome et efficace.",
+      "Powered by Starknet’s performance and security, Snak is a next-gen AI agent framework integrating the latest innovations. With a native communication network, lifetime memory, and 1,000+ plugin compatibility, it’s built for scalability, efficiency, and adaptability. The future of AI agents starts here.",
     asciiState: 2,
     logo: "/images/snak-logo.webp",
     isMainSlide: false,
     primaryLink: {
+      text: "Website",
+      url: "https://starkagent.ai",
+    },
+    secondaryLink: {
       text: "GitHub",
       url: "https://github.com/kasarlabs/snak",
     },
-    secondaryLink: {
+    terceraryLink: {
       text: "Docs",
       url: "https://docs.kasar.io/snak",
     },
-    terceraryLink: {
+    quartenaryLink: {
       text: "Blog",
       url: "https://blog.kasar.io",
     },
@@ -64,7 +68,7 @@ const slides = [
       url: "https://github.com/kasarlabs/quaza",
     },
     secondaryLink: {
-      text: "Docsn",
+      text: "Docs",
       url: "https://docs.quaza.io",
     },
     terceraryLink: {
@@ -364,7 +368,7 @@ export default function ProjectSlider({}: ProjectProps) {
                     "slideUp 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards",
                 }}
               >
-                <p className="text-base lg:text-lg text-neutral-300 max-w-2xl leading-relaxed">
+                <p className="text-base text-neutral-300 max-w-2xl leading-relaxed">
                   {slides[(currentSlide + 1) % slides.length].description}
                 </p>
               </div>
@@ -403,6 +407,17 @@ export default function ProjectSlider({}: ProjectProps) {
                 className="inline-flex items-center px-6 py-3 rounded-2xl bg-transparent border border-white text-white font-medium transition-all hover:bg-white hover:bg-opacity-5 hover:scale-105 text-sm"
               >
                 {slides[currentSlide].terceraryLink.text}{" "}
+              </Link>
+            )}
+
+            {/* Afficher le quatrième lien seulement s'il existe */}
+            {slides[currentSlide].quartenaryLink && (
+              <Link
+                href={slides[currentSlide].quartenaryLink.url}
+                target="_blank"
+                className="inline-flex items-center px-6 py-3 rounded-2xl bg-transparent border border-white text-white font-medium transition-all hover:bg-white hover:bg-opacity-5 hover:scale-105 text-sm"
+              >
+                {slides[currentSlide].quartenaryLink.text}{" "}
               </Link>
             )}
           </div>

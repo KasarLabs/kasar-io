@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import HeroSection from "@/components/HeroSection";
 import ProjectSlider from "@/components/ProjectsSlider";
+import ContactSection from "@/components/ContactSection";
 
 export default function Home() {
   const [showProjectSlider, setShowProjectSlider] = useState(false);
@@ -222,11 +223,23 @@ export default function Home() {
           visibility: "visible", // Always keep in DOM to avoid rendering issues
           transition: "opacity 0.8s ease-in-out",
           pointerEvents: showProjectSlider ? "auto" : "none",
-          // Réduire encore plus la hauteur minimale
-          minHeight: windowHeight ? `${windowHeight * 2}px` : "200vh",
+          // Réduire considérablement la hauteur minimale
+          minHeight: windowHeight ? `${windowHeight * 1.5}px` : "150vh",
         }}
       >
         <ProjectSlider />
+      </div>
+      
+      {/* Contact section juste avant le footer */}
+      <div 
+        className="relative z-20 mt-[1200px]" // Valeur encore plus élevée
+        style={{
+          opacity: showProjectSlider ? 1 : 0,
+          transition: "opacity 0.8s ease-in-out",
+          marginBottom: "-800px", // Réduire davantage l'espace vide
+        }}
+      >
+        <ContactSection />
       </div>
 
       {/* Spacer to trigger the global Footer visibility - augmenter l'opacité pour le voir */}
