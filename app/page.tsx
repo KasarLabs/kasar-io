@@ -4,16 +4,19 @@ import React, { useState, useEffect, useRef } from "react";
 import HeroSection from "@/components/HeroSection";
 import ProjectSlider from "@/components/ProjectsSlider";
 import ContactSection from "@/components/ContactSection";
+import TrustedBy from "@/components/TrustedBy";
 
 export default function Home() {
   const [showProjectSlider, setShowProjectSlider] = useState(false);
   const [showContactSection, setShowContactSection] = useState(false);
+  const [showTrustedBy, setShowTrustedBy] = useState(false);
   const [hasScrolledToFooter, setHasScrolledToFooter] = useState(false);
   const [windowHeight, setWindowHeight] = useState(0);
   const mainRef = useRef(null);
   const footerSpacerRef = useRef(null);
   const projectSliderRef = useRef(null);
   const contactSectionRef = useRef(null);
+  const trustedByRef = useRef(null);
 
   // Handler for when scroll animation completes
   const handleScrollComplete = () => {
@@ -75,10 +78,11 @@ export default function Home() {
       document.documentElement.offsetHeight,
     );
 
-    // Calculer la hauteur nécessaire pour le slider et le footer
+    // Calculer la hauteur nécessaire pour le slider, TrustedBy et le footer
     const slidesCount = 3; // Nombre de slides dans ProjectSlider
     const slideHeight = windowHeight * 0.7; // Hauteur par slide
     const projectSliderHeight = slideHeight * slidesCount;
+    const trustedByHeight = windowHeight; // Hauteur pour la section TrustedBy
     const contactSectionHeight = windowHeight * 2; // Hauteur pour la section de contact
     const footerHeight = windowHeight; // Hauteur approximative pour le footer
 
@@ -86,6 +90,7 @@ export default function Home() {
     const minRequiredHeight =
       scrollAnimationHeight +
       projectSliderHeight +
+      trustedByHeight +
       contactSectionHeight +
       footerHeight;
 
@@ -132,9 +137,11 @@ export default function Home() {
       const slideTransitionHeight = windowHeight * 0.7; // Increased height to slow down transition
       const projectSliderScrollSpace = slideTransitionHeight * slidesCount;
 
-      // Point de transition entre le slider de projets et la section de contact
-      const contactSectionThreshold =
-        scrollAnimationHeight + projectSliderScrollSpace * 0.8;
+      // Point de transition entre le slider de projets et la section TrustedBy
+      const trustedByThreshold = scrollAnimationHeight + projectSliderScrollSpace * 0.85;
+      
+      // Point de transition entre TrustedBy et la section de contact
+      const contactSectionThreshold = trustedByThreshold + windowHeight * 0.8;
 
       // Calculate where the footer should start
       const footerThreshold = contactSectionThreshold + windowHeight * 1.5;
@@ -144,18 +151,20 @@ export default function Home() {
         // Scrolled to footer
         setHasScrolledToFooter(true);
         setShowContactSection(true);
+        setShowTrustedBy(true);
 
         // Masquer progressivement le slider lorsqu'on approche du footer
         if (projectSliderRef.current) {
           (projectSliderRef.current as HTMLElement).style.opacity = "0";
         }
       } else if (scrollPosition >= contactSectionThreshold) {
-        // Transition entre le slider de projets et la section de contact
+        // Transition entre TrustedBy et la section de contact
         setHasScrolledToFooter(false);
         setShowContactSection(true);
+        setShowTrustedBy(true);
 
-        // Faire disparaître progressivement le slider de projets
-        if (projectSliderRef.current) {
+        // Faire disparaître progressivement TrustedBy
+        if (trustedByRef.current) {
           const fadeOutStart = contactSectionThreshold;
           const fadeOutEnd = contactSectionThreshold + windowHeight * 0.3;
           const fadeProgress = Math.min(
@@ -166,8 +175,8 @@ export default function Home() {
             ),
           );
 
-          // Réduire l'opacité du slider progressivement
-          (projectSliderRef.current as HTMLElement).style.opacity =
+          // Réduire l'opacité de TrustedBy progressivement
+          (trustedByRef.current as HTMLElement).style.opacity =
             `${1 - fadeProgress}`;
         }
 
@@ -187,10 +196,54 @@ export default function Home() {
           (contactSectionRef.current as HTMLElement).style.opacity =
             `${fadeProgress}`;
         }
+      } else if (scrollPosition >= trustedByThreshold) {
+        // Transition entre le slider de projets et TrustedBy
+        setHasScrolledToFooter(false);
+        setShowContactSection(false);
+        setShowTrustedBy(true);
+        
+        console.log("TrustedBy devrait être visible maintenant!");
+
+        // Faire disparaître progressivement le slider de projets
+        if (projectSliderRef.current) {
+          const fadeOutStart = trustedByThreshold;
+          const fadeOutEnd = trustedByThreshold + windowHeight * 0.3;
+          const fadeProgress = Math.min(
+            1,
+            Math.max(
+              0,
+              (scrollPosition - fadeOutStart) / (fadeOutEnd - fadeOutStart),
+            ),
+          );
+
+          // Réduire l'opacité du slider progressivement
+          (projectSliderRef.current as HTMLElement).style.opacity =
+            `${1 - fadeProgress}`;
+        }
+
+        // Faire apparaître progressivement TrustedBy
+        if (trustedByRef.current) {
+          const fadeInStart = trustedByThreshold;
+          const fadeInEnd = trustedByThreshold + windowHeight * 0.3;
+          const fadeProgress = Math.min(
+            1,
+            Math.max(
+              0,
+              (scrollPosition - fadeInStart) / (fadeInEnd - fadeInStart),
+            ),
+          );
+
+          // Augmenter l'opacité de TrustedBy progressivement et s'assurer qu'il est visible
+          const trustedByElement = trustedByRef.current as HTMLElement;
+          trustedByElement.style.opacity = `${fadeProgress}`;
+          trustedByElement.style.display = "block";
+          trustedByElement.style.zIndex = "30"; // Augmenter le z-index pour s'assurer qu'il est au-dessus des autres éléments
+        }
       } else if (scrollPosition >= scrollAnimationHeight * 0.97) {
         // Start showing ProjectSlider slightly before HeroSection ends
         setHasScrolledToFooter(false);
         setShowContactSection(false);
+        setShowTrustedBy(false);
 
         // Ensure ProjectSlider is visible when in this section
         if (!showProjectSlider && scrollingDown) {
@@ -241,7 +294,7 @@ export default function Home() {
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, [showProjectSlider, showContactSection, windowHeight]);
+  }, [showProjectSlider, showContactSection, showTrustedBy, windowHeight]);
 
   return (
     <div ref={mainRef} className="bg-black text-white">
@@ -265,7 +318,23 @@ export default function Home() {
         <ProjectSlider />
       </div>
 
-      {/* Contact section après le slider de projets */}
+      {/* Section TrustedBy entre le slider et la section de contact */}
+      <div
+        ref={trustedByRef}
+        className="relative z-30"
+        style={{
+          opacity: showTrustedBy ? 1 : 0,
+          visibility: "visible", // Toujours garder dans le DOM
+          transition: "opacity 1s ease-in-out",
+          pointerEvents: showTrustedBy ? "auto" : "none",
+          marginTop: "100px", // Espace entre le slider et TrustedBy
+          minHeight: "100vh", // S'assurer qu'il a une hauteur suffisante
+        }}
+      >
+        <TrustedBy />
+      </div>
+
+      {/* Contact section après TrustedBy */}
       <div
         ref={contactSectionRef}
         className="relative z-20"
@@ -274,7 +343,7 @@ export default function Home() {
           visibility: "visible", // Toujours garder dans le DOM
           transition: "opacity 1s ease-in-out",
           pointerEvents: showContactSection ? "auto" : "none",
-          marginTop: "100px", // Espace entre le slider et la section de contact
+          marginTop: "100px", // Espace entre TrustedBy et la section de contact
         }}
       >
         <ContactSection />
