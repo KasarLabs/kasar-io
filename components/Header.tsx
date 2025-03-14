@@ -27,6 +27,57 @@ export default function Header() {
     };
   }, []);
 
+  // Fonction pour faire défiler vers la section des projets
+  const scrollToProjects = (e: React.MouseEvent) => {
+    e.preventDefault();
+    
+    // Ajoutons un ID au composant ProjectsSlider
+    const projectsSlider = document.querySelector('[class*="ProjectsSlider"]') || 
+                          document.getElementById('projects-slider');
+    
+    if (projectsSlider) {
+      // Défilement avec un petit décalage pour tenir compte de la hauteur du header
+      const headerHeight = 80; // Hauteur approximative du header en pixels
+      const elementPosition = projectsSlider.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - headerHeight;
+      
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
+    } else {
+      // Si nous ne trouvons pas le slider directement, essayons de trouver le premier slide
+      const firstSlide = document.querySelector('[data-slide-id="1"]') || 
+                         document.querySelector('[data-ascii-state="1"]');
+      
+      if (firstSlide) {
+        const offsetPosition = firstSlide.getBoundingClientRect().top + window.pageYOffset - 80;
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth'
+        });
+      } else {
+        // Fallback: essayons de trouver le conteneur du slider par son contenu
+        const allElements = document.querySelectorAll('div, section');
+        for (let i = 0; i < allElements.length; i++) {
+          const element = allElements[i];
+          if (element.textContent?.includes('SN Stack') && 
+              element.textContent?.includes('Madara')) {
+            const offsetPosition = element.getBoundingClientRect().top + window.pageYOffset - 80;
+            window.scrollTo({
+              top: offsetPosition,
+              behavior: 'smooth'
+            });
+            break;
+          }
+        }
+      }
+    }
+    
+    setDropdownOpen(false);
+    setMobileMenuOpen(false);
+  };
+
   return (
     <header className="w-full z-50 sticky top-0">
       <nav className="h-20 px-4 backdrop-blur-sm md:px-6">
@@ -63,12 +114,13 @@ export default function Header() {
                 className="absolute right-0 mt-2 w-80 bg-black/90 backdrop-blur-sm rounded-md shadow-lg py-4 z-50"
                 onMouseLeave={() => setDropdownOpen(false)}
               >
-                <Link
-                  href="/projects"
+                <a
+                  href="#projects-slider"
+                  onClick={scrollToProjects}
                   className="block px-6 py-3 text-gray-300 hover:text-white hover:bg-black/80 font-calibre-medium text-[40px] text-right transition-all"
                 >
                   Projects
-                </Link>
+                </a>
                 <Link
                   href="/about"
                   className="block px-6 py-3 text-gray-300 hover:text-white hover:bg-black/80 font-calibre-medium text-[40px] text-right transition-all"
@@ -106,13 +158,13 @@ export default function Header() {
         {/* Mobile Menu */}
         {mobileMenuOpen && (
           <div className="md:hidden absolute top-20 left-0 right-0 bg-black/100 backdrop-blur-sm py-4 px-6 space-y-4">
-            <Link
-              href="/projects"
+            <a
+              href="#projects-slider"
+              onClick={scrollToProjects}
               className="block text-gray-300 hover:text-white font-calibre-medium text-lg hover:bg-black py-2 px-4 rounded-lg transition-all"
-              onClick={() => setMobileMenuOpen(false)}
             >
               Projects
-            </Link>
+            </a>
             <Link
               href="/about"
               className="block text-gray-300 hover:text-white font-calibre-medium text-lg hover:bg-black py-2 px-4 rounded-lg transition-all"

@@ -37,8 +37,8 @@ const HeroSection: React.FC<ScrollAnimationProps> = ({ onScrollComplete }) => {
     // pour créer suffisamment d'espace pour tous les mots, mais avec une hauteur réduite
     if (scrollControlRef.current) {
       // Réduction de la hauteur de défilement à 35% de la hauteur originale
-      // On ajoute 50% à la taille totale pour l'espace supplémentaire nécessaire avant la fin
-      const scrollHeight = window.innerHeight * words.length * 0.35 * 1.5;
+      // On ajoute 70% à la taille totale pour l'espace supplémentaire nécessaire avant la fin
+      const scrollHeight = window.innerHeight * words.length * 0.35 * 1.7; // Augmenté de 1.5 à 1.7
       scrollControlRef.current.style.height = `${scrollHeight}px`;
     }
 
@@ -189,9 +189,9 @@ const HeroSection: React.FC<ScrollAnimationProps> = ({ onScrollComplete }) => {
             </div>
           </div>
 
-          {/* Ajout de "with us" en dessous */}
+          {/* Ajout de "with us" en dessous avec plus d'espace en dessous */}
           <h1
-            className="text-white font-bold mt-2 ml-0 p-0"
+            className="text-white font-bold mt-2 ml-0 p-0 mb-24" // Ajout de mb-24 pour plus d'espace en dessous
             style={{ fontSize: `${baseFontSize}rem` }}
           >
             with us.

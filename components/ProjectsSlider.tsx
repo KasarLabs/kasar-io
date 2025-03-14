@@ -33,7 +33,7 @@ const slides = [
     title: "",
     subtitle: "",
     description:
-      "Powered by Starknet’s performance and security, Snak is a next-gen AI agent framework integrating the latest innovations. With a native communication network, lifetime memory, and 1,000+ plugin compatibility, it’s built for scalability, efficiency, and adaptability. The future of AI agents starts here.",
+      "Powered by Starknet's performance and security, Snak is a next-gen AI agent framework integrating the latest innovations. With a native communication network, lifetime memory, and 1,000+ plugin compatibility, it's built for scalability, efficiency, and adaptability. The future of AI agents starts here.",
     asciiState: 2,
     logo: "/images/snak-logo.webp",
     isMainSlide: false,
@@ -130,9 +130,12 @@ export default function ProjectSlider({}: ProjectProps) {
   useEffect(() => {
     if (!hasInitialized || !scrollControlRef.current) return;
 
-    // Réduire encore plus la hauteur totale
-    const slideHeight = window.innerHeight * 0.5; // Hauteur très réduite par slide
-    const totalHeight = slideHeight * slides.length; // Espace minimal
+    // Augmenter la hauteur par slide pour ralentir la transition
+    const slideHeight = window.innerHeight * 0.8; // Hauteur par slide
+    
+    // Ajouter plus d'espace pour le dernier slide (25% supplémentaire)
+    const lastSlideExtraSpace = window.innerHeight * 0.25;
+    const totalHeight = (slideHeight * slides.length) + lastSlideExtraSpace;
 
     // Set height of scroll control element
     scrollControlRef.current.style.height = `${totalHeight}px`;
@@ -163,9 +166,9 @@ export default function ProjectSlider({}: ProjectProps) {
       const sliderStart = scrollPosition - scrollAnimationHeight;
       const viewportHeight = window.innerHeight;
 
-      // Calculer l'index de slide avec une sensibilité encore plus accrue
+      // Calculer l'index de slide avec une sensibilité réduite pour ralentir les transitions
       const slideIndex = Math.min(
-        Math.floor(sliderStart / (viewportHeight * 0.3)), // Seuil très réduit pour une transition plus rapide
+        Math.floor(sliderStart / (viewportHeight * 0.6)), // Seuil augmenté (de 0.3 à 0.6) pour une transition plus lente
         slides.length - 1,
       );
 
@@ -193,6 +196,7 @@ export default function ProjectSlider({}: ProjectProps) {
 
   return (
     <div
+      id="projects-slider"
       ref={slideContainerRef}
       className="w-full min-h-screen flex flex-col justify-center bg-black overflow-hidden relative"
       style={{
