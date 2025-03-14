@@ -30,50 +30,57 @@ export default function Header() {
   // Fonction pour faire défiler vers la section des projets
   const scrollToProjects = (e: React.MouseEvent) => {
     e.preventDefault();
-    
+
     // Ajoutons un ID au composant ProjectsSlider
-    const projectsSlider = document.querySelector('[class*="ProjectsSlider"]') || 
-                          document.getElementById('projects-slider');
-    
+    const projectsSlider =
+      document.querySelector('[class*="ProjectsSlider"]') ||
+      document.getElementById("projects-slider");
+
     if (projectsSlider) {
       // Défilement avec un petit décalage pour tenir compte de la hauteur du header
       const headerHeight = 80; // Hauteur approximative du header en pixels
       const elementPosition = projectsSlider.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - headerHeight;
-      
+      const offsetPosition =
+        elementPosition + window.pageYOffset - headerHeight;
+
       window.scrollTo({
         top: offsetPosition,
-        behavior: 'smooth'
+        behavior: "smooth",
       });
     } else {
       // Si nous ne trouvons pas le slider directement, essayons de trouver le premier slide
-      const firstSlide = document.querySelector('[data-slide-id="1"]') || 
-                         document.querySelector('[data-ascii-state="1"]');
-      
+      const firstSlide =
+        document.querySelector('[data-slide-id="1"]') ||
+        document.querySelector('[data-ascii-state="1"]');
+
       if (firstSlide) {
-        const offsetPosition = firstSlide.getBoundingClientRect().top + window.pageYOffset - 80;
+        const offsetPosition =
+          firstSlide.getBoundingClientRect().top + window.pageYOffset - 80;
         window.scrollTo({
           top: offsetPosition,
-          behavior: 'smooth'
+          behavior: "smooth",
         });
       } else {
         // Fallback: essayons de trouver le conteneur du slider par son contenu
-        const allElements = document.querySelectorAll('div, section');
+        const allElements = document.querySelectorAll("div, section");
         for (let i = 0; i < allElements.length; i++) {
           const element = allElements[i];
-          if (element.textContent?.includes('SN Stack') && 
-              element.textContent?.includes('Madara')) {
-            const offsetPosition = element.getBoundingClientRect().top + window.pageYOffset - 80;
+          if (
+            element.textContent?.includes("SN Stack") &&
+            element.textContent?.includes("Madara")
+          ) {
+            const offsetPosition =
+              element.getBoundingClientRect().top + window.pageYOffset - 80;
             window.scrollTo({
               top: offsetPosition,
-              behavior: 'smooth'
+              behavior: "smooth",
             });
             break;
           }
         }
       }
     }
-    
+
     setDropdownOpen(false);
     setMobileMenuOpen(false);
   };

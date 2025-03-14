@@ -7,11 +7,13 @@ import ContactSection from "@/components/ContactSection";
 
 export default function Home() {
   const [showProjectSlider, setShowProjectSlider] = useState(false);
+  const [showContactSection, setShowContactSection] = useState(false);
   const [hasScrolledToFooter, setHasScrolledToFooter] = useState(false);
   const [windowHeight, setWindowHeight] = useState(0);
   const mainRef = useRef(null);
   const footerSpacerRef = useRef(null);
   const projectSliderRef = useRef(null);
+  const contactSectionRef = useRef(null);
 
   // Handler for when scroll animation completes
   const handleScrollComplete = () => {
@@ -77,11 +79,15 @@ export default function Home() {
     const slidesCount = 3; // Nombre de slides dans ProjectSlider
     const slideHeight = windowHeight * 0.7; // Hauteur par slide
     const projectSliderHeight = slideHeight * slidesCount;
+    const contactSectionHeight = windowHeight * 2; // Hauteur pour la section de contact
     const footerHeight = windowHeight; // Hauteur approximative pour le footer
 
     // Hauteur totale nécessaire
     const minRequiredHeight =
-      scrollAnimationHeight + projectSliderHeight + footerHeight;
+      scrollAnimationHeight +
+      projectSliderHeight +
+      contactSectionHeight +
+      footerHeight;
 
     if (documentHeight < minRequiredHeight) {
       // Add a spacer element if needed
@@ -126,19 +132,32 @@ export default function Home() {
       const slideTransitionHeight = windowHeight * 0.7; // Increased height to slow down transition
       const projectSliderScrollSpace = slideTransitionHeight * slidesCount;
 
-      // Calculate where the footer should start - réduire cette valeur pour atteindre le footer plus tôt
-      const footerThreshold =
+      // Point de transition entre le slider de projets et la section de contact
+      const contactSectionThreshold =
         scrollAnimationHeight + projectSliderScrollSpace * 0.8;
+
+      // Calculate where the footer should start
+      const footerThreshold = contactSectionThreshold + windowHeight * 1.5;
 
       // Determine visibility based on scroll position
       if (scrollPosition >= footerThreshold) {
-        // Scrolled to footer - forcer l'affichage du footer
+        // Scrolled to footer
         setHasScrolledToFooter(true);
+        setShowContactSection(true);
 
         // Masquer progressivement le slider lorsqu'on approche du footer
         if (projectSliderRef.current) {
-          const fadeOutStart = footerThreshold;
-          const fadeOutEnd = footerThreshold + windowHeight * 0.3;
+          (projectSliderRef.current as HTMLElement).style.opacity = "0";
+        }
+      } else if (scrollPosition >= contactSectionThreshold) {
+        // Transition entre le slider de projets et la section de contact
+        setHasScrolledToFooter(false);
+        setShowContactSection(true);
+
+        // Faire disparaître progressivement le slider de projets
+        if (projectSliderRef.current) {
+          const fadeOutStart = contactSectionThreshold;
+          const fadeOutEnd = contactSectionThreshold + windowHeight * 0.3;
           const fadeProgress = Math.min(
             1,
             Math.max(
@@ -151,10 +170,27 @@ export default function Home() {
           (projectSliderRef.current as HTMLElement).style.opacity =
             `${1 - fadeProgress}`;
         }
+
+        // Faire apparaître progressivement la section de contact
+        if (contactSectionRef.current) {
+          const fadeInStart = contactSectionThreshold;
+          const fadeInEnd = contactSectionThreshold + windowHeight * 0.3;
+          const fadeProgress = Math.min(
+            1,
+            Math.max(
+              0,
+              (scrollPosition - fadeInStart) / (fadeInEnd - fadeInStart),
+            ),
+          );
+
+          // Augmenter l'opacité de la section de contact progressivement
+          (contactSectionRef.current as HTMLElement).style.opacity =
+            `${fadeProgress}`;
+        }
       } else if (scrollPosition >= scrollAnimationHeight * 0.97) {
         // Start showing ProjectSlider slightly before HeroSection ends
-        // This avoids the black screen gap
         setHasScrolledToFooter(false);
+        setShowContactSection(false);
 
         // Ensure ProjectSlider is visible when in this section
         if (!showProjectSlider && scrollingDown) {
@@ -205,7 +241,7 @@ export default function Home() {
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, [showProjectSlider, windowHeight]);
+  }, [showProjectSlider, showContactSection, windowHeight]);
 
   return (
     <div ref={mainRef} className="bg-black text-white">
@@ -221,35 +257,37 @@ export default function Home() {
         style={{
           opacity: showProjectSlider ? 1 : 0,
           visibility: "visible", // Always keep in DOM to avoid rendering issues
-          transition: "opacity 0.8s ease-in-out",
+          transition: "opacity 1s ease-in-out",
           pointerEvents: showProjectSlider ? "auto" : "none",
-          // Réduire considérablement la hauteur minimale
           minHeight: windowHeight ? `${windowHeight * 1.5}px` : "150vh",
         }}
       >
         <ProjectSlider />
       </div>
-      
-      {/* Contact section juste avant le footer */}
-      <div 
-        className="relative z-20 mt-[1200px]" // Valeur encore plus élevée
+
+      {/* Contact section après le slider de projets */}
+      <div
+        ref={contactSectionRef}
+        className="relative z-20"
         style={{
-          opacity: showProjectSlider ? 1 : 0,
-          transition: "opacity 0.8s ease-in-out",
-          marginBottom: "-800px", // Réduire davantage l'espace vide
+          opacity: showContactSection ? 1 : 0,
+          visibility: "visible", // Toujours garder dans le DOM
+          transition: "opacity 1s ease-in-out",
+          pointerEvents: showContactSection ? "auto" : "none",
+          marginTop: "100px", // Espace entre le slider et la section de contact
         }}
       >
         <ContactSection />
       </div>
 
-      {/* Spacer to trigger the global Footer visibility - augmenter l'opacité pour le voir */}
+      {/* Spacer to trigger the global Footer visibility */}
       <div
         ref={footerSpacerRef}
-        className="relative z-30" // Ajouter un z-index plus élevé que le slider
+        className="relative z-30"
         style={{
-          height: "100vh", // Augmenter la hauteur pour s'assurer qu'il est visible
+          height: "50vh",
           opacity: hasScrolledToFooter ? 1 : 0,
-          transition: "opacity 0.8s ease-in-out",
+          transition: "opacity 1s ease-in-out",
         }}
       />
     </div>

@@ -130,12 +130,12 @@ export default function ProjectSlider({}: ProjectProps) {
   useEffect(() => {
     if (!hasInitialized || !scrollControlRef.current) return;
 
-    // Augmenter la hauteur par slide pour ralentir la transition
-    const slideHeight = window.innerHeight * 0.8; // Hauteur par slide
-    
-    // Ajouter plus d'espace pour le dernier slide (25% supplémentaire)
-    const lastSlideExtraSpace = window.innerHeight * 0.25;
-    const totalHeight = (slideHeight * slides.length) + lastSlideExtraSpace;
+    // Ajuster la hauteur par slide pour une transition plus fluide
+    const slideHeight = window.innerHeight * 0.75; // Hauteur par slide légèrement réduite
+
+    // Ajouter un espace pour le dernier slide qui permet une transition plus douce
+    const lastSlideExtraSpace = window.innerHeight * 0.3;
+    const totalHeight = slideHeight * slides.length + lastSlideExtraSpace;
 
     // Set height of scroll control element
     scrollControlRef.current.style.height = `${totalHeight}px`;
@@ -262,7 +262,8 @@ export default function ProjectSlider({}: ProjectProps) {
             <div
               className="absolute w-full"
               style={{
-                ...digitClockStyle,
+                transition:
+                  "transform 1s cubic-bezier(0.16, 1, 0.3, 1), opacity 1s cubic-bezier(0.16, 1, 0.3, 1)",
                 transform: isTransitioning
                   ? "translateY(-100%)"
                   : "translateY(0)",
