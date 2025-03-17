@@ -16,27 +16,27 @@ export default function TrustedBy() {
   ];
 
   return (
-    <div className="w-full bg-black px-6 md:px-12 lg:px-16 py-24 min-h-screen flex items-center">
+    <div className="w-full bg-black px-6 md:px-12 lg:px-16 py-24 min-h-screen flex items-center justify-center">
       <div className="max-w-7xl mx-auto">
-        <h2 
+        <h2
           className="text-white font-bold leading-tight text-left"
           style={{ fontSize: "4.8rem" }}
         >
           Notre équipe est reconnue par{" "}
           {trustedPartners.map((partner, index) => (
             <span key={partner.name}>
-              <Link 
-                href={partner.url} 
-                target="_blank" 
+              <Link
+                href={partner.url}
+                target="_blank"
                 rel="noopener noreferrer"
                 className="border-b-4 border-white hover:opacity-80 transition-opacity"
               >
                 {partner.name}
               </Link>
-              {index < trustedPartners.length - 2 
-                ? ", " 
-                : index === trustedPartners.length - 2 
-                  ? " et " 
+              {index < trustedPartners.length - 2
+                ? ", "
+                : index === trustedPartners.length - 2
+                  ? " et "
                   : ""}
             </span>
           ))}
