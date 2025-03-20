@@ -108,9 +108,8 @@ export default function ContactSection() {
       <div
         className="fixed top-0 left-0 w-full h-screen flex items-center p-8"
         style={{
-          opacity: isVisible ? 1 : 0,
-          transition: "opacity 0.5s ease-in-out",
-          pointerEvents: isVisible ? "auto" : "none",
+          opacity: 1,
+          pointerEvents: "auto",
           zIndex: 10,
         }}
       >

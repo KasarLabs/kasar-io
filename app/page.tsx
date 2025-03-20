@@ -145,10 +145,20 @@ export default function Home() {
       // Calculate where the footer should start
       const footerThreshold = contactSectionThreshold + windowHeight * 1.5;
 
-      // Determine visibility based on scroll position
+      // Gérer la visibilité de la section de contact en premier
+      if (scrollPosition >= contactSectionThreshold) {
+        setShowContactSection(true);
+        if (contactSectionRef.current) {
+          const contactElement = contactSectionRef.current as HTMLElement;
+          contactElement.style.opacity = "1";
+          contactElement.style.zIndex = "50";
+          contactElement.style.pointerEvents = "auto";
+        }
+      }
+
+      // Gérer les autres sections
       if (scrollPosition >= footerThreshold) {
         // Scrolled to footer
-        setShowContactSection(true);
         setShowTrustedBy(true);
 
         // Masquer progressivement le slider lorsqu'on approche du footer
@@ -157,13 +167,12 @@ export default function Home() {
         }
       } else if (scrollPosition >= contactSectionThreshold) {
         // Transition entre TrustedBy et la section de contact
-        setShowContactSection(true);
         setShowTrustedBy(true);
 
         // Faire disparaître progressivement TrustedBy
         if (trustedByRef.current) {
           const fadeOutStart = contactSectionThreshold;
-          const fadeOutEnd = contactSectionThreshold + windowHeight * 0.02; // Transition très rapide
+          const fadeOutEnd = contactSectionThreshold + windowHeight * 0.02;
           const fadeProgress = Math.min(
             1,
             Math.max(
@@ -176,29 +185,9 @@ export default function Home() {
           const trustedByElement = trustedByRef.current as HTMLElement;
           trustedByElement.style.opacity = `${1 - fadeProgress}`;
           if (fadeProgress > 0.5) {
-            trustedByElement.style.zIndex = "10"; // Réduire le z-index pour permettre l'interaction avec Contact
-            trustedByElement.style.pointerEvents = "none"; // Désactiver les interactions
+            trustedByElement.style.zIndex = "10";
+            trustedByElement.style.pointerEvents = "none";
           }
-        }
-
-        // Faire apparaître progressivement la section de contact
-        if (contactSectionRef.current) {
-          const fadeInStart = contactSectionThreshold;
-          const fadeInEnd = contactSectionThreshold + windowHeight * 0.1; // Transition plus rapide
-          const fadeProgress = Math.min(
-            1,
-            Math.max(
-              0,
-              (scrollPosition - fadeInStart) / (fadeInEnd - fadeInStart),
-            ),
-          );
-
-          // Augmenter l'opacité de la section de contact progressivement et assurer qu'elle est au-dessus
-          const contactElement = contactSectionRef.current as HTMLElement;
-          contactElement.style.opacity = `${fadeProgress}`;
-          contactElement.style.zIndex = "40"; // S'assurer que Contact est au-dessus de TrustedBy
-          contactElement.style.pointerEvents =
-            fadeProgress > 0.5 ? "auto" : "none";
         }
       } else if (scrollPosition >= trustedByThreshold) {
         // Transition entre le slider de projets et TrustedBy
@@ -339,7 +328,7 @@ export default function Home() {
       {/* Contact section après TrustedBy */}
       <div
         ref={contactSectionRef}
-        className="relative z-20"
+        className="relative z-50"
         style={{
           opacity: showContactSection ? 1 : 0,
           visibility: "visible",
