@@ -118,25 +118,25 @@ export default function Header() {
 
             {dropdownOpen && (
               <div
-                className="absolute right-0 mt-2 w-80 bg-black/90 backdrop-blur-sm rounded-md shadow-lg py-4 z-50"
+                className="absolute right-0 mt-2 w-80 backdrop-blur-sm rounded-md shadow-lg py-4 z-50"
                 onMouseLeave={() => setDropdownOpen(false)}
               >
                 <a
                   href="#projects-slider"
                   onClick={scrollToProjects}
-                  className="block px-6 py-3 text-gray-300 hover:text-white hover:bg-black/80 font-calibre-medium text-[40px] text-right transition-all"
+                  className="block px-6 py-3 text-gray-300 hover:text-white hover:bg-black/80 font-calibre-medium text-[40px] text-right transition-all font-bold"
                 >
                   Projects
                 </a>
                 <Link
                   href="/about"
-                  className="block px-6 py-3 text-gray-300 hover:text-white hover:bg-black/80 font-calibre-medium text-[40px] text-right transition-all"
+                  className="block px-6 py-3 text-gray-300 hover:text-white hover:bg-black/80 font-calibre-medium text-[40px] text-right transition-all font-bold"
                 >
                   About
                 </Link>
                 <Link
                   href="/blog"
-                  className="block px-6 py-3 text-gray-300 hover:text-white hover:bg-black/80 font-calibre-medium text-[40px] text-right transition-all"
+                  className="block px-6 py-3 text-gray-300 hover:text-white hover:bg-black/80 font-calibre-medium text-[40px] text-right transition-all font-bold"
                 >
                   Blog
                 </Link>
@@ -144,7 +144,7 @@ export default function Header() {
                   href="https://github.com/kasarlabs"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block px-6 py-3 text-gray-300 hover:text-white hover:bg-black/80 font-calibre-medium text-[40px] text-right transition-all"
+                  className="block px-6 py-3 text-gray-300 hover:text-white hover:bg-black/80 font-calibre-medium text-[40px] text-right transition-all font-bold"
                 >
                   GitHub
                 </a>
@@ -164,24 +164,24 @@ export default function Header() {
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden absolute top-20 left-0 right-0 bg-black/100 backdrop-blur-sm py-4 px-6 space-y-4">
+          <div className="md:hidden absolute top-20 left-0 right-0 backdrop-blur-sm py-4 px-6 space-y-4">
             <a
               href="#projects-slider"
               onClick={scrollToProjects}
-              className="block text-gray-300 hover:text-white font-calibre-medium text-lg hover:bg-black py-2 px-4 rounded-lg transition-all"
+              className="block text-gray-300 hover:text-white font-calibre-medium text-lg hover:bg-black py-2 px-4 rounded-lg transition-all font-bold"
             >
               Projects
             </a>
             <Link
               href="/about"
-              className="block text-gray-300 hover:text-white font-calibre-medium text-lg hover:bg-black py-2 px-4 rounded-lg transition-all"
+              className="block text-gray-300 hover:text-white font-calibre-medium text-lg hover:bg-black py-2 px-4 rounded-lg transition-all font-bold"
               onClick={() => setMobileMenuOpen(false)}
             >
               About
             </Link>
             <Link
               href="/blog"
-              className="block text-gray-300 hover:text-white font-calibre-medium text-lg hover:bg-black py-2 px-4 rounded-lg transition-all"
+              className="block text-gray-300 hover:text-white font-calibre-medium text-lg hover:bg-black py-2 px-4 rounded-lg transition-all font-bold"
               onClick={() => setMobileMenuOpen(false)}
             >
               Blog
@@ -190,7 +190,7 @@ export default function Header() {
               href="https://github.com/kasarlabs"
               target="_blank"
               rel="noopener noreferrer"
-              className="block text-gray-300 hover:text-white font-calibre-medium text-lg hover:bg-black py-2 px-4 rounded-lg transition-all"
+              className="block text-gray-300 hover:text-white font-calibre-medium text-lg hover:bg-black py-2 px-4 rounded-lg transition-all font-bold"
               onClick={() => setMobileMenuOpen(false)}
             >
               GitHub

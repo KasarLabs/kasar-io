@@ -23,25 +23,25 @@ export default function Markdown({ content }: MarkdownProps) {
           // Personnalisation des titres
           h1: ({ ...props }) => (
             <h1
-              className="text-3xl font-bold mt-8 mb-4 pb-2 border-b dark:border-gray-700 text-white dark:text-white"
+              className="text-4xl font-bold mt-8 mb-4 text-[#9e9e9e]"
               {...props}
             />
           ),
           h2: ({ ...props }) => (
             <h2
-              className="text-2xl font-bold mt-6 mb-3 text-white dark:text-white"
+              className="text-[1.725rem] font-bold mt-6 mb-3 text-[#9e9e9e]"
               {...props}
             />
           ),
           h3: ({ ...props }) => (
             <h3
-              className="text-xl font-bold mt-5 mb-2 text-white dark:text-white"
+              className="text-[1.38rem] font-bold mt-5 mb-2 text-[#9e9e9e]"
               {...props}
             />
           ),
           h4: ({ ...props }) => (
             <h4
-              className="text-lg font-bold mt-4 mb-2 text-white dark:text-white"
+              className="text-[1.15rem] font-bold mt-4 mb-2 text-[#9e9e9e]"
               {...props}
             />
           ),
@@ -60,10 +60,7 @@ export default function Markdown({ content }: MarkdownProps) {
             }
 
             return (
-              <p
-                className="my-4 leading-relaxed text-white dark:text-white"
-                {...props}
-              >
+              <p className="my-4 leading-relaxed text-[#9e9e9e]" {...props}>
                 {children}
               </p>
             );
@@ -191,27 +188,24 @@ export default function Markdown({ content }: MarkdownProps) {
           // Personnalisation des listes
           ul: ({ ...props }) => (
             <ul
-              className="list-disc pl-6 mb-4 space-y-2 text-white dark:text-white"
+              className="list-disc pl-6 mb-4 space-y-2 text-[#9e9e9e]"
               {...props}
             />
           ),
           ol: ({ ...props }) => (
             <ol
-              className="list-decimal pl-6 mb-4 space-y-2 text-white dark:text-white"
+              className="list-decimal pl-6 mb-4 space-y-2 text-[#9e9e9e]"
               {...props}
             />
           ),
           li: ({ ...props }) => (
-            <li
-              className="leading-relaxed text-white dark:text-white"
-              {...props}
-            />
+            <li className="leading-relaxed text-[#9e9e9e]" {...props} />
           ),
 
           // Personnalisation des blocs de citation
           blockquote: ({ ...props }) => (
             <blockquote
-              className="border-l-4 border-gray-300 dark:border-gray-700 pl-4 py-1 my-6 italic bg-gray-50 dark:bg-gray-800 text-white dark:text-white rounded-r-2xl shadow-md"
+              className="border-l-4 border-gray-300 dark:border-gray-700 pl-4 py-1 my-6 italic bg-gray-50 dark:bg-gray-800 text-[#9e9e9e] rounded-r-2xl shadow-md"
               {...props}
             />
           ),
@@ -239,7 +233,7 @@ export default function Markdown({ content }: MarkdownProps) {
           ),
           tbody: ({ ...props }) => (
             <tbody
-              className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-800 text-white dark:text-white"
+              className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-800 text-[#9e9e9e]"
               {...props}
             />
           ),
@@ -251,28 +245,20 @@ export default function Markdown({ content }: MarkdownProps) {
           ),
           td: ({ ...props }) => (
             <td
-              className="px-6 py-4 whitespace-nowrap text-sm text-white dark:text-white"
+              className="px-6 py-4 whitespace-nowrap text-sm text-[#9e9e9e]"
               {...props}
             />
           ),
 
           // Personnalisation des éléments horizontaux
-          hr: ({ ...props }) => (
-            <hr
-              className="my-8 border-t border-gray-200 dark:border-gray-700"
-              {...props}
-            />
-          ),
+          hr: ({ ...props }) => <hr className="hidden" {...props} />,
 
           // Personnalisation des éléments de mise en forme
           strong: ({ ...props }) => (
-            <strong
-              className="font-bold text-white dark:text-white"
-              {...props}
-            />
+            <strong className="font-bold text-[#9e9e9e]" {...props} />
           ),
           em: ({ ...props }) => (
-            <em className="italic text-white dark:text-white" {...props} />
+            <em className="italic text-[#9e9e9e]" {...props} />
           ),
           del: ({ ...props }) => (
             <del className="line-through text-gray-400" {...props} />

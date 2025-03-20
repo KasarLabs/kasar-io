@@ -96,14 +96,14 @@ export default async function PostPage({ params }: PostPageProps) {
         <Markdown content={post.content} />
 
         {post.tags && post.tags.length > 0 && (
-          <div className="mt-12 pt-6 border-t border-gray-200 dark:border-gray-800">
-            <h2 className="text-lg font-semibold mb-4">Tags</h2>
+          <div className="mt-12">
+            <h2 className="text-lg font-semibold mb-4 text-[#9e9e9e]">Tags</h2>
             <div className="flex flex-wrap gap-2">
               {post.tags.map((tag) => (
                 <Link
                   key={tag}
                   href={`/blog/tag/${tag}`}
-                  className="inline-flex items-center rounded-full bg-gray-100 dark:bg-gray-800 px-3 py-1 text-sm font-medium text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                  className="inline-flex items-center rounded-3xl border border-gray-200 dark:border-gray-700 px-3 py-1 text-sm font-medium text-[#9e9e9e] hover:border-gray-300 dark:hover:border-gray-600 transition-colors"
                 >
                   {tag}
                 </Link>

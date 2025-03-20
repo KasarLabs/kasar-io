@@ -86,7 +86,9 @@ export default async function BlogPage() {
                   </div>
 
                   <div className="flex flex-col">
-                    <h2 className="text-xl font-bold mb-2">{post.title}</h2>
+                    <h2 className="text-xl font-bold mb-2 text-white">
+                      {post.title}
+                    </h2>
                     <div className="flex items-center text-sm text-gray-400">
                       <span className="capitalize">
                         {post.tags?.[0] || "Madara"}
@@ -100,7 +102,7 @@ export default async function BlogPage() {
             ))}
 
             {/* Articles placeholder */}
-            {Array.from({ length: 5 }).map((_, index) => (
+            {Array.from({ length: 2 }).map((_, index) => (
               <article
                 key={`placeholder-${index}`}
                 className="flex flex-col overflow-hidden group"
