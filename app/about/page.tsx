@@ -77,31 +77,31 @@ export default function AboutPage() {
         <p className="text-2xl font-medium mb-10">L'innovation numérique est à portée de main.</p>
         
         <div className="space-y-6 text-lg">
-          <p>
+          <p className="font-light">
             Créer des solutions numériques innovantes est le défi technique le plus important de notre époque.
           </p>
           
-          <p>
+          <p className="font-light">
             Nous avons fondé le premier laboratoire dédié exclusivement à l'innovation numérique, avec un seul objectif et un seul produit : des expériences utilisateur exceptionnelles.
           </p>
           
-          <p>
+          <p className="font-light">
             C'est notre mission, notre nom et notre feuille de route complète, car c'est notre unique objectif. Notre équipe, nos investisseurs et notre modèle économique sont tous alignés pour y parvenir.
           </p>
           
-          <p>
+          <p className="font-light">
             Nous abordons la qualité et les fonctionnalités ensemble, comme des problèmes techniques à résoudre par des percées scientifiques et d'ingénierie révolutionnaires. Nous prévoyons d'avancer aussi rapidement que possible tout en nous assurant que la qualité reste toujours notre priorité.
           </p>
           
-          <p>
+          <p className="font-light">
             Ainsi, nous pouvons évoluer sereinement.
           </p>
           
-          <p>
+          <p className="font-light">
             Notre concentration unique signifie aucune distraction par la gestion ou les cycles de produits, et notre modèle d'affaires garantit que la qualité, la sécurité et le progrès sont tous protégés des pressions commerciales à court terme.
           </p>
           
-          <p>
+          <p className="font-light">
             Nous sommes une entreprise française avec des bureaux à Paris et Lyon, où nous avons des racines profondes et la capacité de recruter les meilleurs talents techniques.
           </p>
         </div>

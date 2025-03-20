@@ -141,7 +141,7 @@ export default function Home() {
       const trustedByThreshold = scrollAnimationHeight + projectSliderScrollSpace * 0.85;
       
       // Point de transition entre TrustedBy et la section de contact
-      const contactSectionThreshold = trustedByThreshold + windowHeight * 0.8;
+      const contactSectionThreshold = trustedByThreshold + windowHeight * 1.5;
 
       // Calculate where the footer should start
       const footerThreshold = contactSectionThreshold + windowHeight * 1.5;
@@ -166,7 +166,7 @@ export default function Home() {
         // Faire disparaître progressivement TrustedBy
         if (trustedByRef.current) {
           const fadeOutStart = contactSectionThreshold;
-          const fadeOutEnd = contactSectionThreshold + windowHeight * 0.3;
+          const fadeOutEnd = contactSectionThreshold + windowHeight * 0.1;
           const fadeProgress = Math.min(
             1,
             Math.max(
@@ -321,14 +321,14 @@ export default function Home() {
       {/* Section TrustedBy entre le slider et la section de contact */}
       <div
         ref={trustedByRef}
-        className="relative z-30"
+        className="fixed top-0 left-0 w-full min-h-screen z-30"
         style={{
           opacity: showTrustedBy ? 1 : 0,
-          visibility: "visible", // Toujours garder dans le DOM
-          transition: "opacity 1s ease-in-out",
+          visibility: "visible",
+          transition: "opacity 1s ease-in-out, transform 1s ease-in-out",
           pointerEvents: showTrustedBy ? "auto" : "none",
-          marginTop: "100px", // Espace entre le slider et TrustedBy
-          minHeight: "100vh", // S'assurer qu'il a une hauteur suffisante
+          transform: `translateY(${showTrustedBy ? '0' : '100vh'})`,
+          backgroundColor: "black", // Assurer un fond noir
         }}
       >
         <TrustedBy />
@@ -340,10 +340,10 @@ export default function Home() {
         className="relative z-20"
         style={{
           opacity: showContactSection ? 1 : 0,
-          visibility: "visible", // Toujours garder dans le DOM
+          visibility: "visible",
           transition: "opacity 1s ease-in-out",
           pointerEvents: showContactSection ? "auto" : "none",
-          marginTop: "100px", // Espace entre TrustedBy et la section de contact
+          marginTop: windowHeight * 0.5 + "px", // Ajuster l'espace pour compenser le fixed positioning
         }}
       >
         <ContactSection />

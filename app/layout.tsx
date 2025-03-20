@@ -5,7 +5,10 @@ import "./globals.css";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
-const inter = Inter({ subsets: ["latin"], weight: ["600"] });
+const inter = Inter({ 
+  subsets: ["latin"], 
+  weight: ["300", "400", "500", "600"] 
+});
 
 export const metadata: Metadata = {
   title: "Kasar Labs",

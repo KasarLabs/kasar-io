@@ -22,7 +22,7 @@ export default function TrustedBy() {
           className="text-white font-bold leading-tight text-left"
           style={{ fontSize: "4.8rem" }}
         >
-          Notre équipe est reconnue par{" "}
+          Our team is trusted by{" "}
           {trustedPartners.map((partner, index) => (
             <span key={partner.name}>
               <Link
@@ -36,7 +36,7 @@ export default function TrustedBy() {
               {index < trustedPartners.length - 2
                 ? ", "
                 : index === trustedPartners.length - 2
-                  ? " et "
+                  ? " and "
                   : ""}
             </span>
           ))}

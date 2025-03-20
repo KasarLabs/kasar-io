@@ -33,7 +33,7 @@ const slides = [
     title: "",
     subtitle: "",
     description:
-      "Powered by Starknet's performance and security, Snak is a next-gen AI agent framework integrating the latest innovations. With a native communication network, lifetime memory, and 1,000+ plugin compatibility, it's built for scalability, efficiency, and adaptability. The future of AI agents starts here.",
+      "Powered by Starknet's performance and security, Snak is a next-gen AI agent framework integrating the latest innovations. With a native communication network, lifetime memory, and 1,000+ plugin compatibility, it's built for scalability, efficiency, and adaptability. Your adventure with AI agents starts here.",
     asciiState: 2,
     logo: "/images/snak-logo.webp",
     isMainSlide: false,
@@ -59,19 +59,23 @@ const slides = [
     title: "Quaza",
     subtitle: "",
     description:
-      "Quaza est une solution de layer 3 construite sur Starknet, spécialement conçue pour les agents autonomes et les développeurs. Elle offre des performances améliorées, des frais réduits et des fonctionnalités avancées pour les applications décentralisées modernes.",
+      "As a key player in the SN Stack, we aim to push its limits by deploying a network that integrates all upcoming features of the ecosystem. Meet Quaza, your Starknet L3 on steroids, designed for Agents and developers.",
     asciiState: 3,
-    logo: "/images/quaza-logo.webp",
+    logo: "/images/quaza-no-bg.png",
     isMainSlide: false,
     primaryLink: {
-      text: "GitHub",
-      url: "https://github.com/kasarlabs/quaza",
+      text: "Website",
+      url: "https://starkagent.ai",
     },
     secondaryLink: {
-      text: "Docs",
-      url: "https://docs.quaza.io",
+      text: "GitHub",
+      url: "https://github.com/kasarlabs/snak",
     },
     terceraryLink: {
+      text: "Docs",
+      url: "https://docs.kasar.io/snak",
+    },
+    quartenaryLink: {
       text: "Blog",
       url: "https://blog.kasar.io",
     },
@@ -287,8 +291,24 @@ export default function ProjectSlider({}: ProjectProps) {
                     />
                   </a>
                 )}
+                {currentSlide === 2 && (
+                  <a
+                    href="#"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center"
+                  >
+                    <Image
+                      src="/images/quaza-no-bg.png"
+                      alt="Quaza Logo"
+                      width={60}
+                      height={60}
+                      className="hover:opacity-80 transition-opacity mr-3"
+                    />
+                  </a>
+                )}
                 <h1 className="text-4xl lg:text-5xl font-bold">
-                  {slides[currentSlide].title}
+                  {currentSlide !== 2 ? slides[currentSlide].title : ""}
                 </h1>
               </div>
             </div>
@@ -333,8 +353,24 @@ export default function ProjectSlider({}: ProjectProps) {
                       />
                     </a>
                   )}
+                  {(currentSlide + 1) % slides.length === 2 && (
+                    <a
+                      href="#"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center"
+                    >
+                      <Image
+                        src="/images/quaza-no-bg.png"
+                        alt="Quaza Logo"
+                        width={80}
+                        height={80}
+                        className="hover:opacity-80 transition-opacity mr-3"
+                      />
+                    </a>
+                  )}
                   <h1 className="text-4xl lg:text-5xl font-bold">
-                    {slides[(currentSlide + 1) % slides.length].title}
+                    {(currentSlide + 1) % slides.length !== 2 ? slides[(currentSlide + 1) % slides.length].title : ""}
                   </h1>
                 </div>
               </div>
@@ -373,7 +409,7 @@ export default function ProjectSlider({}: ProjectProps) {
                     "slideUp 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards",
                 }}
               >
-                <p className="text-base text-neutral-300 max-w-2xl leading-relaxed">
+                <p className="text-base text-neutral-300 max-w-2xl leading-relaxed font-light">
                   {slides[(currentSlide + 1) % slides.length].description}
                 </p>
               </div>
