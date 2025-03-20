@@ -15,7 +15,7 @@ export default async function BlogPage() {
   const posts = await getAllPosts();
 
   return (
-    <main className="container mx-auto px-4 py-8 max-w-7xl">
+    <div className="container mx-auto px-4 py-8 max-w-7xl">
       <div className="space-y-6">
         <div className="mb-8">
           {/* Titre animé côté client */}
@@ -124,6 +124,6 @@ export default async function BlogPage() {
           </div>
         </div>
       </div>
-    </main>
+    </div>
   );
 }
