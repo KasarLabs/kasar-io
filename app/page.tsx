@@ -10,10 +10,8 @@ export default function Home() {
   const [showProjectSlider, setShowProjectSlider] = useState(false);
   const [showContactSection, setShowContactSection] = useState(false);
   const [showTrustedBy, setShowTrustedBy] = useState(false);
-  const [hasScrolledToFooter, setHasScrolledToFooter] = useState(false);
   const [windowHeight, setWindowHeight] = useState(0);
   const mainRef = useRef(null);
-  const footerSpacerRef = useRef(null);
   const projectSliderRef = useRef(null);
   const contactSectionRef = useRef(null);
   const trustedByRef = useRef(null);
@@ -150,7 +148,6 @@ export default function Home() {
       // Determine visibility based on scroll position
       if (scrollPosition >= footerThreshold) {
         // Scrolled to footer
-        setHasScrolledToFooter(true);
         setShowContactSection(true);
         setShowTrustedBy(true);
 
@@ -160,7 +157,6 @@ export default function Home() {
         }
       } else if (scrollPosition >= contactSectionThreshold) {
         // Transition entre TrustedBy et la section de contact
-        setHasScrolledToFooter(false);
         setShowContactSection(true);
         setShowTrustedBy(true);
 
@@ -206,7 +202,6 @@ export default function Home() {
         }
       } else if (scrollPosition >= trustedByThreshold) {
         // Transition entre le slider de projets et TrustedBy
-        setHasScrolledToFooter(false);
         setShowContactSection(false);
         setShowTrustedBy(true);
 
@@ -249,7 +244,6 @@ export default function Home() {
         }
       } else if (scrollPosition >= scrollAnimationHeight * 0.97) {
         // Start showing ProjectSlider slightly before HeroSection ends
-        setHasScrolledToFooter(false);
         setShowContactSection(false);
         setShowTrustedBy(false);
 

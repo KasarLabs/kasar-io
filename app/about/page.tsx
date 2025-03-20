@@ -77,7 +77,7 @@ export default function AboutPage() {
           .
         </p>
         <p className="text-2xl font-medium mb-10">
-          L'innovation numérique est à portée de main.
+          L&apos;innovation numérique est à portée de main.
         </p>
 
         <div className="space-y-6 text-lg">
@@ -88,29 +88,30 @@ export default function AboutPage() {
 
           <p className="font-light">
             Nous avons fondé le premier laboratoire dédié exclusivement à
-            l'innovation numérique, avec un seul objectif et un seul produit :
-            des expériences utilisateur exceptionnelles.
+            l&apos;innovation numérique, avec un seul objectif et un seul
+            produit : des expériences utilisateur exceptionnelles.
           </p>
 
           <p className="font-light">
-            C'est notre mission, notre nom et notre feuille de route complète,
-            car c'est notre unique objectif. Notre équipe, nos investisseurs et
-            notre modèle économique sont tous alignés pour y parvenir.
+            C&apos;est notre mission, notre nom et notre feuille de route
+            complète, car c&apos;est notre unique objectif. Notre équipe, nos
+            investisseurs et notre modèle économique sont tous alignés pour y
+            parvenir.
           </p>
 
           <p className="font-light">
             Nous abordons la qualité et les fonctionnalités ensemble, comme des
             problèmes techniques à résoudre par des percées scientifiques et
-            d'ingénierie révolutionnaires. Nous prévoyons d'avancer aussi
-            rapidement que possible tout en nous assurant que la qualité reste
-            toujours notre priorité.
+            d&apos;ingénierie révolutionnaires. Nous prévoyons d&apos;avancer
+            aussi rapidement que possible tout en nous assurant que la qualité
+            reste toujours notre priorité.
           </p>
 
           <p className="font-light">Ainsi, nous pouvons évoluer sereinement.</p>
 
           <p className="font-light">
             Notre concentration unique signifie aucune distraction par la
-            gestion ou les cycles de produits, et notre modèle d'affaires
+            gestion ou les cycles de produits, et notre modèle d&apos;affaires
             garantit que la qualité, la sécurité et le progrès sont tous
             protégés des pressions commerciales à court terme.
           </p>
@@ -127,15 +128,15 @@ export default function AboutPage() {
         <h2 className="text-3xl font-bold mb-8">Notre équipe</h2>
         <p className="text-lg mb-10">
           Nous réunissons une équipe agile et talentueuse des meilleurs
-          ingénieurs et chercheurs dédiés à se concentrer sur l'innovation
-          numérique et rien d'autre.
+          ingénieurs et chercheurs dédiés à se concentrer sur l&apos;innovation
+          numérique et rien d&apos;autre.
         </p>
         <p className="text-lg mb-10">
-          Si c'est vous, nous offrons l'opportunité de réaliser l'œuvre de votre
-          vie et d'aider à résoudre le défi technique le plus important de notre
-          époque.
+          Si c&apos;est vous, nous offrons l&apos;opportunité de réaliser
+          l&apos;œuvre de votre vie et d&apos;aider à résoudre le défi technique
+          le plus important de notre époque.
         </p>
-        <p className="text-lg mb-12">C'est maintenant. Rejoignez-nous.</p>
+        <p className="text-lg mb-12">C&apos;est maintenant. Rejoignez-nous.</p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8">
           {teamMembers.map((member, index) => (

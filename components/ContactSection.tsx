@@ -46,7 +46,7 @@ export default function ContactSection() {
         window.innerHeight * socialNetworks.length * 0.35 * 1.7;
       scrollControlRef.current.style.height = `${scrollHeight}px`;
     }
-  }, []);
+  }, [socialNetworks.length]);
 
   // Gestionnaire de défilement pour détecter la position et animer en conséquence
   useEffect(() => {
@@ -108,9 +108,6 @@ export default function ContactSection() {
       <div
         className="fixed top-0 left-0 w-full h-screen flex items-center p-8"
         style={{
-          backgroundImage:
-            "linear-gradient(to right, rgba(50, 50, 50, 0.1) 1px, transparent 1px), linear-gradient(to bottom, rgba(50, 50, 50, 0.1) 1px, transparent 1px)",
-          backgroundSize: "50px 50px",
           opacity: isVisible ? 1 : 0,
           transition: "opacity 0.5s ease-in-out",
           pointerEvents: isVisible ? "auto" : "none",

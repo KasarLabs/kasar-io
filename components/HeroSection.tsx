@@ -140,9 +140,6 @@ const HeroSection: React.FC<ScrollAnimationProps> = ({ onScrollComplete }) => {
       <div
         className="fixed top-0 left-0 w-full h-screen flex items-center p-8"
         style={{
-          backgroundImage:
-            "linear-gradient(to right, rgba(50, 50, 50, 0.1) 1px, transparent 1px), linear-gradient(to bottom, rgba(50, 50, 50, 0.1) 1px, transparent 1px)",
-          backgroundSize: "50px 50px",
           opacity: isScrollComplete ? 0 : 1,
           transition: "opacity 0.5s ease-in-out",
           pointerEvents: isScrollComplete ? "none" : "auto",
