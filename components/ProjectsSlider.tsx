@@ -135,10 +135,10 @@ export default function ProjectSlider({}: ProjectProps) {
     if (!hasInitialized || !scrollControlRef.current) return;
 
     // Ajuster la hauteur par slide pour une transition plus fluide
-    const slideHeight = window.innerHeight * 0.75; // Hauteur par slide légèrement réduite
+    const slideHeight = window.innerHeight * 1.5; // Hauteur par slide augmentée (de 0.75 à 1.5)
 
     // Ajouter un espace pour le dernier slide qui permet une transition plus douce
-    const lastSlideExtraSpace = window.innerHeight * 0.3;
+    const lastSlideExtraSpace = window.innerHeight * 0.5; // Augmenté de 0.3 à 0.5
     const totalHeight = slideHeight * slides.length + lastSlideExtraSpace;
 
     // Set height of scroll control element
@@ -172,7 +172,7 @@ export default function ProjectSlider({}: ProjectProps) {
 
       // Calculer l'index de slide avec une sensibilité réduite pour ralentir les transitions
       const slideIndex = Math.min(
-        Math.floor(sliderStart / (viewportHeight * 0.6)), // Seuil augmenté (de 0.3 à 0.6) pour une transition plus lente
+        Math.floor(sliderStart / (viewportHeight * 1.2)), // Seuil considérablement augmenté (de 0.6 à 1.2) pour transitions plus lentes
         slides.length - 1,
       );
 

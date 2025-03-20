@@ -36,9 +36,9 @@ const HeroSection: React.FC<ScrollAnimationProps> = ({ onScrollComplete }) => {
     // Définit la hauteur totale de l'élément de contrôle de défilement
     // pour créer suffisamment d'espace pour tous les mots, mais avec une hauteur réduite
     if (scrollControlRef.current) {
-      // Réduction de la hauteur de défilement à 35% de la hauteur originale
-      // On ajoute 70% à la taille totale pour l'espace supplémentaire nécessaire avant la fin
-      const scrollHeight = window.innerHeight * words.length * 0.35 * 1.7; // Augmenté de 1.5 à 1.7
+      // Réduction de la hauteur de défilement à 25% de la hauteur originale (au lieu de 35%)
+      // On ajoute 60% à la taille totale pour l'espace supplémentaire nécessaire avant la fin
+      const scrollHeight = window.innerHeight * words.length * 0.25 * 1.6; // Réduit de 0.35 à 0.25 et de 1.7 à 1.6
       scrollControlRef.current.style.height = `${scrollHeight}px`;
     }
 
@@ -69,8 +69,9 @@ const HeroSection: React.FC<ScrollAnimationProps> = ({ onScrollComplete }) => {
       );
 
       // Calcul de l'index du mot actif basé sur la position de défilement
+      // Multiplication par 1.2 pour accélérer le changement des mots
       const wordIndex = Math.min(
-        Math.floor(relativeScroll * words.length),
+        Math.floor(relativeScroll * words.length * 1.2),
         words.length - 1,
       );
 
@@ -78,8 +79,8 @@ const HeroSection: React.FC<ScrollAnimationProps> = ({ onScrollComplete }) => {
       setActiveWordIndex(wordIndex);
 
       // Vérification si la section est complètement défilée
-      // Augmenté à 100% pour s'assurer que l'animation est vraiment terminée
-      const isComplete = relativeScroll >= 1.0;
+      // Réduit à 0.95 pour s'assurer que l'animation se termine correctement avec le nouveau défilement plus rapide
+      const isComplete = relativeScroll >= 0.95;
 
       if (isComplete && !isScrollComplete) {
         setIsScrollComplete(true);
@@ -175,7 +176,8 @@ const HeroSection: React.FC<ScrollAnimationProps> = ({ onScrollComplete }) => {
                     opacity: index === activeWordIndex ? 1 : 0.2,
                     // Animation de déplacement vertical avec espacement augmenté
                     transform: `translateY(${(index - activeWordIndex) * verticalSpacing}px)`,
-                    transition: "transform 0.5s ease, opacity 0.3s ease",
+                    transition:
+                      "transform 0.3s ease-out, opacity 0.2s ease-out",
                     lineHeight: 1.3, // Augmenté pour plus d'espacement vertical
                     whiteSpace: "nowrap",
                   }}

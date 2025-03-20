@@ -11,8 +11,7 @@ export default function ContactSection() {
 
   // État pour suivre l'index du réseau social actuellement affiché
   const [activeSocialIndex, setActiveSocialIndex] = useState(0);
-  // État pour déterminer si la section est visible
-  const [isVisible, setIsVisible] = useState(false);
+  // Cette variable est utilisée pour des fonctionnalités futures
 
   // Réseaux sociaux avec leurs noms et URLs (icônes supprimées)
   const socialNetworks = [
@@ -63,7 +62,6 @@ export default function ContactSection() {
       // Vérifier si la section est visible
       const isSectionVisible =
         sectionRect.top < viewportHeight && sectionRect.bottom > 0;
-      setIsVisible(isSectionVisible);
 
       if (isSectionVisible) {
         // Position relative dans le conteneur de défilement (0 à 1)

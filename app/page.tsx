@@ -78,7 +78,7 @@ export default function Home() {
 
     // Calculer la hauteur nécessaire pour le slider, TrustedBy et le footer
     const slidesCount = 3; // Nombre de slides dans ProjectSlider
-    const slideHeight = windowHeight * 0.7; // Hauteur par slide
+    const slideHeight = windowHeight * 1.4; // Hauteur par slide augmentée (de 0.7 à 1.4)
     const projectSliderHeight = slideHeight * slidesCount;
     const trustedByHeight = windowHeight; // Hauteur pour la section TrustedBy
     const contactSectionHeight = windowHeight * 2; // Hauteur pour la section de contact
@@ -132,7 +132,7 @@ export default function Home() {
 
       // Calculate the total height for all slides in the ProjectSlider
       const slidesCount = 3; // Number of slides in ProjectSlider
-      const slideTransitionHeight = windowHeight * 0.7; // Increased height to slow down transition
+      const slideTransitionHeight = windowHeight * 1.4; // Increased height to slow down transition (de 0.7 à 1.4)
       const projectSliderScrollSpace = slideTransitionHeight * slidesCount;
 
       // Point de transition entre le slider de projets et la section TrustedBy
