@@ -33,13 +33,10 @@ export default function TrustedBy() {
               >
                 {partner.name}
               </Link>
-              {index < trustedPartners.length - 2
-                ? ", "
-                : index === trustedPartners.length - 2
-                  ? " and "
-                  : ""}
+              {index < trustedPartners.length - 2 ? ", " : ", "}
             </span>
-          ))}
+          ))}{" "}
+          etc
         </h2>
       </div>
     </div>

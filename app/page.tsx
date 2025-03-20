@@ -138,10 +138,11 @@ export default function Home() {
       const projectSliderScrollSpace = slideTransitionHeight * slidesCount;
 
       // Point de transition entre le slider de projets et la section TrustedBy
-      const trustedByThreshold = scrollAnimationHeight + projectSliderScrollSpace * 0.85;
-      
-      // Point de transition entre TrustedBy et la section de contact
-      const contactSectionThreshold = trustedByThreshold + windowHeight * 1.5;
+      const trustedByThreshold =
+        scrollAnimationHeight + projectSliderScrollSpace * 0.85;
+
+      // Point de transition entre TrustedBy et la section de contact (réduit encore plus)
+      const contactSectionThreshold = trustedByThreshold + windowHeight * 0.8;
 
       // Calculate where the footer should start
       const footerThreshold = contactSectionThreshold + windowHeight * 1.5;
@@ -166,7 +167,7 @@ export default function Home() {
         // Faire disparaître progressivement TrustedBy
         if (trustedByRef.current) {
           const fadeOutStart = contactSectionThreshold;
-          const fadeOutEnd = contactSectionThreshold + windowHeight * 0.1;
+          const fadeOutEnd = contactSectionThreshold + windowHeight * 0.02; // Transition très rapide
           const fadeProgress = Math.min(
             1,
             Math.max(
@@ -175,15 +176,19 @@ export default function Home() {
             ),
           );
 
-          // Réduire l'opacité de TrustedBy progressivement
-          (trustedByRef.current as HTMLElement).style.opacity =
-            `${1 - fadeProgress}`;
+          // Réduire l'opacité de TrustedBy progressivement et ajuster le z-index
+          const trustedByElement = trustedByRef.current as HTMLElement;
+          trustedByElement.style.opacity = `${1 - fadeProgress}`;
+          if (fadeProgress > 0.5) {
+            trustedByElement.style.zIndex = "10"; // Réduire le z-index pour permettre l'interaction avec Contact
+            trustedByElement.style.pointerEvents = "none"; // Désactiver les interactions
+          }
         }
 
         // Faire apparaître progressivement la section de contact
         if (contactSectionRef.current) {
           const fadeInStart = contactSectionThreshold;
-          const fadeInEnd = contactSectionThreshold + windowHeight * 0.3;
+          const fadeInEnd = contactSectionThreshold + windowHeight * 0.1; // Transition plus rapide
           const fadeProgress = Math.min(
             1,
             Math.max(
@@ -192,16 +197,19 @@ export default function Home() {
             ),
           );
 
-          // Augmenter l'opacité de la section de contact progressivement
-          (contactSectionRef.current as HTMLElement).style.opacity =
-            `${fadeProgress}`;
+          // Augmenter l'opacité de la section de contact progressivement et assurer qu'elle est au-dessus
+          const contactElement = contactSectionRef.current as HTMLElement;
+          contactElement.style.opacity = `${fadeProgress}`;
+          contactElement.style.zIndex = "40"; // S'assurer que Contact est au-dessus de TrustedBy
+          contactElement.style.pointerEvents =
+            fadeProgress > 0.5 ? "auto" : "none";
         }
       } else if (scrollPosition >= trustedByThreshold) {
         // Transition entre le slider de projets et TrustedBy
         setHasScrolledToFooter(false);
         setShowContactSection(false);
         setShowTrustedBy(true);
-        
+
         console.log("TrustedBy devrait être visible maintenant!");
 
         // Faire disparaître progressivement le slider de projets
@@ -327,7 +335,7 @@ export default function Home() {
           visibility: "visible",
           transition: "opacity 1s ease-in-out, transform 1s ease-in-out",
           pointerEvents: showTrustedBy ? "auto" : "none",
-          transform: `translateY(${showTrustedBy ? '0' : '100vh'})`,
+          transform: `translateY(${showTrustedBy ? "0" : "100vh"})`,
           backgroundColor: "black", // Assurer un fond noir
         }}
       >
@@ -343,22 +351,15 @@ export default function Home() {
           visibility: "visible",
           transition: "opacity 1s ease-in-out",
           pointerEvents: showContactSection ? "auto" : "none",
-          marginTop: windowHeight * 0.5 + "px", // Ajuster l'espace pour compenser le fixed positioning
+          marginTop: windowHeight * 0.5 + "px",
+          minHeight: "100vh",
+          display: "flex",
+          flexDirection: "column",
+          paddingBottom: "100vh", // Ajoute de l'espace après la section Contact
         }}
       >
         <ContactSection />
       </div>
-
-      {/* Spacer to trigger the global Footer visibility */}
-      <div
-        ref={footerSpacerRef}
-        className="relative z-30"
-        style={{
-          height: "50vh",
-          opacity: hasScrolledToFooter ? 1 : 0,
-          transition: "opacity 1s ease-in-out",
-        }}
-      />
     </div>
   );
 }

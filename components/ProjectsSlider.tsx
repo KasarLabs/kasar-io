@@ -370,7 +370,9 @@ export default function ProjectSlider({}: ProjectProps) {
                     </a>
                   )}
                   <h1 className="text-4xl lg:text-5xl font-bold">
-                    {(currentSlide + 1) % slides.length !== 2 ? slides[(currentSlide + 1) % slides.length].title : ""}
+                    {(currentSlide + 1) % slides.length !== 2
+                      ? slides[(currentSlide + 1) % slides.length].title
+                      : ""}
                   </h1>
                 </div>
               </div>

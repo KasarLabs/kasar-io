@@ -17,15 +17,24 @@ body {
   background: rgb(var(--background-rgb));
   display: flex;
   flex-direction: column;
+  position: relative;
+  overflow-x: hidden;
 }
 
 main {
   flex: 1 0 auto;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 footer {
-  flex-shrink: 0;
-  position: relative !important; /* Force relative positioning */
+  position: relative !important;
+  width: 100%;
+  z-index: 40;
+  background-color: rgb(var(--background-rgb));
+  margin-top: -100vh; /* Pour compenser le paddingBottom de la section Contact */
 }
 
 @layer base {
@@ -185,6 +194,7 @@ main.w-full {
   max-width: 100%;
   overflow-x: hidden;
   flex-grow: 1;
+  position: relative;
 }
 
 /* Fix for sticky header */
@@ -200,5 +210,5 @@ footer {
   bottom: auto !important;
   left: auto !important;
   right: auto !important;
-  z-index: auto !important;
+  z-index: 40 !important;
 }
