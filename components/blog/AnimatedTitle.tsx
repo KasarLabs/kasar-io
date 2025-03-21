@@ -29,6 +29,26 @@ export default function AnimatedTitle({ titles = [] }: AnimatedTitleProps) {
     };
   }, [currentIndex, displayTitles]);
 
+  // Corriger le positionnement de la page
+  useEffect(() => {
+    // Réinitialiser immédiatement tout style de position qui pourrait affecter l'affichage
+    const parentContainer = document.querySelector(".content-page");
+    if (parentContainer) {
+      parentContainer.setAttribute(
+        "style",
+        "margin-top: 0 !important; padding-top: 1rem !important; position: relative !important; top: 0 !important; transform: none !important;",
+      );
+    }
+
+    // Forcer un repositionnement de la page entière
+    window.scrollTo(0, 0);
+    document.documentElement.style.scrollBehavior = "auto";
+
+    // Nettoyage des éléments potentiellement ajoutés par la page d'accueil
+    const spacer = document.getElementById("scroll-spacer");
+    if (spacer) spacer.remove();
+  }, []);
+
   return (
     <div className="flex flex-col mb-12">
       <div className="h-32 flex items-center">

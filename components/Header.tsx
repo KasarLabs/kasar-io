@@ -4,11 +4,13 @@ import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Menu, X } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
 
   // Handle clicking outside to close dropdown
   useEffect(() => {
@@ -26,6 +28,35 @@ export default function Header() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  // Comportement amélioré pour la navigation
+  useEffect(() => {
+    // Réinitialiser le scroll et effacer les styles qui pourraient persister
+    const resetPageState = () => {
+      window.scrollTo(0, 0);
+
+      // Si nous quittons la page d'accueil, supprimons tout style inline potentiellement ajouté
+      if (pathname !== "/") {
+        // Assurer que les éléments des pages de contenu sont correctement affichés
+        document.body.style.overflow = "auto";
+
+        // Supprimer tous les spacers qui auraient pu être ajoutés par la page d'accueil
+        const spacer = document.getElementById("scroll-spacer");
+        if (spacer) spacer.remove();
+
+        // Forcer une réinitialisation du DOM après la navigation
+        setTimeout(() => {
+          const contentPage = document.querySelector(".content-page");
+          if (contentPage) {
+            contentPage.classList.add("force-reset");
+            setTimeout(() => contentPage.classList.remove("force-reset"), 50);
+          }
+        }, 0);
+      }
+    };
+
+    resetPageState();
+  }, [pathname]);
 
   // Fonction pour faire défiler vers la section des projets
   const scrollToProjects = (e: React.MouseEvent) => {
@@ -118,25 +149,25 @@ export default function Header() {
 
             {dropdownOpen && (
               <div
-                className="absolute right-0 mt-2 w-80 backdrop-blur-sm rounded-md shadow-lg py-4 z-50"
+                className="absolute right-0 mt-2 w-80 backdrop-blur-sm rounded-md py-4 z-50"
                 onMouseLeave={() => setDropdownOpen(false)}
               >
                 <a
                   href="#projects-slider"
                   onClick={scrollToProjects}
-                  className="block px-6 py-3 text-gray-300 hover:text-white hover:bg-black/80 font-calibre-medium text-[40px] text-right transition-all font-bold"
+                  className="block px-6 py-3 text-gray-300 hover:text-white font-calibre-medium text-[40px] text-right transition-all font-bold"
                 >
                   Projects
                 </a>
                 <Link
                   href="/about"
-                  className="block px-6 py-3 text-gray-300 hover:text-white hover:bg-black/80 font-calibre-medium text-[40px] text-right transition-all font-bold"
+                  className="block px-6 py-3 text-gray-300 hover:text-white font-calibre-medium text-[40px] text-right transition-all font-bold"
                 >
                   About
                 </Link>
                 <Link
                   href="/blog"
-                  className="block px-6 py-3 text-gray-300 hover:text-white hover:bg-black/80 font-calibre-medium text-[40px] text-right transition-all font-bold"
+                  className="block px-6 py-3 text-gray-300 hover:text-white font-calibre-medium text-[40px] text-right transition-all font-bold"
                 >
                   Blog
                 </Link>
@@ -144,7 +175,7 @@ export default function Header() {
                   href="https://github.com/kasarlabs"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block px-6 py-3 text-gray-300 hover:text-white hover:bg-black/80 font-calibre-medium text-[40px] text-right transition-all font-bold"
+                  className="block px-6 py-3 text-gray-300 hover:text-white font-calibre-medium text-[40px] text-right transition-all font-bold"
                 >
                   GitHub
                 </a>

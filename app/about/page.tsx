@@ -1,26 +1,39 @@
+"use client";
+
 import React from "react";
 import Image from "next/image";
-import { Metadata } from "next";
-
-export const metadata: Metadata = {
-  title: "À propos de nous",
-  description: "Notre mission et notre équipe",
-};
+import ScrollToTopButton from "@/components/ScrollToTopButton";
 
 interface TeamMemberProps {
   name: string;
   role: string;
   image: string;
+  github?: string;
 }
 
-const TeamMember: React.FC<TeamMemberProps> = ({ name, role, image }) => {
+const TeamMember: React.FC<TeamMemberProps> = ({
+  name,
+  role,
+  image,
+  github,
+}) => {
   return (
     <div className="flex flex-col items-center">
-      <div className="relative w-40 h-40 rounded-full overflow-hidden mb-4">
+      <div className="relative w-32 h-32 rounded-full overflow-hidden mb-3">
         <Image src={image} alt={name} fill className="object-cover" />
       </div>
-      <h3 className="text-xl font-bold">{name}</h3>
-      <p className="text-gray-600">{role}</p>
+      <h3 className="text-base font-bold">{name}</h3>
+      <p className="text-gray-600 text-sm">{role}</p>
+      {github && (
+        <a
+          href={github}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-xs text-blue-500 mt-1"
+        >
+          GitHub
+        </a>
+      )}
     </div>
   );
 };
@@ -28,115 +41,143 @@ const TeamMember: React.FC<TeamMemberProps> = ({ name, role, image }) => {
 export default function AboutPage() {
   const teamMembers = [
     {
-      name: "Jean Dupont",
-      role: "CEO & Fondateur",
-      image: "/team/member1.jpg",
+      name: "Antiyro",
+      role: "CEO & Founder",
+      image: "https://github.com/antiyro.png",
+      github: "https://github.com/antiyro",
     },
     {
-      name: "Marie Martin",
-      role: "Directrice Technique",
-      image: "/team/member2.jpg",
+      name: "jbcaron",
+      role: "DevOps",
+      image: "https://github.com/jbcaron.png",
+      github: "https://github.com/jbcaron",
     },
     {
-      name: "Pierre Lefebvre",
-      role: "Responsable Marketing",
-      image: "/team/member3.jpg",
+      name: "cchudant",
+      role: "Rust Engineer",
+      image: "https://github.com/cchudant.png",
+      github: "https://github.com/cchudant",
     },
     {
-      name: "Sophie Dubois",
-      role: "Designer UX/UI",
-      image: "/team/member4.jpg",
+      name: "Trantorian1",
+      role: "Rust Engineer",
+      image: "https://github.com/trantorian1.png",
+      github: "https://github.com/trantorian1",
     },
     {
-      name: "Thomas Moreau",
-      role: "Ingénieur IA",
-      image: "/team/member5.jpg",
+      name: "0xhijo",
+      role: "LLM Engineer",
+      image: "https://github.com/0xhijo.png",
+      github: "https://github.com/0xhijo",
     },
     {
-      name: "Camille Bernard",
-      role: "Développeuse Full-Stack",
-      image: "/team/member6.jpg",
+      name: "minhanhld",
+      role: "LLM Engineer",
+      image: "https://github.com/minhanhld.png",
+      github: "https://github.com/minhanhld",
     },
     {
-      name: "Alexandre Petit",
-      role: "Responsable Produit",
-      image: "/team/member7.jpg",
+      name: "ale-sain",
+      role: "Smart Contract Dev",
+      image: "https://github.com/ale-sain.png",
+      github: "https://github.com/ale-sain",
+    },
+    {
+      name: "Tbelleng",
+      role: "Full Stack Engineer",
+      image: "https://github.com/Tbelleng.png",
+      github: "https://github.com/Tbelleng",
+    },
+    {
+      name: "lucienfer",
+      role: "Full Stack Engineer",
+      image: "https://github.com/lucienfer.png",
+      github: "https://github.com/lucienfer",
+    },
+    {
+      name: "enitrat",
+      role: "Cairo Advisor",
+      image: "https://github.com/enitrat.png",
+      github: "https://github.com/enitrat",
     },
   ];
 
+  // Assurer que la page est bien positionnée après le rendu
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      // Réinitialiser la position de défilement
+      window.scrollTo(0, 0);
+
+      // Forcer un repositionnement de la page
+      document.documentElement.style.scrollBehavior = "auto";
+
+      // Corriger le positionnement du contenu
+      const mainElement = document.querySelector("main");
+      if (mainElement) {
+        mainElement.style.position = "relative";
+        mainElement.style.top = "0";
+        mainElement.style.marginTop = "0";
+      }
+    }
+  }, []);
+
   return (
-    <main className="container mx-auto px-4 py-16 max-w-3xl">
-      <section className="mb-16">
-        <h1 className="text-4xl font-bold mb-6">About us</h1>
+    <main
+      className="container mx-auto px-4 py-16 max-w-3xl flex-grow content-page"
+      style={{ marginTop: 0, paddingTop: "2.5rem" }}
+    >
+      <ScrollToTopButton />
+      <section className="mb-16 mt-16">
+        <h1 className="text-4xl font-bold mb-6">Kasar Labs</h1>
         <p className="text-lg text-gray-600 mb-4">
-          Mise à jour : Nous avons levé 10M€ auprès de BPI France, Kima Ventures
-          et Eurazeo.{" "}
-          <a href="/news" className="underline">
-            En savoir plus
-          </a>
-          .
+          Founded in 2021, by a team of Starknet Core developers.
         </p>
         <p className="text-2xl font-medium mb-10">
-          L&apos;innovation numérique est à portée de main.
+          A Global Engineering & Research Laboratory of Starknet Core Developers
         </p>
 
         <div className="space-y-6 text-lg">
           <p className="font-light">
-            Créer des solutions numériques innovantes est le défi technique le
-            plus important de notre époque.
+            At Kasar Labs, we specialize in low-level development for
+            distributed systems, with a particular focus on blockchain
+            technology. We've built a reputation for developing powerful,
+            secure, and user-friendly infrastructure.
           </p>
 
           <p className="font-light">
-            Nous avons fondé le premier laboratoire dédié exclusivement à
-            l&apos;innovation numérique, avec un seul objectif et un seul
-            produit : des expériences utilisateur exceptionnelles.
+            Our expertise spans Zero-Knowledge Proofs & Cryptography, Cairo
+            language & provable execution environments, blockchain core
+            development, and Rust-based systems engineering. This profound
+            understanding of Rust enables us to develop high-quality
+            infrastructure for our solutions.
           </p>
 
           <p className="font-light">
-            C&apos;est notre mission, notre nom et notre feuille de route
-            complète, car c&apos;est notre unique objectif. Notre équipe, nos
-            investisseurs et notre modèle économique sont tous alignés pour y
-            parvenir.
+            As a young, globally distributed team, we approach complex
+            challenges with fearlessness and cutting-edge knowledge. We believe
+            in building elegant, minimalist solutions that prioritize security
+            without compromising usability and developer experience.
           </p>
 
           <p className="font-light">
-            Nous abordons la qualité et les fonctionnalités ensemble, comme des
-            problèmes techniques à résoudre par des percées scientifiques et
-            d&apos;ingénierie révolutionnaires. Nous prévoyons d&apos;avancer
-            aussi rapidement que possible tout en nous assurant que la qualité
-            reste toujours notre priorité.
-          </p>
-
-          <p className="font-light">Ainsi, nous pouvons évoluer sereinement.</p>
-
-          <p className="font-light">
-            Notre concentration unique signifie aucune distraction par la
-            gestion ou les cycles de produits, et notre modèle d&apos;affaires
-            garantit que la qualité, la sécurité et le progrès sont tous
-            protégés des pressions commerciales à court terme.
-          </p>
-
-          <p className="font-light">
-            Nous sommes une entreprise française avec des bureaux à Paris et
-            Lyon, où nous avons des racines profondes et la capacité de recruter
-            les meilleurs talents techniques.
+            We collaborate with industry leaders including Starkware, Nethermind
+            or Informal Systems, bringing our low-level expertise to high-impact
+            projects across the blockchain ecosystem.
           </p>
         </div>
       </section>
 
       <section className="mb-16">
-        <h2 className="text-3xl font-bold mb-8">Notre équipe</h2>
+        <h2 className="text-3xl font-bold mb-8">Our Team</h2>
         <p className="text-lg mb-10">
-          Nous réunissons une équipe agile et talentueuse des meilleurs
-          ingénieurs et chercheurs dédiés à se concentrer sur l&apos;innovation
-          numérique et rien d&apos;autre.
+          We're continuously seeking talented developers and researchers who
+          share our passion for low-level systems, ZK technology, and provable
+          computation.
         </p>
         <p className="text-lg mb-10">
-          Si c&apos;est vous, nous offrons l&apos;opportunité de réaliser
-          l&apos;œuvre de votre vie et d&apos;aider à résoudre le défi technique
-          le plus important de notre époque.
+          Our team values technical excellence, innovation, and the courage to
+          tackle the hardest problems in distributed systems.
         </p>
-        <p className="text-lg mb-12">C&apos;est maintenant. Rejoignez-nous.</p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8">
           {teamMembers.map((member, index) => (
@@ -145,8 +186,25 @@ export default function AboutPage() {
               name={member.name}
               role={member.role}
               image={member.image}
+              github={member.github}
             />
           ))}
+        </div>
+      </section>
+
+      <section className="mb-16 text-center">
+        <h2 className="text-3xl font-bold mb-8">Join Our Team!</h2>
+        <p className="text-lg mb-10">
+          We are looking for exceptional talents in Rust engineering,
+          Zero-Knowledge systems, and distributed systems architecture.
+        </p>
+        <div className="flex justify-center">
+          <a
+            href="https://t.me/kasarlabs"
+            className="inline-flex items-center px-6 py-3 rounded-2xl bg-transparent border border-white text-white font-medium transition-all hover:bg-white hover:bg-opacity-5 hover:scale-105 text-sm"
+          >
+            Contact Us
+          </a>
         </div>
       </section>
 

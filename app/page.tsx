@@ -22,6 +22,45 @@ export default function Home() {
     setShowProjectSlider(true);
   };
 
+  // Fonction pour nettoyer les effets de scroll quand l'utilisateur quitte la page
+  const cleanupScrollEffects = () => {
+    // Événement pour détecter quand l'utilisateur quitte la page d'accueil
+    const handleBeforeUnload = () => {
+      // Supprimer les spacers et autres éléments ajoutés
+      const spacer = document.getElementById("scroll-spacer");
+      if (spacer) spacer.remove();
+
+      // Réinitialiser le scroll et styles
+      window.scrollTo(0, 0);
+      document.body.style.overflow = "auto";
+
+      // Forcer la réinitialisation des styles qui pourraient affecter d'autres pages
+      const styleOverrides = document.createElement("style");
+      styleOverrides.textContent = `
+        body, main { 
+          margin-top: 0 !important; 
+          padding-top: 0 !important;
+          transform: none !important;
+          position: relative !important;
+        }
+      `;
+      document.head.appendChild(styleOverrides);
+    };
+
+    // Ajouter l'écouteur d'événement pour le changement de page
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    // Retourner la fonction de nettoyage
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  };
+
+  // Configurer le nettoyage dans useEffect
+  useEffect(() => {
+    return cleanupScrollEffects();
+  }, []);
+
   // Set up window height state once component mounts
   useEffect(() => {
     // Set window height after component mounts (client-side only)
@@ -82,15 +121,14 @@ export default function Home() {
     const projectSliderHeight = slideHeight * slidesCount;
     const trustedByHeight = windowHeight; // Hauteur pour la section TrustedBy
     const contactSectionHeight = windowHeight * 2; // Hauteur pour la section de contact
-    const footerHeight = windowHeight; // Hauteur approximative pour le footer
+    const footerHeight = 0; // On n'ajoute plus de hauteur supplémentaire pour le footer
 
     // Hauteur totale nécessaire
     const minRequiredHeight =
       scrollAnimationHeight +
       projectSliderHeight +
       trustedByHeight +
-      contactSectionHeight +
-      footerHeight;
+      contactSectionHeight;
 
     if (documentHeight < minRequiredHeight) {
       // Add a spacer element if needed
@@ -104,7 +142,11 @@ export default function Home() {
       const existingSpace = document.getElementById("scroll-spacer");
       if (existingSpace) existingSpace.remove();
 
-      document.body.appendChild(spacerElement);
+      // On n'ajoute pas le spacer directement à body pour éviter de perturber le footer
+      const mainElement = document.querySelector("main");
+      if (mainElement) {
+        mainElement.appendChild(spacerElement);
+      }
     }
   }, [windowHeight]);
 
