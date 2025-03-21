@@ -16,16 +16,20 @@ const slides = [
     logo: "/images/sn-logo-white.png",
     isMainSlide: false,
     primaryLink: {
+      text: "Website",
+      url: "https://starknet.io/sn-stack",
+    },
+    secondaryLink: {
       text: "GitHub",
       url: "https://github.com/madara-alliance/madara",
     },
-    secondaryLink: {
+    terceraryLink: {
       text: "Docs",
       url: "https://docs.madara.build",
     },
-    terceraryLink: {
+    quartenaryLink: {
       text: "Blog",
-      url: "https://blog.kasar.io",
+      url: "/blog",
     },
   },
   {
@@ -51,7 +55,7 @@ const slides = [
     },
     quartenaryLink: {
       text: "Blog",
-      url: "https://blog.kasar.io",
+      url: "/blog",
     },
   },
   {
@@ -65,19 +69,19 @@ const slides = [
     isMainSlide: false,
     primaryLink: {
       text: "Website",
-      url: "https://starkagent.ai",
+      url: "https://quaza.io",
     },
     secondaryLink: {
       text: "GitHub",
-      url: "https://github.com/kasarlabs/snak",
+      url: "https://github.com/kasarlabs/quaza",
     },
     terceraryLink: {
       text: "Docs",
-      url: "https://docs.kasar.io/snak",
+      url: "https://docs.kasar.io/quaza",
     },
     quartenaryLink: {
       text: "Blog",
-      url: "https://blog.kasar.io",
+      url: "/blog",
     },
   },
 ];
@@ -462,7 +466,6 @@ export default function ProjectSlider({}: ProjectProps) {
             {slides[currentSlide].quartenaryLink && (
               <Link
                 href={slides[currentSlide].quartenaryLink.url}
-                target="_blank"
                 className="inline-flex items-center px-6 py-3 rounded-2xl bg-transparent border border-white text-white font-medium transition-all hover:bg-white hover:bg-opacity-5 hover:scale-105 text-sm"
               >
                 {slides[currentSlide].quartenaryLink.text}{" "}

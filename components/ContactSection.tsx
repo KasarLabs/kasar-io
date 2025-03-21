@@ -27,10 +27,6 @@ export default function ContactSection() {
       url: "https://github.com/yourcompany",
     },
     {
-      name: "Discord",
-      url: "https://discord.gg/yourcompany",
-    },
-    {
       name: "Telegram",
       url: "https://t.me/yourcompany",
     },

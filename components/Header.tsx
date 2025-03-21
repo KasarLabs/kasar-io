@@ -58,11 +58,44 @@ export default function Header() {
     resetPageState();
   }, [pathname]);
 
+  // Effet pour gérer la navigation avec hash lors du chargement de la page
+  useEffect(() => {
+    // Vérifier si nous sommes sur la page d'accueil et s'il y a un hash dans l'URL
+    if (pathname === "/" && window.location.hash) {
+      // Attendre que la page soit complètement chargée
+      setTimeout(() => {
+        const targetId = window.location.hash.substring(1); // Enlève le # du début
+        const targetElement = document.getElementById(targetId) || 
+                              document.querySelector(`[class*="${targetId}"]`) || 
+                              document.querySelector(`[data-slide-id="1"]`) || 
+                              document.querySelector(`[data-ascii-state="1"]`);
+        
+        if (targetElement) {
+          const headerHeight = 80;
+          const elementPosition = targetElement.getBoundingClientRect().top;
+          const offsetPosition = elementPosition + window.scrollY - headerHeight;
+          
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: "smooth"
+          });
+        }
+      }, 500); // Délai pour s'assurer que tous les éléments sont chargés
+    }
+  }, [pathname]);
+
   // Fonction pour faire défiler vers la section des projets
   const scrollToProjects = (e: React.MouseEvent) => {
     e.preventDefault();
 
-    // Ajoutons un ID au composant ProjectsSlider
+    // Vérifier si nous sommes sur la page d'accueil
+    if (pathname !== "/") {
+      // Si nous ne sommes pas sur la page d'accueil, rediriger vers la page d'accueil avec un indicateur pour le scroll
+      window.location.href = "/#projects-slider";
+      return;
+    }
+
+    // Le reste de la fonction reste identique pour la page d'accueil
     const projectsSlider =
       document.querySelector('[class*="ProjectsSlider"]') ||
       document.getElementById("projects-slider");
