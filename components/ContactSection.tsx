@@ -12,6 +12,9 @@ export default function ContactSection() {
   // État pour suivre l'index du réseau social actuellement affiché
   const [activeSocialIndex, setActiveSocialIndex] = useState(0);
   // Cette variable est utilisée pour des fonctionnalités futures
+  
+  // État pour suivre si on est sur la section contact ou une autre section
+  const [isSectionInView, setIsSectionInView] = useState(false);
 
   // Réseaux sociaux avec leurs noms et URLs (icônes supprimées)
   const socialNetworks = [
@@ -62,6 +65,10 @@ export default function ContactSection() {
       // Vérifier si la section est visible
       const isSectionVisible =
         sectionRect.top < viewportHeight && sectionRect.bottom > 0;
+      
+      // On détecte si on est principalement sur la section contact ou non
+      // Si le haut de la section est dans le premier tiers de la fenêtre, considérer comme active
+      setIsSectionInView(sectionRect.top < viewportHeight * 0.6);
 
       if (isSectionVisible) {
         // Position relative dans le conteneur de défilement (0 à 1)
@@ -106,9 +113,10 @@ export default function ContactSection() {
       <div
         className="fixed top-0 left-0 w-full h-screen flex items-center p-8"
         style={{
-          opacity: 1,
-          pointerEvents: "auto",
-          zIndex: 10,
+          opacity: 1, // Toujours visible
+          // On active les événements de pointeur seulement quand on est sur la section contact
+          pointerEvents: isSectionInView ? "auto" : "none",
+          zIndex: 10, // Z-index plus bas que ProjectsSlider (qui est à 20)
         }}
       >
         {/* Conteneur aligné à gauche avec marge */}
