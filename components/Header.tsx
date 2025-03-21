@@ -160,7 +160,7 @@ export default function Header() {
               className="relative w-15 h-15 rounded-full overflow-hidden"
             >
               <Image
-                src="/images/kasarLogoNoBg.png"
+                src="/images/KasarLogoNoBg.png"
                 alt="Logo"
                 width={60}
                 height={60}
