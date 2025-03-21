@@ -216,7 +216,10 @@ export default function ProjectSlider({}: ProjectProps) {
         <UnifiedAsciiAnimation currentSlide={asciiState} />
       </div>
 
-      <div className="w-full px-6 md:px-12 lg:px-16 py-16 fixed top-0 left-0 z-10 min-h-screen flex flex-col justify-center" style={{ pointerEvents: "auto" }}>
+      <div
+        className="w-full px-6 md:px-12 lg:px-16 py-16 fixed top-0 left-0 z-10 min-h-screen flex flex-col justify-center"
+        style={{ pointerEvents: "auto" }}
+      >
         <div className="max-w-4xl mx-auto lg:mx-0 w-full">
           <div className="flex items-center gap-4 mb-4">
             {/* Conteneur pour l'animation du sous-titre */}
@@ -425,7 +428,7 @@ export default function ProjectSlider({}: ProjectProps) {
               transition: "opacity 0.5s ease",
               opacity: isTransitioning ? 0.5 : 1,
               zIndex: 30,
-              position: "relative"
+              position: "relative",
             }}
           >
             <Link
