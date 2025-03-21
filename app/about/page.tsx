@@ -133,7 +133,7 @@ export default function AboutPage() {
           Founded in 2021, by a team of Starknet Core developers.
         </p>
         <p className="text-2xl font-medium mb-10">
-          A Global Engineering & Research Laboratory of Starknet Core Developers
+          An Engineering & Research Laboratory
         </p>
 
         <div className="space-y-6 text-lg">

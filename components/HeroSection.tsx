@@ -15,11 +15,9 @@ const HeroSection: React.FC<ScrollAnimationProps> = ({ onScrollComplete }) => {
   const words = [
     "Infrastructure",
     "Rust Project",
-    "Full Node Client",
-    "App Chain",
-    "Sequencer",
     "AI Agent",
-    "Provable program",
+    "Execution client",
+    "Zk Project",
     "Cairo Contract",
   ];
 
