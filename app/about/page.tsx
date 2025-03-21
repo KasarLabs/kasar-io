@@ -170,9 +170,9 @@ export default function AboutPage() {
       <section className="mb-16">
         <h2 className="text-3xl font-bold mb-8">Our Team</h2>
         <p className="text-lg mb-10">
-          We&apos;re continuously seeking talented developers and researchers who
-          share our passion for low-level systems, ZK technology, and provable
-          computation.
+          We&apos;re continuously seeking talented developers and researchers
+          who share our passion for low-level systems, ZK technology, and
+          provable computation.
         </p>
         <p className="text-lg mb-10">
           Our team values technical excellence, innovation, and the courage to
