@@ -120,8 +120,7 @@ export default function Home() {
     const slideHeight = windowHeight * 1.4; // Hauteur par slide augmentée (de 0.7 à 1.4)
     const projectSliderHeight = slideHeight * slidesCount;
     const trustedByHeight = windowHeight; // Hauteur pour la section TrustedBy
-    const contactSectionHeight = windowHeight * 2; // Hauteur pour la section de contact
-    const footerHeight = 0; // On n'ajoute plus de hauteur supplémentaire pour le footer
+    const contactSectionHeight = windowHeight * 3; // Hauteur augmentée pour la section de contact
 
     // Hauteur totale nécessaire
     const minRequiredHeight =
@@ -181,8 +180,8 @@ export default function Home() {
       const trustedByThreshold =
         scrollAnimationHeight + projectSliderScrollSpace * 0.85;
 
-      // Point de transition entre TrustedBy et la section de contact (réduit encore plus)
-      const contactSectionThreshold = trustedByThreshold + windowHeight * 0.8;
+      // Point de transition entre TrustedBy et la section de contact (retardé davantage)
+      const contactSectionThreshold = trustedByThreshold + windowHeight * 1.5;
 
       // Calculate where the footer should start
       const footerThreshold = contactSectionThreshold + windowHeight * 1.5;
@@ -195,6 +194,21 @@ export default function Home() {
           contactElement.style.opacity = "1";
           contactElement.style.zIndex = "50";
           contactElement.style.pointerEvents = "auto";
+
+          // Forcer une réinitialisation du défilement des réseaux sociaux
+          const contactComponent = contactElement.querySelector("div");
+          if (contactComponent) {
+            // Déclencher un événement pour forcer le recalcul des positions
+            window.dispatchEvent(new Event("scroll"));
+          }
+        }
+      } else {
+        // Masquer la section de contact
+        setShowContactSection(false);
+        if (contactSectionRef.current) {
+          const contactElement = contactSectionRef.current as HTMLElement;
+          contactElement.style.opacity = "0";
+          contactElement.style.pointerEvents = "none";
         }
       }
 
@@ -214,7 +228,7 @@ export default function Home() {
         // Faire disparaître progressivement TrustedBy
         if (trustedByRef.current) {
           const fadeOutStart = contactSectionThreshold;
-          const fadeOutEnd = contactSectionThreshold + windowHeight * 0.02;
+          const fadeOutEnd = contactSectionThreshold + windowHeight * 0.3;
           const fadeProgress = Math.min(
             1,
             Math.max(

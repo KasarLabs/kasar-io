@@ -140,7 +140,7 @@ export default function AboutPage() {
           <p className="font-light">
             At Kasar Labs, we specialize in low-level development for
             distributed systems, with a particular focus on blockchain
-            technology. We've built a reputation for developing powerful,
+            technology. We&apos;ve built a reputation for developing powerful,
             secure, and user-friendly infrastructure.
           </p>
 
@@ -170,7 +170,7 @@ export default function AboutPage() {
       <section className="mb-16">
         <h2 className="text-3xl font-bold mb-8">Our Team</h2>
         <p className="text-lg mb-10">
-          We're continuously seeking talented developers and researchers who
+          We&apos;re continuously seeking talented developers and researchers who
           share our passion for low-level systems, ZK technology, and provable
           computation.
         </p>

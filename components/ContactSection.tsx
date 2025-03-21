@@ -41,7 +41,7 @@ export default function ContactSection() {
     if (scrollControlRef.current) {
       // Définit la hauteur pour créer suffisamment d'espace pour tous les réseaux sociaux
       const scrollHeight =
-        window.innerHeight * socialNetworks.length * 0.35 * 1.7;
+        window.innerHeight * socialNetworks.length * 0.5 * 1.7;
       scrollControlRef.current.style.height = `${scrollHeight}px`;
     }
   }, [socialNetworks.length]);
@@ -71,14 +71,19 @@ export default function ContactSection() {
         );
 
         // Calcul de l'index du réseau social actif basé sur la position de défilement
+        // On utilise une courbe progressive pour commencer à Twitter et avoir un défilement fluide
+        const progressiveFactor = Math.pow(relativeScroll, 1.2); // Légère courbe pour contrôler la progression
         const socialIndex = Math.min(
-          Math.floor(relativeScroll * socialNetworks.length),
+          Math.floor(progressiveFactor * socialNetworks.length),
           socialNetworks.length - 1,
         );
 
         setActiveSocialIndex(socialIndex);
       }
     };
+
+    // Réinitialiser l'index à 0 quand le composant est monté
+    setActiveSocialIndex(0);
 
     window.addEventListener("scroll", handleScroll, { passive: true });
 
