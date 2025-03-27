@@ -8,6 +8,8 @@ export default function ContactSection() {
   const sectionRef = useRef<HTMLDivElement>(null);
   // Référence à l'élément de contrôle de défilement
   const scrollControlRef = useRef<HTMLDivElement>(null);
+  // État pour suivre si l'écran est en mode mobile
+  const [isMobile, setIsMobile] = useState(false);
 
   // État pour suivre l'index du réseau social actuellement affiché
   const [activeSocialIndex, setActiveSocialIndex] = useState(0);
@@ -31,6 +33,22 @@ export default function ContactSection() {
       url: "https://t.me/yourcompany",
     },
   ];
+
+  // Fonction pour détecter si l'écran est en mode mobile
+  useEffect(() => {
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth < 768); // Breakpoint standard pour mobile
+    };
+
+    // Vérifier initialement
+    checkIfMobile();
+
+    // Ajouter un écouteur pour les changements de taille d'écran
+    window.addEventListener("resize", checkIfMobile);
+
+    // Nettoyer l'écouteur
+    return () => window.removeEventListener("resize", checkIfMobile);
+  }, []);
 
   // Calcule la hauteur nécessaire pour la section de défilement
   useEffect(() => {
@@ -94,8 +112,9 @@ export default function ContactSection() {
   // Espacement vertical entre les réseaux sociaux
   const verticalSpacing = 90;
 
-  // Calculer la taille de police
-  const baseFontSize = 4.8; // Même taille que la HeroSection
+  // Calculer la taille de police responsive
+  const baseFontSize = isMobile ? 4 : 4.8; // Plus petit pour mobile
+  const socialFontSize = isMobile ? 4 : baseFontSize; // Taille spécifique pour les réseaux sociaux en mobile
 
   return (
     <div ref={sectionRef} className="relative w-full bg-black">
@@ -115,50 +134,102 @@ export default function ContactSection() {
         }}
       >
         {/* Conteneur aligné à gauche avec marge */}
-        <div className="flex flex-col ml-12">
-          {/* Conteneur pour aligner "Connect with us on" et les réseaux sociaux */}
-          <div className="flex items-center">
-            {/* Texte principal avec taille similaire à la hero section */}
-            <h1
-              className="text-white font-bold m-0 p-0 leading-tight"
-              style={{ fontSize: `${baseFontSize}rem` }}
-            >
-              Connect with us on
-            </h1>
+        <div className={`flex flex-col ${isMobile ? "ml-1" : "ml-12"}`}>
+          {/* Conteneur pour adapter le layout en fonction du mobile/desktop */}
+          {isMobile ? (
+            // Version mobile avec les réseaux sociaux en dessous du texte
+            <div className="flex flex-col">
+              {/* Texte principal */}
+              <h1
+                className="text-white font-bold m-0 p-0 leading-tight"
+                style={{ fontSize: `${baseFontSize}rem` }}
+              >
+                Connect with us on
+              </h1>
 
-            {/* Espace entre le texte et les réseaux sociaux */}
-            <div className="w-4"></div>
-
-            {/* Conteneur des réseaux sociaux qui défilent */}
-            <div className="relative h-32 flex items-center">
-              {socialNetworks.map((social, index) => (
-                <Link
-                  key={index}
-                  href={social.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="absolute flex items-center hover:opacity-90 transition-opacity pointer-events-auto"
-                  style={{
-                    fontSize: `${baseFontSize}rem`,
-                    fontWeight: "bold",
-                    color: "#FFF",
-                    opacity: index === activeSocialIndex ? 1 : 0.2,
-                    transform: `translateY(${(index - activeSocialIndex) * verticalSpacing}px)`,
-                    transition: "transform 0.5s ease, opacity 0.3s ease",
-                    lineHeight: 1.3,
-                    whiteSpace: "nowrap",
-                    textDecoration:
-                      index === activeSocialIndex ? "underline" : "none",
-                    textDecorationThickness: "2px",
-                    textUnderlineOffset: "8px",
-                  }}
-                >
-                  {social.name}
-                  {index === activeSocialIndex ? "." : ""}
-                </Link>
-              ))}
+              {/* Conteneur des réseaux sociaux qui défilent en dessous */}
+              <div
+                className="relative"
+                style={{
+                  height: `${socialFontSize * 1.2}rem`,
+                  marginTop: "0.5rem",
+                  marginBottom: "0.5rem",
+                }}
+              >
+                {socialNetworks.map((social, index) => (
+                  <Link
+                    key={index}
+                    href={social.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="absolute flex items-center hover:opacity-90 transition-opacity pointer-events-auto"
+                    style={{
+                      fontSize: `${socialFontSize}rem`,
+                      fontWeight: "bold",
+                      color: "#FFF",
+                      opacity: index === activeSocialIndex ? 1 : 0,
+                      transition:
+                        "opacity 0.6s ease-in-out, transform 0.4s ease-out",
+                      lineHeight: 1.2,
+                      whiteSpace: "nowrap",
+                      textDecoration:
+                        index === activeSocialIndex ? "underline" : "none",
+                      textDecorationThickness: "2px",
+                      textUnderlineOffset: "6px",
+                      left: 0,
+                    }}
+                  >
+                    {social.name}
+                    {index === activeSocialIndex ? "." : ""}
+                  </Link>
+                ))}
+              </div>
             </div>
-          </div>
+          ) : (
+            // Version desktop (format original)
+            <div className="flex items-center">
+              {/* Texte principal avec taille similaire à la hero section */}
+              <h1
+                className="text-white font-bold m-0 p-0 leading-tight"
+                style={{ fontSize: `${baseFontSize}rem` }}
+              >
+                Connect with us on
+              </h1>
+
+              {/* Espace entre le texte et les réseaux sociaux */}
+              <div className="w-4"></div>
+
+              {/* Conteneur des réseaux sociaux qui défilent */}
+              <div className="relative h-32 flex items-center">
+                {socialNetworks.map((social, index) => (
+                  <Link
+                    key={index}
+                    href={social.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="absolute flex items-center hover:opacity-90 transition-opacity pointer-events-auto"
+                    style={{
+                      fontSize: `${baseFontSize}rem`,
+                      fontWeight: "bold",
+                      color: "#FFF",
+                      opacity: index === activeSocialIndex ? 1 : 0.2,
+                      transform: `translateY(${(index - activeSocialIndex) * verticalSpacing}px)`,
+                      transition: "transform 0.5s ease, opacity 0.3s ease",
+                      lineHeight: 1.3,
+                      whiteSpace: "nowrap",
+                      textDecoration:
+                        index === activeSocialIndex ? "underline" : "none",
+                      textDecorationThickness: "2px",
+                      textUnderlineOffset: "8px",
+                    }}
+                  >
+                    {social.name}
+                    {index === activeSocialIndex ? "." : ""}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

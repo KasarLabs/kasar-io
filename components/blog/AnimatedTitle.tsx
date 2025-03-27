@@ -50,18 +50,19 @@ export default function AnimatedTitle({ titles = [] }: AnimatedTitleProps) {
   }, []);
 
   return (
-    <div className="flex flex-col mb-12">
-      <div className="h-32 flex items-center">
+    <div className="flex flex-col">
+      <div className="h-36 sm:h-40 flex items-center">
         <h1
-          className={`text-6xl font-bold transition-opacity duration-500 ${
+          className={`text-5xl sm:text-6xl font-bold transition-opacity duration-500 ${
             fadeState === "in" ? "opacity-100" : "opacity-0"
           }`}
         >
           {displayTitles[currentIndex]}
         </h1>
       </div>
-      <p className="text-gray-400 text-lg mt-4">
-        Discover our latest articles, tutorials, and news about our projects.
+      <p className="text-gray-400 text-base sm:text-lg mt-2 sm:mt-4 max-w-2xl">
+        Discover our latest articles, tutorials, and news about our projects and
+        technologies.{" "}
       </p>
     </div>
   );

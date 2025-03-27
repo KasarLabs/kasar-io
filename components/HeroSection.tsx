@@ -10,6 +10,8 @@ const HeroSection: React.FC<ScrollAnimationProps> = ({ onScrollComplete }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   // Référence à l'élément de contrôle de défilement
   const scrollControlRef = useRef<HTMLDivElement>(null);
+  // État pour suivre si l'écran est en mode mobile
+  const [isMobile, setIsMobile] = useState(false);
 
   // Définition de la liste des mots qui vont défiler (points retirés)
   const words = [
@@ -28,6 +30,22 @@ const HeroSection: React.FC<ScrollAnimationProps> = ({ onScrollComplete }) => {
   const [activeWordIndex, setActiveWordIndex] = useState(0);
   // État pour suivre si la section est complètement défilée
   const [isScrollComplete, setIsScrollComplete] = useState(false);
+
+  // Fonction pour détecter si l'écran est en mode mobile
+  useEffect(() => {
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth < 768); // Breakpoint standard pour mobile
+    };
+
+    // Vérifier initialement
+    checkIfMobile();
+
+    // Ajouter un écouteur pour les changements de taille d'écran
+    window.addEventListener("resize", checkIfMobile);
+
+    // Nettoyer l'écouteur
+    return () => window.removeEventListener("resize", checkIfMobile);
+  }, []);
 
   // Fonction pour calculer la hauteur de la section de défilement
   useEffect(() => {
@@ -103,8 +121,12 @@ const HeroSection: React.FC<ScrollAnimationProps> = ({ onScrollComplete }) => {
     };
   }, [words.length, isScrollComplete, onScrollComplete]);
 
-  // Calculer la nouvelle taille de police (80% de l'original)
-  const baseFontSize = 4.8; // 6rem * 0.8 = 4.8rem (réduction de 20%)
+  // Calculer la taille de police responsive
+  const baseFontSize = isMobile ? 2.8 : 4.8; // Plus petit pour mobile
+
+  // Tailles distinctes pour le mobile
+  const mobilePrimaryTextSize = 4; // Taille pour "Build your next gen" et "with us"
+  const mobileWordSize = 2.8; // Taille pour les mots qui défilent
 
   // Augmente l'espacement vertical entre les mots
   const verticalSpacing = 90; // Augmenté depuis 80px
@@ -137,7 +159,7 @@ const HeroSection: React.FC<ScrollAnimationProps> = ({ onScrollComplete }) => {
 
       {/* Contenu fixe qui reste à l'écran pendant le défilement */}
       <div
-        className="fixed top-0 left-0 w-full h-screen flex items-center p-8"
+        className={`fixed top-0 left-0 w-full h-screen flex items-center ${isMobile ? "p-5" : "p-8"}`}
         style={{
           opacity: isScrollComplete ? 0 : 1,
           transition: "opacity 0.5s ease-in-out",
@@ -146,53 +168,111 @@ const HeroSection: React.FC<ScrollAnimationProps> = ({ onScrollComplete }) => {
         }}
       >
         {/* Conteneur aligné à gauche avec marge */}
-        <div className="flex flex-col ml-12">
-          {/* Conteneur pour aligner "Build your next gen" et les mots */}
-          <div className="flex items-center">
-            {/* Texte principal avec taille réduite de 20% */}
-            <h1
-              className="text-white font-bold m-0 p-0 leading-tight"
-              style={{ fontSize: `${baseFontSize}rem` }}
-            >
-              Build your next gen
-            </h1>
+        <div className={`flex flex-col ${isMobile ? "ml-4" : "ml-12"}`}>
+          {isMobile ? (
+            // Layout mobile - format vertical
+            <>
+              {/* Texte principal avec taille réduite pour mobile */}
+              <h1
+                className="text-white font-bold m-0 p-0 leading-tight"
+                style={{ fontSize: `${mobilePrimaryTextSize}rem` }}
+              >
+                Build your next gen
+              </h1>
 
-            {/* Espace entre le texte et les mots */}
-            <div className="w-4"></div>
+              {/* Conteneur des mots qui défilent - format vertical */}
+              <div
+                className="relative"
+                style={{
+                  height: `${mobileWordSize * 1.2}rem`,
+                  marginTop: "0.5rem",
+                  marginBottom: "0.5rem",
+                }}
+              >
+                {words.map((word, index) => (
+                  <div
+                    key={index}
+                    className="absolute"
+                    style={{
+                      fontSize: `${mobileWordSize}rem`,
+                      fontWeight: "bold",
+                      color: colors[index % colors.length],
+                      opacity: index === activeWordIndex ? 1 : 0,
+                      transform: "translateY(0)",
+                      transition:
+                        "opacity 0.6s ease-in-out, transform 0.4s ease-out",
+                      lineHeight: 1.2,
+                      whiteSpace: "nowrap",
+                      left: 0,
+                    }}
+                  >
+                    {word}
+                  </div>
+                ))}
+              </div>
 
-            {/* Conteneur des mots qui défilent - augmenté en hauteur */}
-            <div className="relative h-32 flex items-center">
-              {words.map((word, index) => (
-                <div
-                  key={index}
-                  className="absolute"
-                  style={{
-                    fontSize: `${baseFontSize}rem`,
-                    fontWeight: "bold",
-                    color: colors[index % colors.length],
-                    // Inverse l'opacité: le mot actif est à 100%, les autres à 50%
-                    opacity: index === activeWordIndex ? 1 : 0.2,
-                    // Animation de déplacement vertical avec espacement augmenté
-                    transform: `translateY(${(index - activeWordIndex) * verticalSpacing}px)`,
-                    transition:
-                      "transform 0.3s ease-out, opacity 0.2s ease-out",
-                    lineHeight: 1.3, // Augmenté pour plus d'espacement vertical
-                    whiteSpace: "nowrap",
-                  }}
+              {/* "with us" en dessous */}
+              <h1
+                className="text-white font-bold ml-0 p-0 mb-12"
+                style={{
+                  fontSize: `${mobilePrimaryTextSize}rem`,
+                  marginTop: "0.5rem",
+                }}
+              >
+                with us.
+              </h1>
+            </>
+          ) : (
+            // Layout desktop original - format horizontal
+            <>
+              {/* Conteneur pour aligner "Build your next gen" et les mots */}
+              <div className="flex items-center">
+                {/* Texte principal */}
+                <h1
+                  className="text-white font-bold m-0 p-0 leading-tight"
+                  style={{ fontSize: `${baseFontSize}rem` }}
                 >
-                  {word}
-                </div>
-              ))}
-            </div>
-          </div>
+                  Build your next gen
+                </h1>
 
-          {/* Ajout de "with us" en dessous avec plus d'espace en dessous */}
-          <h1
-            className="text-white font-bold mt-2 ml-0 p-0 mb-24" // Ajout de mb-24 pour plus d'espace en dessous
-            style={{ fontSize: `${baseFontSize}rem` }}
-          >
-            with us.
-          </h1>
+                {/* Espace entre le texte et les mots */}
+                <div className="w-4"></div>
+
+                {/* Conteneur des mots qui défilent - augmenté en hauteur */}
+                <div className="relative h-32 flex items-center">
+                  {words.map((word, index) => (
+                    <div
+                      key={index}
+                      className="absolute"
+                      style={{
+                        fontSize: `${baseFontSize}rem`,
+                        fontWeight: "bold",
+                        color: colors[index % colors.length],
+                        // Inverse l'opacité: le mot actif est à 100%, les autres à 50%
+                        opacity: index === activeWordIndex ? 1 : 0.2,
+                        // Animation de déplacement vertical avec espacement augmenté
+                        transform: `translateY(${(index - activeWordIndex) * verticalSpacing}px)`,
+                        transition:
+                          "transform 0.3s ease-out, opacity 0.2s ease-out",
+                        lineHeight: 1.3, // Augmenté pour plus d'espacement vertical
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {word}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Ajout de "with us" en dessous avec plus d'espace en dessous */}
+              <h1
+                className="text-white font-bold mt-2 ml-0 p-0 mb-24" // Ajout de mb-24 pour plus d'espace en dessous
+                style={{ fontSize: `${baseFontSize}rem` }}
+              >
+                with us.
+              </h1>
+            </>
+          )}
         </div>
       </div>
     </div>

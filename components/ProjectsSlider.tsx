@@ -216,12 +216,33 @@ export default function ProjectSlider({}: ProjectProps) {
       <div ref={scrollControlRef} className="w-full absolute top-0 left-0" />
 
       {/* Animation en arrière-plan complète - fixed to keep it on screen while scrolling */}
-      <div className="fixed inset-0" style={{ pointerEvents: "none" }}>
+      <div
+        className="fixed inset-0 z-0 opacity-90"
+        style={{ pointerEvents: "none" }}
+      >
         <UnifiedAsciiAnimation currentSlide={asciiState} />
       </div>
 
+      {/* Indicateurs de slide repositionnés en bas pour éviter tout chevauchement */}
+      <div className="fixed bottom-8 left-0 right-0 md:left-8 md:right-auto md:bottom-auto md:top-1/2 md:-translate-y-1/2 flex justify-center md:justify-start md:flex-col z-50">
+        <div className="flex flex-row md:flex-col space-x-2 md:space-x-0 md:space-y-2">
+          {slides.map((slide, index) => (
+            <button
+              key={slide.id}
+              className={`transition-all duration-300 ${
+                index === currentSlide
+                  ? "bg-white w-6 md:w-4 h-1.5"
+                  : "bg-neutral-600 w-1.5 h-1.5"
+              } rounded-full`}
+              onClick={() => goToSlide(index)}
+              aria-label={`Go to slide ${index + 1}`}
+            />
+          ))}
+        </div>
+      </div>
+
       <div
-        className="w-full px-6 md:px-12 lg:px-16 py-16 fixed top-0 left-0 z-10 min-h-screen flex flex-col justify-center"
+        className="w-full px-4 sm:px-6 md:px-12 lg:px-16 py-8 sm:py-16 fixed top-0 left-0 z-20 min-h-screen flex flex-col justify-center"
         style={{ pointerEvents: "auto" }}
       >
         <div className="max-w-4xl mx-auto lg:mx-0 w-full">
@@ -267,8 +288,8 @@ export default function ProjectSlider({}: ProjectProps) {
             </div>
           </div>
 
-          {/* Conteneur pour l'animation de titre */}
-          <div className="h-16 mb-4 overflow-hidden relative">
+          {/* Conteneur pour l'animation de titre avec hauteur fixe augmentée */}
+          <div className="h-24 sm:h-28 mb-4 overflow-hidden relative">
             {/* Titre actuel */}
             <div
               className="absolute w-full"
@@ -281,20 +302,25 @@ export default function ProjectSlider({}: ProjectProps) {
                 opacity: isTransitioning ? 0 : 1,
               }}
             >
-              <div className="flex items-center gap-4">
+              <div className="flex items-start gap-4">
                 {currentSlide === 1 && (
                   <a
                     href="https://www.starkagent.ai"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center"
+                    className="flex items-start min-w-[100px] min-h-[100px] pt-2"
                   >
                     <Image
                       src="/images/snak-logo.png"
                       alt="SNAK Logo"
                       width={84}
                       height={84}
-                      className="hover:opacity-80 transition-opacity"
+                      className="hover:opacity-80 transition-opacity object-contain"
+                      style={{
+                        objectFit: "contain",
+                        maxWidth: "100%",
+                        maxHeight: "100%",
+                      }}
                     />
                   </a>
                 )}
@@ -303,18 +329,18 @@ export default function ProjectSlider({}: ProjectProps) {
                     href="#"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center"
+                    className="flex items-start min-w-[60px] min-h-[60px] pt-2"
                   >
                     <Image
                       src="/images/quaza-no-bg.png"
                       alt="Quaza Logo"
                       width={60}
                       height={60}
-                      className="hover:opacity-80 transition-opacity mr-3"
+                      className="hover:opacity-80 transition-opacity mr-3 object-contain"
                     />
                   </a>
                 )}
-                <h1 className="text-4xl lg:text-5xl font-bold">
+                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold pt-4">
                   {currentSlide !== 2 ? slides[currentSlide].title : ""}
                 </h1>
               </div>
@@ -333,14 +359,15 @@ export default function ProjectSlider({}: ProjectProps) {
                     "slideUp 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards",
                 }}
               >
-                <div className="flex items-center gap-4">
+                <div className="flex items-start gap-4">
                   {(currentSlide + 1) % slides.length === 0 && (
-                    <div className="mr-3">
+                    <div className="mr-3 min-w-[128px] min-h-[128px] pt-2">
                       <Image
                         src="/images/sn-logo-white.png"
                         alt="SN Stack Logo"
                         width={128}
                         height={128}
+                        className="object-contain"
                       />
                     </div>
                   )}
@@ -349,14 +376,19 @@ export default function ProjectSlider({}: ProjectProps) {
                       href="https://www.starkagent.ai"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center"
+                      className="flex items-start min-w-[70px] min-h-[70px] pt-2"
                     >
                       <Image
                         src="/images/snak-logo.png"
                         alt="SNAK Logo"
                         width={48}
                         height={48}
-                        className="hover:opacity-80 transition-opacity mr-3"
+                        className="hover:opacity-80 transition-opacity mr-3 object-contain"
+                        style={{
+                          objectFit: "contain",
+                          maxWidth: "100%",
+                          maxHeight: "100%",
+                        }}
                       />
                     </a>
                   )}
@@ -365,18 +397,18 @@ export default function ProjectSlider({}: ProjectProps) {
                       href="#"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center"
+                      className="flex items-start min-w-[80px] min-h-[80px] pt-2"
                     >
                       <Image
                         src="/images/quaza-no-bg.png"
                         alt="Quaza Logo"
                         width={80}
                         height={80}
-                        className="hover:opacity-80 transition-opacity mr-3"
+                        className="hover:opacity-80 transition-opacity mr-3 object-contain"
                       />
                     </a>
                   )}
-                  <h1 className="text-4xl lg:text-5xl font-bold">
+                  <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold pt-4">
                     {(currentSlide + 1) % slides.length !== 2
                       ? slides[(currentSlide + 1) % slides.length].title
                       : ""}
@@ -387,7 +419,7 @@ export default function ProjectSlider({}: ProjectProps) {
           </div>
 
           {/* Conteneur pour l'animation de description avec hauteur auto */}
-          <div className="mb-8 overflow-hidden relative">
+          <div className="mb-8 overflow-hidden relative max-w-md md:max-w-xl lg:max-w-2xl">
             {/* Description actuelle */}
             <div
               className="w-full"
@@ -400,7 +432,7 @@ export default function ProjectSlider({}: ProjectProps) {
                 position: isTransitioning ? "absolute" : "relative",
               }}
             >
-              <p className="text-base text-neutral-300 max-w-2xl leading-relaxed">
+              <p className="text-sm sm:text-base text-neutral-300 max-w-2xl leading-relaxed">
                 {slides[currentSlide].description}
               </p>
             </div>
@@ -418,16 +450,16 @@ export default function ProjectSlider({}: ProjectProps) {
                     "slideUp 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards",
                 }}
               >
-                <p className="text-base text-neutral-300 max-w-2xl leading-relaxed font-light">
+                <p className="text-sm sm:text-base text-neutral-300 max-w-2xl leading-relaxed font-light">
                   {slides[(currentSlide + 1) % slides.length].description}
                 </p>
               </div>
             )}
           </div>
 
-          {/* Boutons - avec animation de fondu simple */}
+          {/* Boutons - améliorés pour affichage responsive et en ligne */}
           <div
-            className="flex flex-col sm:flex-row gap-3 relative"
+            className="flex flex-row gap-2 sm:gap-3 relative overflow-x-auto pb-2 no-scrollbar md:flex-wrap"
             style={{
               transition: "opacity 0.5s ease",
               opacity: isTransitioning ? 0.5 : 1,
@@ -438,17 +470,17 @@ export default function ProjectSlider({}: ProjectProps) {
             <Link
               href={slides[currentSlide].primaryLink.url}
               target="_blank"
-              className="inline-flex items-center px-6 py-3 rounded-2xl bg-white text-black font-medium transition-all hover:bg-neutral-200 hover:scale-105 text-sm"
+              className="inline-flex items-center justify-center px-4 sm:px-5 md:px-6 py-2 sm:py-3 rounded-2xl bg-white text-black font-medium transition-all hover:bg-neutral-200 hover:scale-105 text-xs sm:text-sm whitespace-nowrap min-w-fit"
             >
-              {slides[currentSlide].primaryLink.text}{" "}
+              {slides[currentSlide].primaryLink.text}
             </Link>
 
             <Link
               href={slides[currentSlide].secondaryLink.url}
               target="_blank"
-              className="inline-flex items-center px-6 py-3 rounded-2xl bg-transparent border border-white text-white font-medium transition-all hover:bg-white hover:bg-opacity-5 hover:scale-105 text-sm"
+              className="inline-flex items-center justify-center px-4 sm:px-5 md:px-6 py-2 sm:py-3 rounded-2xl bg-transparent border border-white text-white font-medium transition-all hover:bg-white hover:bg-opacity-5 hover:scale-105 text-xs sm:text-sm whitespace-nowrap min-w-fit"
             >
-              {slides[currentSlide].secondaryLink.text}{" "}
+              {slides[currentSlide].secondaryLink.text}
             </Link>
 
             {/* Afficher le troisième lien seulement s'il existe */}
@@ -456,9 +488,9 @@ export default function ProjectSlider({}: ProjectProps) {
               <Link
                 href={slides[currentSlide].terceraryLink.url}
                 target="_blank"
-                className="inline-flex items-center px-6 py-3 rounded-2xl bg-transparent border border-white text-white font-medium transition-all hover:bg-white hover:bg-opacity-5 hover:scale-105 text-sm"
+                className="inline-flex items-center justify-center px-4 sm:px-5 md:px-6 py-2 sm:py-3 rounded-2xl bg-transparent border border-white text-white font-medium transition-all hover:bg-white hover:bg-opacity-5 hover:scale-105 text-xs sm:text-sm whitespace-nowrap min-w-fit"
               >
-                {slides[currentSlide].terceraryLink.text}{" "}
+                {slides[currentSlide].terceraryLink.text}
               </Link>
             )}
 
@@ -466,27 +498,13 @@ export default function ProjectSlider({}: ProjectProps) {
             {slides[currentSlide].quartenaryLink && (
               <Link
                 href={slides[currentSlide].quartenaryLink.url}
-                className="inline-flex items-center px-6 py-3 rounded-2xl bg-transparent border border-white text-white font-medium transition-all hover:bg-white hover:bg-opacity-5 hover:scale-105 text-sm"
+                className="inline-flex items-center justify-center px-4 sm:px-5 md:px-6 py-2 sm:py-3 rounded-2xl bg-transparent border border-white text-white font-medium transition-all hover:bg-white hover:bg-opacity-5 hover:scale-105 text-xs sm:text-sm whitespace-nowrap min-w-fit"
               >
-                {slides[currentSlide].quartenaryLink.text}{" "}
+                {slides[currentSlide].quartenaryLink.text}
               </Link>
             )}
           </div>
         </div>
-      </div>
-
-      {/* Indicateurs de slide déplacés à gauche */}
-      <div className="fixed left-8 top-1/2 transform -translate-y-1/2 flex flex-col space-y-2">
-        {slides.map((slide, index) => (
-          <button
-            key={slide.id}
-            className={`h-1.5 transition-all duration-300 ${
-              index === currentSlide ? "bg-white w-4" : "bg-neutral-600 w-1.5"
-            } rounded-full`}
-            onClick={() => goToSlide(index)}
-            aria-label={`Go to slide ${index + 1}`}
-          />
-        ))}
       </div>
 
       {/* Indicateur de défilement combiné (original + icône) */}
@@ -566,6 +584,15 @@ export default function ProjectSlider({}: ProjectProps) {
         html {
           scrollbar-width: thin;
           scrollbar-color: rgba(255, 255, 255, 0.3) rgba(0, 0, 0, 0.2);
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+
+        .no-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
         }
       `}</style>
     </div>

@@ -12,7 +12,7 @@ const Footer = () => {
       {" "}
       {/* Changed from fixed to relative, added mt-auto */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
           {/* Column 1 - KasarLabs Logo and Terms */}
           <div className="flex flex-col items-center sm:items-start space-y-4">
             <div className="w-[125px] sm:w-[140px]">
@@ -61,21 +61,66 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Column 2 - Resources */}
+          {/* Column 2 - Projects */}
+          <div className="text-center sm:text-left">
+            <h3 className="text-white font-semibold mb-3 md:mb-4 text-base md:text-lg">
+              Projects
+            </h3>
+            <ul className="space-y-2 md:space-y-3">
+              <li>
+                <a
+                  href="https://starknet.io/sn-stack"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-neutral-400 hover:text-white text-sm md:text-base transition-colors"
+                >
+                  SN Stack
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://starkagent.ai"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-neutral-400 hover:text-white text-sm md:text-base transition-colors"
+                >
+                  Snak
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://quaza.io"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-neutral-400 hover:text-white text-sm md:text-base transition-colors"
+                >
+                  Quaza
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          {/* Column 3 - Resources */}
           <div className="text-center sm:text-left">
             <h3 className="text-white font-semibold mb-3 md:mb-4 text-base md:text-lg">
               Resources
             </h3>
             <ul className="space-y-2 md:space-y-3">
               <li>
-                <a
-                  href="https://www.starknet.io"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <Link
+                  href="/blog"
                   className="text-neutral-400 hover:text-white text-sm md:text-base transition-colors"
                 >
-                  Starknet
-                </a>
+                  Blog
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/about"
+                  className="text-neutral-400 hover:text-white text-sm md:text-base transition-colors"
+                >
+                  About
+                </Link>
               </li>
               <li>
                 <a
@@ -90,34 +135,46 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Column 3 - Contact Us */}
+          {/* Column 4 - Contact Us */}
           <div className="text-center sm:text-left">
             <h3 className="text-white font-semibold mb-3 md:mb-4 text-base md:text-lg">
               Contact us
             </h3>
-            <div className="flex justify-center sm:justify-start space-x-4 md:space-x-6">
-              <Link
-                href="https://twitter.com/kasarlabs"
-                target="_blank"
-                className="text-neutral-400 hover:text-white transition-colors"
-              >
-                <BsTwitter className="w-5 h-5 sm:w-6 sm:h-6" />
-              </Link>
-              <Link
-                href="https://t.me/+jZZuOamlUM5lNWNk"
-                target="_blank"
-                className="text-neutral-400 hover:text-white transition-colors"
-              >
-                <BsTelegram className="w-5 h-5 sm:w-6 sm:h-6" />
-              </Link>
-              <Link
-                href="https://github.com/kasarlabs"
-                target="_blank"
-                className="text-neutral-400 hover:text-white transition-colors"
-              >
-                <BsGithub className="w-5 h-5 sm:w-6 sm:h-6" />
-              </Link>
-            </div>
+            <ul className="space-y-2 md:space-y-3">
+              <li>
+                <a
+                  href="mailto:contact@kasar.io"
+                  className="text-neutral-400 hover:text-white text-sm md:text-base transition-colors"
+                >
+                  contact@kasar.io
+                </a>
+              </li>
+              <li className="pt-2">
+                <div className="flex justify-center sm:justify-start space-x-4 md:space-x-6">
+                  <Link
+                    href="https://twitter.com/kasarlabs"
+                    target="_blank"
+                    className="text-neutral-400 hover:text-white transition-colors"
+                  >
+                    <BsTwitter className="w-5 h-5 sm:w-6 sm:h-6" />
+                  </Link>
+                  <Link
+                    href="https://t.me/kasarlabs"
+                    target="_blank"
+                    className="text-neutral-400 hover:text-white transition-colors"
+                  >
+                    <BsTelegram className="w-5 h-5 sm:w-6 sm:h-6" />
+                  </Link>
+                  <Link
+                    href="https://github.com/kasarlabs"
+                    target="_blank"
+                    className="text-neutral-400 hover:text-white transition-colors"
+                  >
+                    <BsGithub className="w-5 h-5 sm:w-6 sm:h-6" />
+                  </Link>
+                </div>
+              </li>
+            </ul>
           </div>
         </div>
 

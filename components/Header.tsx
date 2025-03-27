@@ -3,14 +3,22 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, X } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
+  const toggleButtonRef = useRef<HTMLButtonElement>(null);
   const pathname = usePathname();
+
+  // Fonction pour basculer le menu mobile
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen((prevState) => !prevState);
+    // Log pour le débogage
+    console.log("Menu mobile toggled:", !mobileMenuOpen);
+  };
 
   // Handle clicking outside to close dropdown
   useEffect(() => {
@@ -21,13 +29,39 @@ export default function Header() {
       ) {
         setDropdownOpen(false);
       }
+
+      // Fermer le menu mobile si on clique en dehors des liens ET du bouton
+      if (
+        mobileMenuOpen &&
+        mobileMenuRef.current &&
+        !mobileMenuRef.current.contains(event.target as Node) &&
+        toggleButtonRef.current &&
+        !toggleButtonRef.current.contains(event.target as Node)
+      ) {
+        setMobileMenuOpen(false);
+      }
     }
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, []);
+  }, [mobileMenuOpen]);
+
+  // Effet pour gérer le scroll lorsque le menu mobile est ouvert
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+      console.log("Menu is open, overflow hidden");
+    } else {
+      document.body.style.overflow = "auto";
+      console.log("Menu is closed, overflow auto");
+    }
+
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [mobileMenuOpen]);
 
   // Comportement amélioré pour la navigation
   useEffect(() => {
@@ -56,6 +90,9 @@ export default function Header() {
     };
 
     resetPageState();
+
+    // Fermer le menu mobile lors d'un changement de page
+    setMobileMenuOpen(false);
   }, [pathname]);
 
   // Effet pour gérer la navigation avec hash lors du chargement de la page
@@ -65,19 +102,21 @@ export default function Header() {
       // Attendre que la page soit complètement chargée
       setTimeout(() => {
         const targetId = window.location.hash.substring(1); // Enlève le # du début
-        const targetElement = document.getElementById(targetId) || 
-                              document.querySelector(`[class*="${targetId}"]`) || 
-                              document.querySelector(`[data-slide-id="1"]`) || 
-                              document.querySelector(`[data-ascii-state="1"]`);
-        
+        const targetElement =
+          document.getElementById(targetId) ||
+          document.querySelector(`[class*="${targetId}"]`) ||
+          document.querySelector(`[data-slide-id="1"]`) ||
+          document.querySelector(`[data-ascii-state="1"]`);
+
         if (targetElement) {
           const headerHeight = 80;
           const elementPosition = targetElement.getBoundingClientRect().top;
-          const offsetPosition = elementPosition + window.scrollY - headerHeight;
-          
+          const offsetPosition =
+            elementPosition + window.scrollY - headerHeight;
+
           window.scrollTo({
             top: offsetPosition,
-            behavior: "smooth"
+            behavior: "smooth",
           });
         }
       }, 500); // Délai pour s'assurer que tous les éléments sont chargés
@@ -149,6 +188,9 @@ export default function Header() {
     setMobileMenuOpen(false);
   };
 
+  // Log pour le rendu
+  console.log("Rendering header, mobileMenuOpen:", mobileMenuOpen);
+
   return (
     <header className="w-full z-50 sticky top-0">
       <nav className="h-20 px-4 backdrop-blur-sm md:px-6">
@@ -218,34 +260,38 @@ export default function Header() {
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden p-2 text-gray-300 hover:text-white"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            ref={toggleButtonRef}
+            className="md:hidden w-12 h-12 bg-transparent border border-white border-2 rounded-2xl transition-all hover:bg-gray-200"
+            onClick={toggleMobileMenu}
             aria-label="Toggle menu"
-          >
-            {mobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
-          </button>
+          ></button>
         </div>
 
-        {/* Mobile Menu */}
-        {mobileMenuOpen && (
-          <div className="md:hidden absolute top-20 left-0 right-0 backdrop-blur-sm py-4 px-6 space-y-4">
+        {/* Mobile Menu - Full Screen */}
+        <div
+          className={`fixed inset-0 top-20 left-0 right-0 bottom-0 w-full h-[calc(100vh-80px)] z-[9999] transition-all duration-300 md:hidden ${
+            mobileMenuOpen ? "opacity-100 visible" : "opacity-0 invisible"
+          }`}
+          style={{ backgroundColor: "rgba(0, 0, 0, 0.95)" }}
+        >
+          <div className="h-full flex flex-col items-end justify-between py-16 px-8">
             <a
               href="#projects-slider"
               onClick={scrollToProjects}
-              className="block text-gray-300 hover:text-white font-calibre-medium text-lg hover:bg-black py-2 px-4 rounded-lg transition-all font-bold"
+              className="text-white font-calibre-medium text-[56px] font-bold mr-4 px-4 py-2 hover:bg-black hover:bg-opacity-50 rounded"
             >
               Projects
             </a>
             <Link
               href="/about"
-              className="block text-gray-300 hover:text-white font-calibre-medium text-lg hover:bg-black py-2 px-4 rounded-lg transition-all font-bold"
+              className="text-white font-calibre-medium text-[56px] font-bold mr-4 px-4 py-2 hover:bg-black hover:bg-opacity-50 rounded"
               onClick={() => setMobileMenuOpen(false)}
             >
               About
             </Link>
             <Link
               href="/blog"
-              className="block text-gray-300 hover:text-white font-calibre-medium text-lg hover:bg-black py-2 px-4 rounded-lg transition-all font-bold"
+              className="text-white font-calibre-medium text-[56px] font-bold mr-4 px-4 py-2 hover:bg-black hover:bg-opacity-50 rounded"
               onClick={() => setMobileMenuOpen(false)}
             >
               Blog
@@ -254,13 +300,13 @@ export default function Header() {
               href="https://github.com/kasarlabs"
               target="_blank"
               rel="noopener noreferrer"
-              className="block text-gray-300 hover:text-white font-calibre-medium text-lg hover:bg-black py-2 px-4 rounded-lg transition-all font-bold"
+              className="text-white font-calibre-medium text-[56px] font-bold mr-4 px-4 py-2 hover:bg-black hover:bg-opacity-50 rounded"
               onClick={() => setMobileMenuOpen(false)}
             >
               GitHub
             </a>
           </div>
-        )}
+        </div>
       </nav>
     </header>
   );
